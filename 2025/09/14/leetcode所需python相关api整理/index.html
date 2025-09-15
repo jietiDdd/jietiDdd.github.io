@@ -27,7 +27,7 @@
 <meta property="og:description" content="Python 刷 LeetCode时常用的 list 方法 1. 列表创建与访问 创建：nums &#x3D; [1, 2, 3] 访问单个元素：nums[0]，nums[-1] 切片：nums[1:3]，nums[:]，nums[::-1]（逆序）   2. 增加元素 尾部添加：nums.append(x) 任意位置插入：nums.insert(i, x) 合并另一个列表：nums.extend([4,5">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-09-14T05:18:52.000Z">
-<meta property="article:modified_time" content="2025-09-14T06:56:57.580Z">
+<meta property="article:modified_time" content="2025-09-15T08:05:22.213Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="leetcode">
 <meta name="twitter:card" content="summary_large_image">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.4k 字
+          3.5k 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          21 分钟
+          29 分钟
         
       </span>
     
@@ -644,6 +644,172 @@
 </ul>
 <hr>
 <p>这些用法覆盖了 LeetCode 刷题绝大多数 <code>enumerate()</code> 高频场景</p>
+<h1 id="Python-刷-LeetCode时常用的栈（stack）用法"><a href="#Python-刷-LeetCode时常用的栈（stack）用法" class="headerlink" title="Python 刷 LeetCode时常用的栈（stack）用法"></a>Python 刷 LeetCode时常用的栈（stack）用法</h1><hr>
+<h2 id="1-栈的基本定义"><a href="#1-栈的基本定义" class="headerlink" title="1. 栈的基本定义"></a>1. 栈的基本定义</h2><ul>
+<li>栈是一种**后进先出（LIFO）**的数据结构。</li>
+<li>Python 没有专门的 stack 类型，通常用**列表（list）**实现。</li>
+</ul>
+<hr>
+<h2 id="2-创建和基本操作"><a href="#2-创建和基本操作" class="headerlink" title="2. 创建和基本操作"></a>2. 创建和基本操作</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">stack = []        <span class="hljs-comment"># 创建空栈</span><br><br>stack.append(x)   <span class="hljs-comment"># 入栈</span><br>top = stack.pop() <span class="hljs-comment"># 出栈（弹出栈顶元素）</span><br>peek = stack[-<span class="hljs-number">1</span>]  <span class="hljs-comment"># 取栈顶元素（不弹出）</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-高频LeetCode场景-1"><a href="#3-高频LeetCode场景-1" class="headerlink" title="3. 高频LeetCode场景"></a>3. 高频LeetCode场景</h2><ul>
+<li><strong>括号匹配</strong>、<strong>逆序输出</strong>、<strong>单调栈</strong>、<strong>最近较大&#x2F;较小元素</strong>等题目</li>
+<li>递归模拟</li>
+<li>DFS（深度优先搜索）非递归写法</li>
+</ul>
+<hr>
+<h2 id="4-单调栈模板"><a href="#4-单调栈模板" class="headerlink" title="4. 单调栈模板"></a>4. 单调栈模板</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">stack = []<br><span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> arr:<br>    <span class="hljs-keyword">while</span> stack <span class="hljs-keyword">and</span> x &lt; stack[-<span class="hljs-number">1</span>]:<br>        stack.pop()<br>    stack.append(x)<br></code></pre></td></tr></table></figure>
+<ul>
+<li>用于处理“下一个更小&#x2F;更大元素”问题</li>
+</ul>
+<hr>
+<h2 id="5-判断栈空"><a href="#5-判断栈空" class="headerlink" title="5. 判断栈空"></a>5. 判断栈空</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> stack:<br>    <span class="hljs-comment"># 栈为空</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-其他"><a href="#6-其他" class="headerlink" title="6. 其他"></a>6. 其他</h2><ul>
+<li><code>collections.deque</code> 也可以当栈用，但 LeetCode 常用 list</li>
+<li><code>stack.pop()</code> 若栈为空会抛异常，可用 <code>if stack:</code> 先判断</li>
+<li>不要用 <code>insert(0, x)</code>&#x2F;<code>pop(0)</code>，那是队列操作</li>
+</ul>
+<hr>
+<h2 id="7-总结"><a href="#7-总结" class="headerlink" title="7. 总结"></a>7. 总结</h2><ul>
+<li>Python 用 list 实现栈，<code>append</code> 入栈，<code>pop</code> 出栈</li>
+<li>高频题型：括号、单调栈、DFS等</li>
+<li>适用于需要<strong>逆序处理</strong>或<strong>回溯</strong>的场景</li>
+</ul>
+<h1 id="Python-刷-LeetCode时常用的队列（queue）用法"><a href="#Python-刷-LeetCode时常用的队列（queue）用法" class="headerlink" title="Python 刷 LeetCode时常用的队列（queue）用法"></a>Python 刷 LeetCode时常用的队列（queue）用法</h1><hr>
+<h2 id="1-队列的基本定义"><a href="#1-队列的基本定义" class="headerlink" title="1. 队列的基本定义"></a>1. 队列的基本定义</h2><ul>
+<li>队列是一种**先进先出（FIFO）**的数据结构。</li>
+<li>Python 标准库没有专门的 queue 类型，但常用这两种实现：<ul>
+<li><code>collections.deque</code></li>
+<li><code>queue.Queue</code>（多线程场景用）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="2-用-list-实现队列（不推荐）"><a href="#2-用-list-实现队列（不推荐）" class="headerlink" title="2. 用 list 实现队列（不推荐）"></a>2. 用 list 实现队列（不推荐）</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">q = []<br>q.append(x)     <span class="hljs-comment"># 入队（到尾部）</span><br>x = q.pop(<span class="hljs-number">0</span>)    <span class="hljs-comment"># 出队（从头部）</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li><strong>不推荐</strong>：<code>pop(0)</code> 时间复杂度 O(n)，慢！</li>
+</ul>
+<hr>
+<h2 id="3-推荐用-deque-实现队列"><a href="#3-推荐用-deque-实现队列" class="headerlink" title="3. 推荐用 deque 实现队列"></a>3. 推荐用 deque 实现队列</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br>q = deque()<br>q.append(x)     <span class="hljs-comment"># 入队</span><br>x = q.popleft() <span class="hljs-comment"># 出队</span><br></code></pre></td></tr></table></figure>
+<ul>
+<li><code>popleft()</code> 时间复杂度 O(1)，高效！</li>
+</ul>
+<hr>
+<h2 id="4-常见LeetCode题型"><a href="#4-常见LeetCode题型" class="headerlink" title="4. 常见LeetCode题型"></a>4. 常见LeetCode题型</h2><ul>
+<li>BFS（广度优先搜索）模板</li>
+<li>层序遍历</li>
+<li>滑动窗口</li>
+</ul>
+<h3 id="BFS队列模板"><a href="#BFS队列模板" class="headerlink" title="BFS队列模板"></a>BFS队列模板</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> deque<br><br>q = deque()<br>q.append(start)<br>visited = <span class="hljs-built_in">set</span>([start])<br><br><span class="hljs-keyword">while</span> q:<br>    node = q.popleft()<br>    <span class="hljs-comment"># 扩展邻居</span><br>    <span class="hljs-keyword">for</span> nei <span class="hljs-keyword">in</span> graph[node]:<br>        <span class="hljs-keyword">if</span> nei <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> visited:<br>            q.append(nei)<br>            visited.add(nei)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-其他用法"><a href="#5-其他用法" class="headerlink" title="5. 其他用法"></a>5. 其他用法</h2><ul>
+<li><code>len(q)</code> 获取队列长度</li>
+<li><code>q[0]</code> 获取队首元素，不弹出</li>
+<li><code>q.clear()</code> 清空队列</li>
+</ul>
+<hr>
+<h2 id="6-多线程场景"><a href="#6-多线程场景" class="headerlink" title="6. 多线程场景"></a>6. 多线程场景</h2><ul>
+<li>用 <code>queue.Queue</code> 更安全，支持线程同步</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> queue <span class="hljs-keyword">import</span> Queue<br><br>q = Queue()<br>q.put(x)      <span class="hljs-comment"># 入队</span><br>x = q.get()   <span class="hljs-comment"># 出队</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="7-总结-1"><a href="#7-总结-1" class="headerlink" title="7. 总结"></a>7. 总结</h2><ul>
+<li>刷题推荐用 <code>collections.deque</code> 实现队列</li>
+<li><code>append</code> 入队，<code>popleft</code> 出队，O(1)效率</li>
+<li>高频题型：BFS、层序遍历、滑动窗口</li>
+</ul>
+<h1 id="Python-any-及类似的聚合判断API介绍"><a href="#Python-any-及类似的聚合判断API介绍" class="headerlink" title="Python any() 及类似的聚合判断API介绍"></a>Python any() 及类似的聚合判断API介绍</h1><hr>
+<h2 id="1-any"><a href="#1-any" class="headerlink" title="1. any()"></a>1. any()</h2><ul>
+<li><strong>语法</strong>：<code>any(iterable)</code></li>
+<li><strong>功能</strong>：只要迭代对象里有一个元素为真（bool(x) &#x3D;&#x3D; True），就返回 True；否则返回 False。</li>
+<li><strong>刷题场景</strong>：判断是否“至少有一个”满足条件。</li>
+</ul>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">nums = [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">any</span>(nums))  <span class="hljs-comment"># True</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">any</span>(x &gt; <span class="hljs-number">10</span> <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums))  <span class="hljs-comment"># False</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="2-all"><a href="#2-all" class="headerlink" title="2. all()"></a>2. all()</h2><ul>
+<li><strong>语法</strong>：<code>all(iterable)</code></li>
+<li><strong>功能</strong>：迭代对象所有元素都为真（bool(x) &#x3D;&#x3D; True）时，返回 True；否则返回 False。</li>
+<li><strong>刷题场景</strong>：判断是否“全部”满足条件。</li>
+</ul>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">nums = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">all</span>(nums))  <span class="hljs-comment"># True</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">all</span>(x &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums))  <span class="hljs-comment"># True</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">all</span>(x &gt; <span class="hljs-number">2</span> <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> nums))  <span class="hljs-comment"># False</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="3-内置-max-min-sum"><a href="#3-内置-max-min-sum" class="headerlink" title="3. 内置 max(), min(), sum()"></a>3. 内置 max(), min(), sum()</h2><p>虽然不是布尔聚合，但常用于刷题中的“是否存在最大&#x2F;最小&#x2F;累加情况”。</p>
+<ul>
+<li><code>max(iterable)</code>: 返回最大值</li>
+<li><code>min(iterable)</code>: 返回最小值</li>
+<li><code>sum(iterable)</code>: 计算总和</li>
+</ul>
+<h3 id="配合条件判断"><a href="#配合条件判断" class="headerlink" title="配合条件判断"></a>配合条件判断</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">nums = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]<br><span class="hljs-keyword">if</span> <span class="hljs-built_in">max</span>(nums) &gt; <span class="hljs-number">2</span>:<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;有元素大于2&quot;</span>)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-filter"><a href="#4-filter" class="headerlink" title="4. filter()"></a>4. filter()</h2><ul>
+<li><strong>语法</strong>：<code>filter(function, iterable)</code></li>
+<li><strong>功能</strong>：筛选可迭代对象中满足 function 条件的元素。</li>
+<li>常和 <code>any()</code>&#x2F;<code>all()</code> 配合判定“是否有满足条件的元素”。</li>
+</ul>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">nums = [<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">0</span>]<br>positive_nums = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">filter</span>(<span class="hljs-keyword">lambda</span> x: x &gt; <span class="hljs-number">0</span>, nums))  <span class="hljs-comment"># [1, 3]</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-内置-enumerate-zip-、map"><a href="#5-内置-enumerate-zip-、map" class="headerlink" title="5. 内置 enumerate(), zip()、map()"></a>5. 内置 enumerate(), zip()、map()</h2><p>这些不是布尔聚合，但常用于组合条件判断：</p>
+<ul>
+<li><code>enumerate(iterable)</code>: 获取索引和值</li>
+<li><code>zip(a, b)</code>: 并行遍历</li>
+<li><code>map(func, iterable)</code>: 批量映射</li>
+</ul>
+<h3 id="配合-any-all"><a href="#配合-any-all" class="headerlink" title="配合 any&#x2F;all"></a>配合 any&#x2F;all</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">a = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>]<br>b = [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">4</span>]<br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">any</span>(x != y <span class="hljs-keyword">for</span> x, y <span class="hljs-keyword">in</span> <span class="hljs-built_in">zip</span>(a, b)))  <span class="hljs-comment"># True, 判断是否有不相等的元素</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="6-刷题常见场景举例"><a href="#6-刷题常见场景举例" class="headerlink" title="6. 刷题常见场景举例"></a>6. 刷题常见场景举例</h2><ul>
+<li><strong>矩阵是否存在某个值</strong>：<code>any(val == target for row in matrix for val in row)</code></li>
+<li><strong>全体条件满足</strong>：<code>all(x &gt;= 0 for x in nums)</code></li>
+<li><strong>是否有重复</strong>：<code>any(nums.count(x) &gt; 1 for x in nums)</code> 或更高效用 <code>set</code></li>
+</ul>
+<hr>
+<h2 id="7-其他相关函数"><a href="#7-其他相关函数" class="headerlink" title="7. 其他相关函数"></a>7. 其他相关函数</h2><ul>
+<li><code>set()</code>: 去重后判定</li>
+<li><code>sorted()</code>: 排序后判定</li>
+</ul>
+<hr>
+<h2 id="8-总结对比"><a href="#8-总结对比" class="headerlink" title="8. 总结对比"></a>8. 总结对比</h2><table>
+<thead>
+<tr>
+<th>API</th>
+<th>判断逻辑</th>
+<th>返回类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>any()</td>
+<td>至少有一个为真</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>all()</td>
+<td>全部都为真</td>
+<td>bool</td>
+</tr>
+<tr>
+<td>filter</td>
+<td>返回符合条件的元素</td>
+<td>可迭代对象</td>
+</tr>
+<tr>
+<td>max&#x2F;min&#x2F;sum</td>
+<td>聚合值</td>
+<td>数值</td>
+</tr>
+</tbody></table>
+<hr>
+<blockquote>
+<p>刷题时，<code>any()</code> 用于“存在性”判定，<code>all()</code> 用于“全体性”判定，经常和生成式搭配，写法简洁高效。</p>
+</blockquote>
 
                 
               </div>
@@ -733,6 +899,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2025/09/14/hot100%E6%95%B4%E7%90%86%E4%B9%8Bpython%E7%89%88/" title="hot100整理之python版">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">hot100整理之python版</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
