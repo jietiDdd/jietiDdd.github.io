@@ -27,7 +27,7 @@
 <meta property="og:description" content="Python 刷 LeetCode时常用的 list 方法 1. 列表创建与访问 创建：nums &#x3D; [1, 2, 3] 访问单个元素：nums[0]，nums[-1] 切片：nums[1:3]，nums[:]，nums[::-1]（逆序）   2. 增加元素 尾部添加：nums.append(x) 任意位置插入：nums.insert(i, x) 合并另一个列表：nums.extend([4,5">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-09-14T05:18:52.000Z">
-<meta property="article:modified_time" content="2025-09-15T08:05:22.213Z">
+<meta property="article:modified_time" content="2025-09-18T04:36:42.553Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="leetcode">
 <meta name="twitter:card" content="summary_large_image">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.5k 字
+          3.8k 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          29 分钟
+          32 分钟
         
       </span>
     
@@ -810,6 +810,52 @@
 <blockquote>
 <p>刷题时，<code>any()</code> 用于“存在性”判定，<code>all()</code> 用于“全体性”判定，经常和生成式搭配，写法简洁高效。</p>
 </blockquote>
+<h1 id="Python-的-reduce-用法介绍"><a href="#Python-的-reduce-用法介绍" class="headerlink" title="Python 的 reduce 用法介绍"></a>Python 的 <code>reduce</code> 用法介绍</h1><p><code>reduce</code> 是 Python 中一个用于将序列归约为单一值的高阶函数。它可以对序列中的元素进行累积计算，常用于累加、累乘等场景。</p>
+<hr>
+<h2 id="1-基本语法"><a href="#1-基本语法" class="headerlink" title="1. 基本语法"></a>1. 基本语法</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> reduce<br><br>reduce(function, iterable[, initializer])<br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>function</strong>：二元函数（接受两个参数，如 lambda x, y: x + y）</li>
+<li><strong>iterable</strong>：可迭代对象（如列表、元组等）</li>
+<li><strong>initializer</strong>（可选）：指定初始值</li>
+</ul>
+<hr>
+<h2 id="2-工作原理"><a href="#2-工作原理" class="headerlink" title="2. 工作原理"></a>2. 工作原理</h2><p><code>reduce</code> 会对序列的前两个元素调用函数，将结果与第三个元素继续调用函数，依次进行，直到序列处理完毕。</p>
+<p>例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> reduce<br><br>result = reduce(<span class="hljs-keyword">lambda</span> x, y: x + y, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>])<br><span class="hljs-built_in">print</span>(result)  <span class="hljs-comment"># 输出 10</span><br></code></pre></td></tr></table></figure>
+<p>过程：</p>
+<ul>
+<li>1 + 2 &#x3D; 3</li>
+<li>3 + 3 &#x3D; 6</li>
+<li>6 + 4 &#x3D; 10</li>
+</ul>
+<hr>
+<h2 id="3-使用-initializer"><a href="#3-使用-initializer" class="headerlink" title="3. 使用 initializer"></a>3. 使用 initializer</h2><p>如果提供了 <code>initializer</code>，则它会作为第一次运算的左参数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">result = reduce(<span class="hljs-keyword">lambda</span> x, y: x + y, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>], <span class="hljs-number">10</span>)<br><span class="hljs-built_in">print</span>(result)  <span class="hljs-comment"># 输出 16</span><br><span class="hljs-comment"># 10 + 1 = 11, 11 + 2 = 13, 13 + 3 = 16</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="4-常见用途示例"><a href="#4-常见用途示例" class="headerlink" title="4. 常见用途示例"></a>4. 常见用途示例</h2><h3 id="累乘"><a href="#累乘" class="headerlink" title="累乘"></a>累乘</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> reduce<br>result = reduce(<span class="hljs-keyword">lambda</span> x, y: x * y, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>])<br><span class="hljs-built_in">print</span>(result)  <span class="hljs-comment"># 输出 24</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="拼接字符串"><a href="#拼接字符串" class="headerlink" title="拼接字符串"></a>拼接字符串</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">reduce(<span class="hljs-keyword">lambda</span> x, y: x + y, [<span class="hljs-string">&#x27;a&#x27;</span>, <span class="hljs-string">&#x27;b&#x27;</span>, <span class="hljs-string">&#x27;c&#x27;</span>])  <span class="hljs-comment"># 输出 &#x27;abc&#x27;</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="求最大值"><a href="#求最大值" class="headerlink" title="求最大值"></a>求最大值</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">reduce(<span class="hljs-keyword">lambda</span> x, y: x <span class="hljs-keyword">if</span> x &gt; y <span class="hljs-keyword">else</span> y, [<span class="hljs-number">1</span>, <span class="hljs-number">5</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>])  <span class="hljs-comment"># 输出 5</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="5-注意事项-1"><a href="#5-注意事项-1" class="headerlink" title="5. 注意事项"></a>5. 注意事项</h2><ul>
+<li>如果序列为空且未指定 initializer，会报错。</li>
+<li>许多简单场景可以用内置函数（如 <code>sum</code>, <code>max</code>）替代。</li>
+<li><code>reduce</code> 在需要复杂归约时很有用。</li>
+</ul>
+<hr>
+<h2 id="6-小结"><a href="#6-小结" class="headerlink" title="6. 小结"></a>6. 小结</h2><ul>
+<li><code>reduce</code> 可以将序列归约为单一值。</li>
+<li>适合累积、合并等复杂操作。</li>
+<li>需要导入 <code>functools</code> 模块。</li>
+</ul>
+<hr>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li>官方文档：<a target="_blank" rel="noopener" href="https://docs.python.org/3/library/functools.html#functools.reduce">functools.reduce</a></li>
+</ul>
 
                 
               </div>
