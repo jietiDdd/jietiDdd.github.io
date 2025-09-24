@@ -27,7 +27,7 @@
 <meta property="og:description" content="lecture2: File System 1使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据  single-node inode-based filesystem文件包">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/f168499e6e2c216911f11ae3f177bf53.png">
-<meta property="og:image" content="http://example.com/CSE-lecture2-File-System-1/0f669c904929ad467e9ef39d73689358.png">
+<meta property="og:image" content="http://example.com/0f669c904929ad467e9ef39d73689358.png">
 <meta property="og:image" content="http://example.com/CSE-lecture2-File-System-1/95d6c1a886a13c3019898be5d3f29abb.png">
 <meta property="og:image" content="http://example.com/CSE-lecture2-File-System-1/b11191fe13bc85fb45260278566f86d0.png">
 <meta property="og:image" content="http://example.com/CSE-lecture2-File-System-1/6af3e44202425edaa4ac21d28e617156.png">
@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://example.com/CSE-lecture2-File-System-1/44b20884d3907caa236f17a905ecf9b7.png">
 <meta property="og:image" content="http://example.com/CSE-lecture2-File-System-1/d44dfec3bb652eb23a7c445b1c6bd7b1.png">
 <meta property="article:published_time" content="2025-09-21T07:33:31.000Z">
-<meta property="article:modified_time" content="2025-09-24T10:12:25.036Z">
+<meta property="article:modified_time" content="2025-09-24T10:55:55.597Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -290,7 +290,7 @@
                 <h3 id="lecture2-File-System-1"><a href="#lecture2-File-System-1" class="headerlink" title="lecture2: File System 1"></a>lecture2: File System 1</h3><p>使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据</p>
 <p><img src="/f168499e6e2c216911f11ae3f177bf53.png" srcset="/img/loading.gif" lazyload alt="架构"></p>
 <h4 id="single-node-inode-based-filesystem"><a href="#single-node-inode-based-filesystem" class="headerlink" title="single-node inode-based filesystem"></a>single-node inode-based filesystem</h4><p>文件包含两个特性：durable, name</p>
-<p><img src="/./CSE-lecture2-File-System-1/0f669c904929ad467e9ef39d73689358.png" srcset="/img/loading.gif" lazyload alt="文件的实现"></p>
+<p><img src="/0f669c904929ad467e9ef39d73689358.png" srcset="/img/loading.gif" lazyload alt="文件的实现"></p>
 <p>disk driver的抽象：</p>
 <ul>
 <li>分为一个一个的sector（早期512B，现在为4KB），注意sector为磁盘扇区的概念，而block为操作系统的概念</li>
