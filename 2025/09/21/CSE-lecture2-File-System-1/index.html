@@ -1,0 +1,757 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="jietiDdd">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="lecture2: File System 1使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据  single-node inode-based filesystem文件包">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSE_lecture2:File System 1">
+<meta property="og:url" content="http://example.com/2025/09/21/CSE-lecture2-File-System-1/index.html">
+<meta property="og:site_name" content="jietiDdd的个人博客">
+<meta property="og:description" content="lecture2: File System 1使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据  single-node inode-based filesystem文件包">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/f168499e6e2c216911f11ae3f177bf53.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/0f669c904929ad467e9ef39d73689358.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/95d6c1a886a13c3019898be5d3f29abb.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/b11191fe13bc85fb45260278566f86d0.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/6af3e44202425edaa4ac21d28e617156.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/3f524b6babd481f7da974ba72d96dc6e.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/b0743f32e0ad6521c0344a432de87d33.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/44b20884d3907caa236f17a905ecf9b7.png">
+<meta property="og:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/d44dfec3bb652eb23a7c445b1c6bd7b1.png">
+<meta property="article:published_time" content="2025-09-21T07:33:31.000Z">
+<meta property="article:modified_time" content="2025-09-24T09:22:56.536Z">
+<meta property="article:author" content="jietiDdd">
+<meta property="article:tag" content="se">
+<meta property="article:tag" content="cse">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/source/_posts/CSE-lecture2-File-System-1/f168499e6e2c216911f11ae3f177bf53.png">
+  
+  
+  
+  <title>CSE_lecture2:File System 1 - jietiDdd的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>jietiDdd的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/aleister.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CSE_lecture2:File System 1"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-21 15:33" pubdate>
+          2025年9月21日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          757 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          7 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CSE_lecture2:File System 1</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h3 id="lecture2-File-System-1"><a href="#lecture2-File-System-1" class="headerlink" title="lecture2: File System 1"></a>lecture2: File System 1</h3><p>使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据</p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/f168499e6e2c216911f11ae3f177bf53.png" srcset="/img/loading.gif" lazyload alt="架构"></p>
+<h4 id="single-node-inode-based-filesystem"><a href="#single-node-inode-based-filesystem" class="headerlink" title="single-node inode-based filesystem"></a>single-node inode-based filesystem</h4><p>文件包含两个特性：durable, name</p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/0f669c904929ad467e9ef39d73689358.png" srcset="/img/loading.gif" lazyload alt="文件的实现"></p>
+<p>disk driver的抽象：</p>
+<ul>
+<li>分为一个一个的sector（早期512B，现在为4KB），注意sector为磁盘扇区的概念，而block为操作系统的概念</li>
+<li>API为read和write</li>
+<li>需要进一步抽象成file system，如果是直接分配sector index，会出现难以寻找空闲sector，难以放大文件，难以命名，可用性和安全性都不足</li>
+</ul>
+<h4 id="inode-7-software-layers"><a href="#inode-7-software-layers" class="headerlink" title="inode: 7 software layers"></a>inode: 7 software layers</h4><h5 id="L1-block-layer"><a href="#L1-block-layer" class="headerlink" title="L1: block layer"></a>L1: block layer</h5><p>提供block id，得到4KB数据；或者提供block id和要写的数据，将其写入到对应的block，即实现block number-&gt;block data</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure BLOCK_NUMBER_TO_BLOCK(integer b) -&gt; block<br>    <span class="hljs-keyword">return</span> devices[b]<br></code></pre></td></tr></table></figure>
+
+<p>为什么使用block而非sector？因为file system的最小单位是block，而磁盘的最小单位是sector，只是恰好这俩大小一致罢了，而这是可以调整的<br>如何决定block size？权衡efficiency和utilization，以及内部的碎片<br>如何得知block size？使用磁盘开头的super block记录metadata，super block包含block size, num of free blocks, a list of free blocks, etc.<br>使用bitmap for free blocks记录哪些block被用过，哪些没有</p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/95d6c1a886a13c3019898be5d3f29abb.png" srcset="/img/loading.gif" lazyload alt="block layer"></p>
+<h5 id="L2-file-layer"><a href="#L2-file-layer" class="headerlink" title="L2: file layer"></a>L2: file layer</h5><p>记录某一个文件使用了哪些block，即inode，包含block_nums[N]和size，size为精确值，其中N可以不用太大，当文件过大时，使用indirect block解决</p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/b11191fe13bc85fb45260278566f86d0.png" srcset="/img/loading.gif" lazyload alt="indirect block"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure INODE_TO_BLOCK(integer offset, inode i) -&gt; block<br>    o &lt;- offset / BLOCKSIZE<br>    b &lt;- INDEX_TO_BLOCK_NUMBER(i, o)<br>    <span class="hljs-keyword">return</span> BLOCK_NUMBER_TO_BLOCK(b)<br><br>procedure INDEX_TO_BLOCK_NUMBER(inode i, integer index) -&gt; integer<br>    <span class="hljs-keyword">return</span> i.block_nums[index]<br></code></pre></td></tr></table></figure>
+
+<h5 id="L3-inode-number-layer"><a href="#L3-inode-number-layer" class="headerlink" title="L3: inode number layer"></a>L3: inode number layer</h5><p>实现inode num-&gt;inode，即inode table，是一个大数组</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure INODE_NUMBER_TO_INODE(integer num) -&gt; inode<br>    <span class="hljs-keyword">return</span> inode_table[num]<br></code></pre></td></tr></table></figure>
+
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/6af3e44202425edaa4ac21d28e617156.png" srcset="/img/loading.gif" lazyload alt="inode table"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure INODE_NUMBER_TO_BLOCK(integer offset, integer inode_number) -&gt; block<br>    inode i = INODE_NUMBER_TO_INODE(inode_number)<br>    o &lt;- offset / BLOCKSIZE<br>    b &lt;- INDEX_TO_BLOCK_NUMBER(i, o)<br>    <span class="hljs-keyword">return</span> BLOCK_NUMBER_TO_BLOCK(b)<br></code></pre></td></tr></table></figure>
+
+<h5 id="L4-file-name-layer"><a href="#L4-file-name-layer" class="headerlink" title="L4: file name layer"></a>L4: file name layer</h5><p>实现file name和inode number的一一对应关系，存放在directory，而这个directory也抽象成file，存放在inode中，因此inode内部增加type来区分目录和普通文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure NAME_TO_INODE(string filename, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    <span class="hljs-keyword">return</span> LOOKUP(<span class="hljs-built_in">dir</span>, filename)<br><br>procedure LOOKUP(string filename, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    block b<br>    inode i = INODE_NUMBER_TO_INODE(<span class="hljs-built_in">dir</span>)<br>    <span class="hljs-keyword">if</span> i.<span class="hljs-built_in">type</span> != DIRECTORY then <span class="hljs-keyword">return</span> FAILURE<br>    <span class="hljs-keyword">for</span> offset <span class="hljs-keyword">from</span> <span class="hljs-number">0</span> to i.size - <span class="hljs-number">1</span> do<br>        b &lt;- INODE_NUMBER_TO_BLOCK(offset, <span class="hljs-built_in">dir</span>)<br>        <span class="hljs-keyword">if</span> STRING_MATCH(filename, b) then<br>            <span class="hljs-keyword">return</span> INODE_NUMBER(filename, b)<br>        offset &lt;- offset + BLOCKSIZE<br>    <span class="hljs-keyword">return</span> FAILURE<br></code></pre></td></tr></table></figure>
+
+<h5 id="L5-path-name-layer"><a href="#L5-path-name-layer" class="headerlink" title="L5: path name layer"></a>L5: path name layer</h5><p>层次化的directory为path，直接层层递归即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure PATH_TO_INODE_NUMBER(string path, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    <span class="hljs-keyword">if</span> PLAIN_NAME(path) <span class="hljs-keyword">return</span> NAME_TO_INODE_NUMBER(path, <span class="hljs-built_in">dir</span>)<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">dir</span> &lt;- LOOKUP(FIRST(path), <span class="hljs-built_in">dir</span>)<br>        path &lt;- REST(path)<br>        <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, <span class="hljs-built_in">dir</span>)<br></code></pre></td></tr></table></figure>
+
+<h6 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h6><p>link让不同的文件名指向相同的inode num，而unlink取消filename和inode num之间的联系，这是hard link<br>在inode里面添加一项refcnt，link时+1，unlink时-1，当refcnt &#x3D; 0时才清除这个inode对应的file<br>link不能构成环，否则会导致内存泄漏，因此规定目录不能link，除了两个例外：<code>.</code>和 <code>..</code>这两个hard link</p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/3f524b6babd481f7da974ba72d96dc6e.png" srcset="/img/loading.gif" lazyload alt="no cycle for link"></p>
+<h6 id="renaming"><a href="#renaming" class="headerlink" title="renaming"></a>renaming</h6><p>编辑文件时会创建一个临时文件，重命名时，顺序为：</p>
+<ol>
+<li><code>UNLINK(to_name)</code></li>
+<li><code>LINK(from_name, to_name)</code></li>
+<li><code>UNLINK(from_name)</code></li>
+</ol>
+<p>但如果计算机在1和2之间突然断电呢？这会使得to_name丢失。因此要保证原子性操作</p>
+<h5 id="L6-absolute-path-name-layer"><a href="#L6-absolute-path-name-layer" class="headerlink" title="L6: absolute path name layer"></a>L6: absolute path name layer</h5><p>引入根目录<code>/</code>，其中<code>/.</code>和<code>/..</code>依然是根目录</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure GENERATEPATH_TO_INODE_NUMBER(string path) -&gt; integer<br>    <span class="hljs-keyword">if</span> path[<span class="hljs-number">0</span>] = <span class="hljs-string">&quot;/&quot;</span> <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, <span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, wd)<br></code></pre></td></tr></table></figure>
+
+<p>参考一个例子来理解file system layers</p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/b0743f32e0ad6521c0344a432de87d33.png" srcset="/img/loading.gif" lazyload alt="an example"></p>
+<p><img src="/source/_posts/CSE-lecture2-File-System-1/44b20884d3907caa236f17a905ecf9b7.png" srcset="/img/loading.gif" lazyload alt="dump a directory"></p>
+<h5 id="L7-symbolic-link-layer"><a href="#L7-symbolic-link-layer" class="headerlink" title="L7: symbolic link layer"></a>L7: symbolic link layer</h5><p><img src="/source/_posts/CSE-lecture2-File-System-1/d44dfec3bb652eb23a7c445b1c6bd7b1.png" srcset="/img/loading.gif" lazyload alt="dump a symbolic link"></p>
+<p>区分hard link和soft link，hard link强调两个filename都指向同一个inode num，而soft link强调一个filename指向另一个filename，当文件被删除时，hard link连接的文件能够正常访问，而soft link连接的文件会打不开（注意谁指向谁）</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/se/" class="print-no-link">#se</a>
+      
+        <a href="/tags/cse/" class="print-no-link">#cse</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CSE_lecture2:File System 1</div>
+      <div>http://example.com/2025/09/21/CSE-lecture2-File-System-1/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>jietiDdd</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/09/23/CSE-lecture3-File-System-2/" title="CSE_lecture3:File System 2">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CSE_lecture3:File System 2</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/09/14/hot100%E6%95%B4%E7%90%86%E4%B9%8Bpython%E7%89%88/" title="hot100整理之python版">
+                        <span class="hidden-mobile">hot100整理之python版</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'jietiDdd/jietiDdd.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
