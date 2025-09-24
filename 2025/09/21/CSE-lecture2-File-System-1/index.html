@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://example.com/2025/09/21/CSE-lecture2-File-System-1/44b20884d3907caa236f17a905ecf9b7.png">
 <meta property="og:image" content="http://example.com/2025/09/21/CSE-lecture2-File-System-1/d44dfec3bb652eb23a7c445b1c6bd7b1.png">
 <meta property="article:published_time" content="2025-09-21T07:33:31.000Z">
-<meta property="article:modified_time" content="2025-09-24T11:17:46.761Z">
+<meta property="article:modified_time" content="2025-09-24T13:15:04.847Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -302,7 +302,10 @@
 <h3 id="inode-7-software-layers"><a href="#inode-7-software-layers" class="headerlink" title="inode: 7 software layers"></a>inode: 7 software layers</h3><h4 id="L1-block-layer"><a href="#L1-block-layer" class="headerlink" title="L1: block layer"></a>L1: block layer</h4><p>提供block id，得到4KB数据；或者提供block id和要写的数据，将其写入到对应的block，即实现block number-&gt;block data</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure BLOCK_NUMBER_TO_BLOCK(integer b) -&gt; block<br>    <span class="hljs-keyword">return</span> devices[b]<br></code></pre></td></tr></table></figure>
 
-<p>为什么使用block而非sector？因为file system的最小单位是block，而磁盘的最小单位是sector，只是恰好这俩大小一致罢了，而这是可以调整的<br>如何决定block size？权衡efficiency和utilization，以及内部的碎片<br>如何得知block size？使用磁盘开头的super block记录metadata，super block包含block size, num of free blocks, a list of free blocks, etc.<br>使用bitmap for free blocks记录哪些block被用过，哪些没有</p>
+<p>为什么使用block而非sector？因为file system的最小单位是block，而磁盘的最小单位是sector，只是恰好这俩大小一致罢了，而这是可以调整的</p>
+<p>如何决定block size？权衡efficiency和utilization，以及内部的碎片</p>
+<p>如何得知block size？使用磁盘开头的super block记录metadata，super block包含block size, num of free blocks, a list of free blocks, etc.</p>
+<p>使用bitmap for free blocks记录哪些block被用过，哪些没有</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/95d6c1a886a13c3019898be5d3f29abb.png" srcset="/img/loading.gif" lazyload class="" title="block layer">
 
 <h4 id="L2-file-layer"><a href="#L2-file-layer" class="headerlink" title="L2: file layer"></a>L2: file layer</h4><p>记录某一个文件使用了哪些block，即inode，包含block_nums[N]和size，size为精确值，其中N可以不用太大，当文件过大时，使用indirect block解决</p>
@@ -323,7 +326,9 @@
 <h4 id="L5-path-name-layer"><a href="#L5-path-name-layer" class="headerlink" title="L5: path name layer"></a>L5: path name layer</h4><p>层次化的directory为path，直接层层递归即可</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure PATH_TO_INODE_NUMBER(string path, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    <span class="hljs-keyword">if</span> PLAIN_NAME(path) <span class="hljs-keyword">return</span> NAME_TO_INODE_NUMBER(path, <span class="hljs-built_in">dir</span>)<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">dir</span> &lt;- LOOKUP(FIRST(path), <span class="hljs-built_in">dir</span>)<br>        path &lt;- REST(path)<br>        <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, <span class="hljs-built_in">dir</span>)<br></code></pre></td></tr></table></figure>
 
-<h5 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h5><p>link让不同的文件名指向相同的inode num，而unlink取消filename和inode num之间的联系，这是hard link<br>在inode里面添加一项refcnt，link时+1，unlink时-1，当refcnt &#x3D; 0时才清除这个inode对应的file<br>link不能构成环，否则会导致内存泄漏，因此规定目录不能link，除了两个例外：<code>.</code>和 <code>..</code>这两个hard link</p>
+<h5 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h5><p>link让不同的文件名指向相同的inode num，而unlink取消filename和inode num之间的联系，这是hard link</p>
+<p>在inode里面添加一项refcnt，link时+1，unlink时-1，当refcnt &#x3D; 0时才清除这个inode对应的file</p>
+<p>link不能构成环，否则会导致内存泄漏，因此规定目录不能link，除了两个例外：<code>.</code>和 <code>..</code>这两个hard link</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/3f524b6babd481f7da974ba72d96dc6e.png" srcset="/img/loading.gif" lazyload class="" title="no cycle for link">
 
 <h5 id="renaming"><a href="#renaming" class="headerlink" title="renaming"></a>renaming</h5><p>编辑文件时会创建一个临时文件，重命名时，顺序为：</p>
