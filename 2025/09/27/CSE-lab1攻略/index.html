@@ -27,7 +27,7 @@
 <meta property="og:description" content="lab1: Basic Filesystem在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等directory">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-09-27T06:59:10.000Z">
-<meta property="article:modified_time" content="2025-09-27T12:12:04.654Z">
+<meta property="article:modified_time" content="2025-09-27T14:54:04.643Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -354,7 +354,7 @@
 <ul>
 <li><code>BlockAllocatorTest.Allocation</code></li>
 </ul>
-<h3 id="part2-inode-layer"><a href="#part2-inode-layer" class="headerlink" title="part2: inode layer"></a>part2: inode layer</h3><h4 id="part-2A-inode-and-inode-manager"><a href="#part-2A-inode-and-inode-manager" class="headerlink" title="part 2A: inode and inode manager"></a>part 2A: inode and inode manager</h4><p>首先分析一下inode层的架构：</p>
+<h3 id="part-2-inode-layer"><a href="#part-2-inode-layer" class="headerlink" title="part 2: inode layer"></a>part 2: inode layer</h3><h4 id="part-2A-inode-and-inode-manager"><a href="#part-2A-inode-and-inode-manager" class="headerlink" title="part 2A: inode and inode manager"></a>part 2A: inode and inode manager</h4><p>首先分析一下inode层的架构：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">| Super block | Inode Table | Inode allocation bitmap | Block allocation bitmap | Other data blocks |<br></code></pre></td></tr></table></figure>
 
 <p>其实和课上的区别就是inode table不再直接存储inode，而是存储inode id和block id的映射关系，也就是说，inode也被当作block处理了</p>
@@ -392,7 +392,7 @@
 <li><code>InodeManagerTest.InitAndTable</code></li>
 <li><code>InodeManagerTest.Allocation</code></li>
 </ul>
-<h3 id="part3-filesystem-layer"><a href="#part3-filesystem-layer" class="headerlink" title="part3: filesystem layer"></a>part3: filesystem layer</h3><p>在filesystem层，我们可以尽情使用<code>block_manager_</code>, <code>inode_manager_</code>, <code>block_allocator_</code>的相关api了</p>
+<h3 id="part-3-filesystem-layer"><a href="#part-3-filesystem-layer" class="headerlink" title="part 3: filesystem layer"></a>part 3: filesystem layer</h3><p>在filesystem层，我们可以尽情使用<code>block_manager_</code>, <code>inode_manager_</code>, <code>block_allocator_</code>的相关api了</p>
 <p>本部分的错误处理过于冗余，因此提供的代码会进行简化</p>
 <h4 id="part-3A-create"><a href="#part-3A-create" class="headerlink" title="part 3A: create"></a>part 3A: create</h4><p>本部分实现<code>alloc_inode</code>函数，按照以下步骤即可：</p>
 <ul>
