@@ -1,0 +1,895 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="jietiDdd">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="lab1: Basic Filesystem在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等directory">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSE_lab1攻略">
+<meta property="og:url" content="http://example.com/2025/09/27/CSE-lab1%E6%94%BB%E7%95%A5/index.html">
+<meta property="og:site_name" content="jietiDdd的个人博客">
+<meta property="og:description" content="lab1: Basic Filesystem在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等directory">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-09-27T06:59:10.000Z">
+<meta property="article:modified_time" content="2025-09-27T12:02:38.742Z">
+<meta property="article:author" content="jietiDdd">
+<meta property="article:tag" content="se">
+<meta property="article:tag" content="cse">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>CSE_lab1攻略 - jietiDdd的个人博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>jietiDdd的个人博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/aleister.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="CSE_lab1攻略"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-09-27 14:59" pubdate>
+          2025年9月27日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          39 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">CSE_lab1攻略</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="lab1-Basic-Filesystem"><a href="#lab1-Basic-Filesystem" class="headerlink" title="lab1: Basic Filesystem"></a>lab1: Basic Filesystem</h2><p>在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：</p>
+<ul>
+<li>block layer: 包括block manager和block allocator</li>
+<li>inode layer: 包括inode manager</li>
+<li>filesystem layer: 包括create, write, read操作，同时对等directory和file</li>
+</ul>
+<p>lab的每个部分正好对应了这三层</p>
+<p>关于怎么获取lab和配置docker不再赘述，简单说明怎么编译和测试。在<code>chfs</code>目录下使用以下命令进行编译：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> build<br><span class="hljs-built_in">cd</span> build<br>cmake ..<br></code></pre></td></tr></table></figure>
+
+<p>在<code>build</code>目录下使用以下指令完成单元测试：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">make build-tests -j<br>make <span class="hljs-built_in">test</span> -j<br></code></pre></td></tr></table></figure>
+
+<p>要进行集成测试，首先在<code>build</code>目录下使用以下指令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make fs -j<br></code></pre></td></tr></table></figure>
+
+<p>再进入<code>scripts/lab1</code>执行以下命令，请不要使用<code>sudo</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">./integration_test.sh<br></code></pre></td></tr></table></figure>
+
+<p>接下来提供lab1的攻略，在实现lab时，阅读对应的头文件来使用可以简化代码的api</p>
+<h3 id="part-1-block-layer"><a href="#part-1-block-layer" class="headerlink" title="part 1: block layer"></a>part 1: block layer</h3><h4 id="part-1A-block-manager"><a href="#part-1A-block-manager" class="headerlink" title="part 1A: block manager"></a>part 1A: block manager</h4><p>在这一部分，我们需要实现block manager，来进行block的读写和清除</p>
+<p>阅读<code>manager.h</code>和几个构造函数，我们得知block manager的结构为：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">BlockManager</span>&#123;<br>    <span class="hljs-type">const</span> usize block_sz = <span class="hljs-number">4096</span>         <span class="hljs-comment">// block的大小，也就是4KB</span><br>    u8 *block_data                      <span class="hljs-comment">// 这里管理的是整个磁盘的所有data</span><br>    usize block_cnt                     <span class="hljs-comment">// 整个磁盘有多少block，因此在根据block id进行读写时，要进行判断</span><br>    <span class="hljs-type">bool</span> in_memory                      <span class="hljs-comment">// lab1用不到</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>在实现<code>write_block</code>, <code>write_partial_block</code>和<code>zero_block</code>函数时，利用<code>std::memcpy</code>将data写入到<code>block_data</code>对应的位置即可（这里不用管<code>block_data</code>的状态），注意以下几点：</p>
+<ul>
+<li>判断<code>block_id</code>是否超出<code>block_cnt</code></li>
+<li>在<code>write_partial_block</code>中，要额外判断<code>offset + len</code>是否超出<code>block_sz</code></li>
+<li>在<code>zero_block</code>中，直接使用<code>std::memset</code>将block设置为全零即可（这里和上课讲的不太一样，上课时讲的是覆写block，而这里会进行清零）</li>
+</ul>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">BlockManager::write_block</span><span class="hljs-params">(<span class="hljs-type">block_id_t</span> block_id, <span class="hljs-type">const</span> u8 *data)</span></span><br><span class="hljs-function">    -&gt; ChfsNullResult </span>&#123;<br>  <br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br>  <span class="hljs-comment">// 检查是否越界</span><br>  <span class="hljs-built_in">CHFS_ASSERT</span>(block_id &lt; <span class="hljs-keyword">this</span>-&gt;block_cnt, <span class="hljs-string">&quot;Invalid block id&quot;</span>);<br>  <span class="hljs-comment">// data最多只写入block_sz个字节</span><br>  std::<span class="hljs-built_in">memcpy</span>(<span class="hljs-keyword">this</span>-&gt;block_data + block_id * <span class="hljs-keyword">this</span>-&gt;block_sz, data, <span class="hljs-keyword">this</span>-&gt;block_sz);<br><br>  <span class="hljs-keyword">return</span> KNullOk;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">BlockManager::write_partial_block</span><span class="hljs-params">(<span class="hljs-type">block_id_t</span> block_id, <span class="hljs-type">const</span> u8 *data,</span></span><br><span class="hljs-params"><span class="hljs-function">                                       usize offset, usize len)</span></span><br><span class="hljs-function">    -&gt; ChfsNullResult </span>&#123;<br>  <br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br>  <span class="hljs-built_in">CHFS_ASSERT</span>(block_id &lt; <span class="hljs-keyword">this</span>-&gt;block_cnt, <span class="hljs-string">&quot;Invalid block id&quot;</span>);<br>  <span class="hljs-comment">// 检查offset和len是否合法</span><br>  <span class="hljs-built_in">CHFS_ASSERT</span>(offset + len &lt;= <span class="hljs-keyword">this</span>-&gt;block_sz, <span class="hljs-string">&quot;Invalid offset or length&quot;</span>);<br>  std::<span class="hljs-built_in">memcpy</span>(<span class="hljs-keyword">this</span>-&gt;block_data + block_id * <span class="hljs-keyword">this</span>-&gt;block_sz + offset, data, len);<br><br>  <span class="hljs-keyword">return</span> KNullOk;<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">BlockManager::zero_block</span><span class="hljs-params">(<span class="hljs-type">block_id_t</span> block_id)</span> -&gt; ChfsNullResult </span>&#123;<br>  <br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br>  <span class="hljs-built_in">CHFS_ASSERT</span>(block_id &lt; <span class="hljs-keyword">this</span>-&gt;block_cnt, <span class="hljs-string">&quot;Invalid block id&quot;</span>);<br>  <span class="hljs-comment">// 全部置零</span><br>  std::<span class="hljs-built_in">memset</span>(<span class="hljs-keyword">this</span>-&gt;block_data + block_id * <span class="hljs-keyword">this</span>-&gt;block_sz, <span class="hljs-number">0</span>, <span class="hljs-keyword">this</span>-&gt;block_sz);<br><br>  <span class="hljs-keyword">return</span> KNullOk;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>而<code>read_block</code>函数直接反向<code>std::memcpy</code>即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">BlockManager::read_block</span><span class="hljs-params">(<span class="hljs-type">block_id_t</span> block_id, u8 *data)</span> -&gt; ChfsNullResult </span>&#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br>  <span class="hljs-built_in">CHFS_ASSERT</span>(block_id &lt; <span class="hljs-keyword">this</span>-&gt;block_cnt, <span class="hljs-string">&quot;Invalid block id&quot;</span>);<br>  std::<span class="hljs-built_in">memcpy</span>(data, <span class="hljs-keyword">this</span>-&gt;block_data + block_id * <span class="hljs-keyword">this</span>-&gt;block_sz, <span class="hljs-keyword">this</span>-&gt;block_sz);<br><br>  <span class="hljs-keyword">return</span> KNullOk;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>这一部分只需要几次<code>ASSERT</code>和几次<code>std::memcpy</code>即可实现，现在可以通过以下单元测试了：</p>
+<ul>
+<li><code>BlockManagerTest.ReadWritePageTest</code></li>
+<li><code>BlockManagerTest.ZeroTest</code></li>
+<li><code>BlockManagerTest.InMemoryTest</code></li>
+</ul>
+<h4 id="part-1B-block-allocator"><a href="#part-1B-block-allocator" class="headerlink" title="part 1B: block allocator"></a>part 1B: block allocator</h4><p>在这一部分，我们需要实现block allocator，根据block bitmap来决定分配哪个block</p>
+<p>还是阅读<code>allocator.h</code>，我们知道block bitmap被存储在多个连续的block里面，即区间<code>[bitmap_block_id, bitmap_block_id + bitmap_block_cnt - 1]</code>，注意以下几点：</p>
+<ul>
+<li>由于是使用bit来存储block是否被使用，因此需要注意byte和bit的转换，即<code>KBitsPerByte</code></li>
+<li>bitmap的最后一个block不一定被使用完，需要分类讨论，并使用<code>last_block_num</code></li>
+</ul>
+<p>再进入<code>bitmap.h</code>，活用以下函数：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-built_in">Bitmap</span>(u8 *data, usize payload)                                     <span class="hljs-comment">// 将读取进入buffer的block内容构造为一个bitmap，便于调用api</span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">set</span><span class="hljs-params">(usize index)</span>                                               <span class="hljs-comment">// 用于allocate</span></span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">clear</span><span class="hljs-params">(usize index)</span>                                             <span class="hljs-comment">// 用于deallocate</span></span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">check</span><span class="hljs-params">(usize index)</span> -&gt; <span class="hljs-type">bool</span>                                     <span class="hljs-comment">// 用于错误处理</span></span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">find_first_free</span><span class="hljs-params">()</span> -&gt; std::optional&lt;usize&gt;                      <span class="hljs-comment">// 用于allocate</span></span><br><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">find_first_free_w_bound</span><span class="hljs-params">(usize bits)</span> -&gt; std::optional&lt;usize&gt;    <span class="hljs-comment">// 用于allocate时的最后一个bitmap block</span></span><br></code></pre></td></tr></table></figure>
+
+<p>参考已经写好的代码，我们其实可以留意到如何进行block的读写，即使用一个buffer来存储内容，届时我们只需要处理buffer.data即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(bm-&gt;block_size())</span></span>;<br>bm-&gt;<span class="hljs-built_in">read_block</span>(bid, buffer.<span class="hljs-built_in">data</span>());<br>bm-&gt;<span class="hljs-built_in">write_block</span>(bid, buffer.<span class="hljs-built_in">data</span>());<br></code></pre></td></tr></table></figure>
+
+<p>接下来实现<code>allocate</code>函数，首先我们进行分类讨论，利用<code>Bitmap</code>类来寻找第一个空的bit</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">if</span> (i == <span class="hljs-keyword">this</span>-&gt;bitmap_block_cnt - <span class="hljs-number">1</span>) &#123;<br>  <span class="hljs-comment">// If current block is the last block of the bitmap.</span><br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Find the first free bit of current bitmap block</span><br>  <span class="hljs-comment">// and store it in `res`.</span><br>  <span class="hljs-comment">// 对于最后一个bitmap block，只搜索last_block_num个bit，这里使用bitmap.h中的相关api</span><br>  res = <span class="hljs-built_in">Bitmap</span>(buffer.<span class="hljs-built_in">data</span>(), bm-&gt;<span class="hljs-built_in">block_size</span>())<br>            .<span class="hljs-built_in">find_first_free_w_bound</span>(<span class="hljs-keyword">this</span>-&gt;last_block_num);<br>  <br>&#125; <span class="hljs-keyword">else</span> &#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Find the first free bit of current bitmap block</span><br>  <span class="hljs-comment">// and store it in `res`.</span><br>  <span class="hljs-comment">// 而其他bitmap block，搜索全部bit</span><br>  res = <span class="hljs-built_in">Bitmap</span>(buffer.<span class="hljs-built_in">data</span>(), bm-&gt;<span class="hljs-built_in">block_size</span>()).<span class="hljs-built_in">find_first_free</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>考虑到我们通过一个循环来遍历bitmap的所有block，因此当<code>res</code>为真时，我们再进行分配，这里分为几步：</p>
+<ul>
+<li>将bitmap的对应位置设为1，使用前面提到的<code>set</code>函数</li>
+<li>将bitmap写回对应的block，怎么读的就怎么写</li>
+<li>计算出要返回的block id，这里就要注意bit和byte的转换了</li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// The block id of the allocated block.</span><br><span class="hljs-type">block_id_t</span> retval = <span class="hljs-built_in">static_cast</span>&lt;<span class="hljs-type">block_id_t</span>&gt;(<span class="hljs-number">0</span>);<br><br><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span></span><br><span class="hljs-comment">// 1. Set the free bit we found to 1 in the bitmap.</span><br><span class="hljs-function">Bitmap <span class="hljs-title">bitmap</span><span class="hljs-params">(buffer.data(), bm-&gt;block_size())</span></span>;<br>bitmap.<span class="hljs-built_in">set</span>(*res);<br><span class="hljs-comment">// 2. Flush the changed bitmap block back to the block manager.</span><br>bm-&gt;<span class="hljs-built_in">write_block</span>(i + <span class="hljs-keyword">this</span>-&gt;bitmap_block_id, buffer.<span class="hljs-built_in">data</span>());<br><span class="hljs-comment">// 3. Calculate the value of `retval`.</span><br>retval = i * (bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte) + *res;<br><br><span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsResult</span>&lt;<span class="hljs-type">block_id_t</span>&gt;(retval);<br></code></pre></td></tr></table></figure>
+
+<p>接下来实现<code>deallocate</code>函数，其实就是根据bid找到对应的bitmap block，进行<code>clear</code>即可，善用除数和余数定位，步骤如下：</p>
+<ul>
+<li>使用<code>block_id / (bm-&gt;block_size() * KBitsPerByte)</code>和<code>block_id % (bm-&gt;block_size() * KBitsPerByte)</code>定位到是第几个bitmap block的第几个bit，并<code>read_block</code>，在这一部分我们需要使用<code>check</code>函数来判断是否invalid</li>
+<li>使用<code>clear</code>函数置零，再<code>write_block</code></li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br><span class="hljs-comment">// 1. According to `block_id`, zero the bit in the bitmap.</span><br><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(bm-&gt;block_size())</span></span>;<br><span class="hljs-comment">// 每个bitmap block管理block_sz * 8个数据块</span><br>bm-&gt;<span class="hljs-built_in">read_block</span>(<span class="hljs-keyword">this</span>-&gt;bitmap_block_id + block_id / (bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte), buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-function">Bitmap <span class="hljs-title">bitmap</span><span class="hljs-params">(buffer.data(), bm-&gt;block_size())</span></span>;<br><span class="hljs-comment">// 如果该位已经是0了，说明已经被释放</span><br><span class="hljs-keyword">if</span> (!bitmap.<span class="hljs-built_in">check</span>(block_id % (bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte))) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsNullResult</span>(ErrorType::INVALID_ARG);<br>&#125;<br>bitmap.<span class="hljs-built_in">clear</span>(block_id % (bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte));<br><span class="hljs-comment">// 2. Flush the changed bitmap block back to the block manager.</span><br><span class="hljs-comment">// unwrap()用于处理ChfsNullResult</span><br>bm-&gt;<span class="hljs-built_in">write_block</span>(<span class="hljs-keyword">this</span>-&gt;bitmap_block_id + block_id / (bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte), buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-comment">// 3. Return ChfsNullResult(ErrorType::INVALID_ARG) </span><br><span class="hljs-comment">//    if you find `block_id` is invalid (e.g. already freed).</span><br></code></pre></td></tr></table></figure>
+
+<p>现在我们可以通过以下单元测试了：</p>
+<ul>
+<li><code>BlockAllocatorTest.Allocation</code></li>
+</ul>
+<h3 id="part2-inode-layer"><a href="#part2-inode-layer" class="headerlink" title="part2: inode layer"></a>part2: inode layer</h3><h4 id="part-2A-inode-and-inode-manager"><a href="#part-2A-inode-and-inode-manager" class="headerlink" title="part 2A: inode and inode manager"></a>part 2A: inode and inode manager</h4><p>首先分析一下inode层的架构：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">| Super block | Inode Table | Inode allocation bitmap | Block allocation bitmap | Other data blocks |<br></code></pre></td></tr></table></figure>
+
+<p>其实和课上的区别就是inode table不再直接存储inode，而是存储inode id和block id的映射关系，也就是说，inode也被当作block处理了</p>
+<p>这里注意inode table和inode bitmap都是存储的raw_id，而暴露给上层的都是logic_id，因此活用<code>RAW_2_LOGIC</code>和<code>LOGIC_2_RAW</code>即可，不过没搞清楚也无所谓，注释会告诉你的</p>
+<p>几个架构的区间为：</p>
+<ul>
+<li>inode table: <code>[1, n_table_blocks]</code>，这是因为有一个super block</li>
+<li>inode allocation bitmap: <code>[1 + n_table_blocks, 1 + n_table_blocks + n_bitmap_blocks]</code></li>
+</ul>
+<p>接下来就来实现几个函数，首先是<code>allocate_inode</code>，代码已经实现了遍历inode bitmap来找到<code>free_idx</code>了，同时也给inode分配好了bid，因此步骤如下：</p>
+<ul>
+<li>实现inode block的写入：创建一个<code>Inode</code>实例，利用构造函数将<code>type</code>刷进去，再使用<code>flush_to_buffer</code>函数将这个inode刷进buffer里面（详见<code>inode.h</code>），最后将buffer写入bid对应的block里面</li>
+<li>实现inode table的写入：使用<code>set_table</code>函数将raw_id存进去,raw_id的计算类似于block bitmap</li>
+<li>返回logic_id</li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span></span><br><span class="hljs-comment">// 1. Initialize the inode with the given type.</span><br><span class="hljs-comment">// 使用buffer存储inode数据</span><br><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(bm-&gt;block_size())</span></span>;<br><span class="hljs-function">Inode <span class="hljs-title">inode</span><span class="hljs-params">(type, bm-&gt;block_size())</span></span>;<br>inode.<span class="hljs-built_in">flush_to_buffer</span>(buffer.<span class="hljs-built_in">data</span>());<br><span class="hljs-comment">// 将buffer的内容写入到bid指定的block中</span><br><span class="hljs-keyword">auto</span> write_res = bm-&gt;<span class="hljs-built_in">write_block</span>(bid, buffer.<span class="hljs-built_in">data</span>());<br><span class="hljs-keyword">if</span> (write_res.<span class="hljs-built_in">is_err</span>()) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsResult</span>&lt;<span class="hljs-type">inode_id_t</span>&gt;(write_res.<span class="hljs-built_in">unwrap_error</span>());<br>&#125;<br><span class="hljs-comment">// 2. Setup the inode table.</span><br><span class="hljs-comment">// 先根据free_idx和count计算出inode id</span><br><span class="hljs-type">inode_id_t</span> raw_id = count * (bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte) + free_idx.<span class="hljs-built_in">value</span>();<br><span class="hljs-comment">// 根据inode id计算出inode index</span><br><span class="hljs-type">inode_id_t</span> logic_id = <span class="hljs-built_in">RAW_2_LOGIC</span>(raw_id);<br><span class="hljs-comment">// 实现bid和inode index的映射关系</span><br><span class="hljs-keyword">auto</span> set_res = <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">set_table</span>(raw_id, bid);<br><span class="hljs-keyword">if</span> (set_res.<span class="hljs-built_in">is_err</span>()) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsResult</span>&lt;<span class="hljs-type">inode_id_t</span>&gt;(set_res.<span class="hljs-built_in">unwrap_error</span>());<br>&#125;<br><span class="hljs-comment">// 3. Return the id of the allocated inode.</span><br><span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsResult</span>&lt;<span class="hljs-type">inode_id_t</span>&gt;(logic_id);<br><span class="hljs-comment">//    You may have to use the `RAW_2_LOGIC` macro</span><br><span class="hljs-comment">//    to get the result inode id.</span><br></code></pre></td></tr></table></figure>
+
+<p>接下来是<code>free_inode</code>，这里提供的是logic_id，注意转换，步骤如下：</p>
+<ul>
+<li>清除inode table：将bid设置为<code>KInvalidBlockID</code>即可，参考<code>manager.h</code></li>
+<li>清除inode bitmap：和1B部分的<code>deallocate</code>基本一致，遗憾的是inode manager没有提供block allocator的接口，所以重复这段代码，注意下区间定位即可</li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span></span><br><span class="hljs-comment">// 1. Clear the inode table entry.</span><br><span class="hljs-comment">//    You may have to use macro `LOGIC_2_RAW`</span><br><span class="hljs-comment">//    to get the index of inode table from `id`.</span><br><span class="hljs-type">inode_id_t</span> raw_id = <span class="hljs-built_in">LOGIC_2_RAW</span>(id);<br><span class="hljs-comment">// 直接将该entry设置为Invalid</span><br><span class="hljs-keyword">auto</span> set_res = <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">set_table</span>(raw_id, KInvalidBlockID);<br><span class="hljs-keyword">if</span> (set_res.<span class="hljs-built_in">is_err</span>()) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsNullResult</span>(set_res.<span class="hljs-built_in">unwrap_error</span>());<br>&#125;<br><span class="hljs-comment">// 2. Clear the inode bitmap.</span><br><span class="hljs-comment">// 寻找在inode bitmap的第几个block的第几个bit</span><br><span class="hljs-keyword">auto</span> inode_bits_per_block = bm-&gt;<span class="hljs-built_in">block_size</span>() * KBitsPerByte;<br><span class="hljs-keyword">auto</span> bitmap_block_idx = raw_id / inode_bits_per_block;<br><span class="hljs-keyword">auto</span> bit_idx = raw_id % inode_bits_per_block;<br><span class="hljs-comment">// 每次使用buffer管理读写操作</span><br><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(bm-&gt;block_size())</span></span>;<br><span class="hljs-comment">// 从1开始，因为0是super block</span><br><span class="hljs-comment">// inode bitmap从1 + n_table_blocks开始，到1 + n_table_blocks + n_bitmap_blocks结束</span><br>bm-&gt;<span class="hljs-built_in">read_block</span>(<span class="hljs-number">1</span> + n_table_blocks + bitmap_block_idx, buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-function">Bitmap <span class="hljs-title">bitmap</span><span class="hljs-params">(buffer.data(), bm-&gt;block_size())</span></span>;<br>bitmap.<span class="hljs-built_in">clear</span>(bit_idx);<br>bm-&gt;<span class="hljs-built_in">write_block</span>(<span class="hljs-number">1</span> + n_table_blocks + bitmap_block_idx, buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br></code></pre></td></tr></table></figure>
+
+<p>接下来是<code>get</code>函数，在inode table查找即可，这里的inode table为一个大数组，被存放在多个block当中，所以还是使用除数和余数方法定位，并将读上来的buffer类型转换为<code>block_id_t</code>数组（类型转换非常重要，后面还会出现），实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br><span class="hljs-comment">// Get the block id of inode whose id is `id`</span><br><span class="hljs-comment">// from the inode table. You may have to use</span><br><span class="hljs-comment">// the macro `LOGIC_2_RAW` to get the inode</span><br><span class="hljs-comment">// table index.</span><br><span class="hljs-type">inode_id_t</span> raw_id = <span class="hljs-built_in">LOGIC_2_RAW</span>(id);<br><span class="hljs-keyword">if</span> (raw_id &gt;= max_inode_supported - <span class="hljs-number">1</span>) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsResult</span>&lt;<span class="hljs-type">block_id_t</span>&gt;(ErrorType::INVALID_ARG);<br>&#125;<br><span class="hljs-comment">// 计算在inode table的第几个block的第几个entry</span><br><span class="hljs-keyword">auto</span> inode_per_block = bm-&gt;<span class="hljs-built_in">block_size</span>() / <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">block_id_t</span>);<br><span class="hljs-keyword">auto</span> block_idx = raw_id / inode_per_block;<br><span class="hljs-keyword">auto</span> entry_idx = raw_id % inode_per_block;<br><span class="hljs-comment">// 使用buffer存储读入的block数据</span><br><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(bm-&gt;block_size())</span></span>;<br><span class="hljs-comment">// 注意inode table从1开始，因为0是super block，以1 + n_table_blocks结尾</span><br>bm-&gt;<span class="hljs-built_in">read_block</span>(<span class="hljs-number">1</span> + block_idx, buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-comment">// 实现转换，保证数组的最小单位是block_id_t</span><br><span class="hljs-type">block_id_t</span> *table = <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">block_id_t</span> *&gt;(buffer.<span class="hljs-built_in">data</span>());<br>res_block_id = table[entry_idx];<br><br><span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsResult</span>&lt;<span class="hljs-type">block_id_t</span>&gt;(res_block_id);<br></code></pre></td></tr></table></figure>
+
+<p>最后是<code>set_table</code>函数，和<code>get</code>函数非常相似，只不过从读<code>table[entry_idx]</code>变为<code>table[entry_idx] = bid</code>，实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement this function.</span><br><span class="hljs-comment">// Fill `bid` into the inode table entry</span><br><span class="hljs-comment">// whose index is `idx`.</span><br><span class="hljs-comment">// 类似于get函数，只不过是写入而不是读取</span><br><span class="hljs-keyword">if</span> (idx &gt;= max_inode_supported - <span class="hljs-number">1</span>) &#123;<br>  <span class="hljs-keyword">return</span> <span class="hljs-built_in">ChfsNullResult</span>(ErrorType::INVALID_ARG);<br>&#125;<br><span class="hljs-comment">// 计算在inode table的第几个block的第几个entry</span><br><span class="hljs-keyword">auto</span> inode_per_block = bm-&gt;<span class="hljs-built_in">block_size</span>() / <span class="hljs-built_in">sizeof</span>(<span class="hljs-type">block_id_t</span>);<br><span class="hljs-keyword">auto</span> block_idx = idx / inode_per_block;<br><span class="hljs-keyword">auto</span> entry_idx = idx % inode_per_block;<br><span class="hljs-comment">// 使用buffer存储写入的block数据</span><br><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(bm-&gt;block_size())</span></span>;<br>bm-&gt;<span class="hljs-built_in">read_block</span>(<span class="hljs-number">1</span> + block_idx, buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-comment">// 实现转换，保证数组的最小单位是block_id_t</span><br><span class="hljs-type">block_id_t</span> *table = <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">block_id_t</span> *&gt;(buffer.<span class="hljs-built_in">data</span>());<br>table[entry_idx] = bid;<br>bm-&gt;<span class="hljs-built_in">write_block</span>(<span class="hljs-number">1</span> + block_idx, buffer.<span class="hljs-built_in">data</span>()).<span class="hljs-built_in">unwrap</span>();<br></code></pre></td></tr></table></figure>
+
+<p>这一部分实现后，即可通过以下测试：</p>
+<ul>
+<li><code>InodeManagerTest.InitAndTable</code></li>
+<li><code>InodeManagerTest.Allocation</code></li>
+</ul>
+<h3 id="part3-filesystem-layer"><a href="#part3-filesystem-layer" class="headerlink" title="part3: filesystem layer"></a>part3: filesystem layer</h3><p>在filesystem层，我们可以尽情使用<code>block_manager_</code>, <code>inode_manager_</code>, <code>block_allocator_</code>的相关api了</p>
+<p>本部分的错误处理过于冗余，因此提供的代码会进行简化</p>
+<h4 id="part-3A-create"><a href="#part-3A-create" class="headerlink" title="part 3A: create"></a>part 3A: create</h4><p>本部分实现<code>alloc_inode</code>函数，按照以下步骤即可：</p>
+<ul>
+<li>为inode分配一个空闲block：使用block allocator的<code>allocate</code>函数获取bid即可，注意我们的数据都经过<code>ChfsResult</code>包装过，便于进行错误检查，要想获得里面的数据，使用<code>unwrap()</code>即可</li>
+<li>分配inode：使用inode manager的<code>allocate_inode</code>函数即可</li>
+<li>初始化inode block：这里其实在上一步就已经实现了</li>
+</ul>
+<p>部分实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span></span><br><span class="hljs-comment">// 1. Allocate a block for the inode.</span><br><span class="hljs-keyword">auto</span> block_res = <span class="hljs-keyword">this</span>-&gt;block_allocator_-&gt;<span class="hljs-built_in">allocate</span>();<br><span class="hljs-comment">// unwrap用于获取Result的值，即获取bid，提供给allocate_inode使用</span><br><span class="hljs-type">block_id_t</span> bid = block_res.<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-comment">// 2. Allocate an inode.</span><br>inode_res = <span class="hljs-keyword">this</span>-&gt;inode_manager_-&gt;<span class="hljs-built_in">allocate_inode</span>(type, bid);<br><span class="hljs-comment">// 3. Initialize the inode block</span><br><span class="hljs-comment">//    and write the block back to block manager.</span><br></code></pre></td></tr></table></figure>
+
+<p>现在能通过以下单元测试了：</p>
+<ul>
+<li><code>BasicFileSystemTest.Init</code></li>
+<li><code>FileSystemTest.CreateAndGetAttr</code></li>
+</ul>
+<h4 id="part-3B-read-and-write"><a href="#part-3B-read-and-write" class="headerlink" title="part 3B: read and write"></a>part 3B: read and write</h4><p>这部分应该是整个lab最难的部分，因为需要同时考虑direct block和indirect block（幸运的是，有足够的证据证明每个inode只有一个indirect block），因此回到<code>inode.h</code>，寻找一些和这俩有关的api，后面会用到</p>
+<p>为了克服难题，我们需要认真阅读两个函数中已经实现的部分</p>
+<p>首先是<code>read_file</code>函数，该函数根据inode id干了这些事：</p>
+<ul>
+<li>读取inode，将其变成了<code>inode_p</code>指针，注意这一阶段分配了一个<code>std::vector&lt;u8&gt; indirect_block(0)</code>，便于到时候我们缓存indirect block的内容</li>
+<li>遍历inode存放的所有block id，分类讨论是否是indirect block来准确获得存放file的bid</li>
+<li>根据bid进行<code>read_file</code>，追加到content中，注意这个content是一个<code>std::vector&lt;u8&gt;</code>，而不是一个<code>std::string</code>，在转换时注意类型转换</li>
+</ul>
+<p>我们要实现的是第2、3步，分别来说一下，首先是获取bid这一步，分类讨论：</p>
+<ul>
+<li>direct block：直接读取blocks数组的对应位置即可</li>
+<li>indirect block：使用<code>get_indirect_block_id</code>函数将indirect读取进入<code>indirect_block.data()</code>这一缓冲区，将其转换成<code>block_id_t</code>数组，最后定位到数组对应位置即可，注意在定位时要减去<code>get_direct_block_num</code></li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// Get current block id.</span><br><span class="hljs-type">block_id_t</span> bid = KInvalidBlockID;<br><span class="hljs-keyword">if</span> (inode_p-&gt;<span class="hljs-built_in">is_direct_block</span>(read_sz / block_size)) &#123;<br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement the case of direct block.</span><br>  <span class="hljs-comment">// 直接从inode中获取block id</span><br>  bid = inode_p-&gt;blocks[read_sz / block_size];<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement the case of indirect block.</span><br>  <span class="hljs-comment">// 先进入indirect block，再从indirect block中获取block id</span><br>  block_manager_-&gt;<span class="hljs-built_in">read_block</span>(inode_p-&gt;<span class="hljs-built_in">get_indirect_block_id</span>(),<br>                             indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-comment">// 将indirect_block转换为block_id_t数组</span><br>  <span class="hljs-keyword">auto</span> indirect_block_p =<br>      <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">block_id_t</span> *&gt;(indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-comment">// 在indirect block中，从direct block的数量开始找</span><br>  bid =<br>      indirect_block_p[read_sz / block_size - inode_p-&gt;<span class="hljs-built_in">get_direct_block_num</span>()];<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后是读取文件到content这一步，比较简单，善用内置api即可：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Read from current block and store to `content`.</span><br><span class="hljs-keyword">auto</span> read_res = <span class="hljs-keyword">this</span>-&gt;block_manager_-&gt;<span class="hljs-built_in">read_block</span>(bid, buffer.<span class="hljs-built_in">data</span>());<br><span class="hljs-comment">// content用于存放file读取的内容</span><br>content.<span class="hljs-built_in">insert</span>(content.<span class="hljs-built_in">end</span>(), buffer.<span class="hljs-built_in">data</span>(), buffer.<span class="hljs-built_in">data</span>() + sz);  <br>read_sz += sz;<br></code></pre></td></tr></table></figure>
+
+<p>其次是<code>write_file</code>函数，这个函数很冗长，干了这些事：</p>
+<ul>
+<li>依然是读取inode</li>
+<li>比较<code>inode_p-&gt;get_size()</code>和<code>content.size()</code>，看是否需要分配新的block或者释放多余的block（从这里就能看出，write_file是直接进行覆写），当然这里又要分类讨论是否是indirect block了</li>
+<li>将content分block_size写入对应的block中，这里还是要分类讨论是否是indirect block</li>
+<li>更新inode，所以我们在前面直接作用于inode_p即可，不用对inode block进行读写，<strong>但是，indirect block在这里可没更新，因此在前面必须要进行indirect block的读写</strong>（你可以理解成除了inode block以外的block平等地需要在前面就读写）</li>
+</ul>
+<p>我们要实现的依然是2、3步，注意分类讨论即可，由于复杂的错误处理逻辑，代码相当冗长，本攻略直接跳过了，交给代码补全吧</p>
+<p>先说分配更多的block这一步，遍历inode里面的blocks数组的idx时：</p>
+<ul>
+<li>使用block allocator进行<code>allocate</code>，得到bid</li>
+<li>根据idx判断是否是indirect block<ul>
+<li>direct block: 直接<code>set_block_direct</code></li>
+<li>indirect block: 使用<code>get_or_insert-indirect_block</code>分配一个indirect block，然后<code>read_block</code>得到indirect block的<code>block_id_t</code>数组，修改对应位置后<code>write_block</code></li>
+</ul>
+</li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement the case of allocating more blocks.</span><br><span class="hljs-comment">// 1. Allocate a block.</span><br><span class="hljs-keyword">auto</span> res = <span class="hljs-keyword">this</span>-&gt;block_allocator_-&gt;<span class="hljs-built_in">allocate</span>();<br><span class="hljs-type">block_id_t</span> bid = res.<span class="hljs-built_in">unwrap</span>();<br><span class="hljs-comment">// 2. Fill the allocated block id to the inode.</span><br><span class="hljs-comment">//    You should pay attention to the case of indirect block.</span><br><span class="hljs-comment">//    You may use function `get_or_insert_indirect_block`</span><br><span class="hljs-comment">//    in the case of indirect block.</span><br><span class="hljs-comment">// 分类讨论是否是direct block</span><br><span class="hljs-keyword">if</span> (inode_p-&gt;<span class="hljs-built_in">is_direct_block</span>(idx)) &#123;<br>  <span class="hljs-comment">// Direct block</span><br>  inode_p-&gt;<span class="hljs-built_in">set_block_direct</span>(idx, bid);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br>  <span class="hljs-comment">// Indirect block</span><br>  <span class="hljs-keyword">auto</span> indirect_res =<br>      inode_p-&gt;<span class="hljs-built_in">get_or_insert_indirect_block</span>(<span class="hljs-keyword">this</span>-&gt;block_allocator_);<br>  <span class="hljs-comment">// 读取indirect block内容到indirect_block</span><br>  <span class="hljs-keyword">auto</span> read_res = <span class="hljs-keyword">this</span>-&gt;block_manager_-&gt;<span class="hljs-built_in">read_block</span>(<br>      inode_p-&gt;<span class="hljs-built_in">get_indirect_block_id</span>(), indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-comment">// 将indirect_block转换为block_id_t数组</span><br>  <span class="hljs-keyword">auto</span> indirect_block_p =<br>      <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">block_id_t</span> *&gt;(indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-comment">// 在indirect block中，从direct block的数量开始找</span><br>  indirect_block_p[idx - inode_p-&gt;<span class="hljs-built_in">get_direct_block_num</span>()] = bid;<br>  <span class="hljs-comment">// 将修改后的indirect block写回block manager</span><br>  <span class="hljs-comment">// 而inode本身暂时不用写回磁盘，等最后一起写回</span><br>  <span class="hljs-keyword">auto</span> write_res = <span class="hljs-keyword">this</span>-&gt;block_manager_-&gt;<span class="hljs-built_in">write_block</span>(<br>      inode_p-&gt;<span class="hljs-built_in">get_indirect_block_id</span>(), indirect_block.<span class="hljs-built_in">data</span>());<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>释放多余的block就是将对应的位置变为KInvalidBlockID即可，变化不大，注意获取到bid进行deallocate即可。我们不用管indirect block本身释放的问题，因为代码已经实现了：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">if</span> (inode_p-&gt;<span class="hljs-built_in">is_direct_block</span>(idx)) &#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Free the direct extra block.</span><br>  <span class="hljs-type">block_id_t</span> bid = inode_p-&gt;blocks[idx];<br>  <span class="hljs-keyword">auto</span> res = <span class="hljs-keyword">this</span>-&gt;block_allocator_-&gt;<span class="hljs-built_in">deallocate</span>(bid);<br>&#125; <span class="hljs-keyword">else</span> &#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Free the indirect extra block.</span><br>  <span class="hljs-comment">// 进入到indirect block，回收里面存放的block</span><br>  <span class="hljs-keyword">auto</span> indirect_block_id = inode_p-&gt;<span class="hljs-built_in">get_indirect_block_id</span>();<br>  <span class="hljs-keyword">auto</span> read_res =<br>      <span class="hljs-keyword">this</span>-&gt;block_manager_-&gt;<span class="hljs-built_in">read_block</span>(indirect_block_id, indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-keyword">auto</span> indirect_block_p =<br>      <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">block_id_t</span> *&gt;(indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-type">block_id_t</span> bid = indirect_block_p[idx - inode_p-&gt;<span class="hljs-built_in">get_direct_block_num</span>()];<br>  <span class="hljs-keyword">auto</span> res = <span class="hljs-keyword">this</span>-&gt;block_allocator_-&gt;<span class="hljs-built_in">deallocate</span>(bid);<br>  <span class="hljs-comment">// 既然之前有read_block，现在就要写回indirect block</span><br>  indirect_block_p[idx - inode_p-&gt;<span class="hljs-built_in">get_direct_block_num</span>()] = KInvalidBlockID;<br>  <span class="hljs-keyword">auto</span> write_res = <span class="hljs-keyword">this</span>-&gt;block_manager_-&gt;<span class="hljs-built_in">write_block</span>(indirect_block_id, indirect_block.<span class="hljs-built_in">data</span>());<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后以block_size为单位将content写入block即可（由于已经<code>std::memcpy</code>过，故我们操作的是<code>buffer.data()</code>），分类讨论是否是indirect block即可，这里和read_file区别不大：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">buffer</span><span class="hljs-params">(block_size)</span></span>;<br><span class="hljs-built_in">memcpy</span>(buffer.<span class="hljs-built_in">data</span>(), content.<span class="hljs-built_in">data</span>() + write_sz, sz);<br><br><span class="hljs-type">block_id_t</span> bid = KInvalidBlockID;<br><span class="hljs-keyword">if</span> (inode_p-&gt;<span class="hljs-built_in">is_direct_block</span>(block_idx)) &#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement getting block id of current direct block.</span><br>  bid = inode_p-&gt;blocks[block_idx];<br><br>&#125; <span class="hljs-keyword">else</span> &#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Implement getting block id of current indirect block.</span><br>  <span class="hljs-comment">// 先进入到indirect block，再从indirect block中获取block id</span><br>  block_manager_-&gt;<span class="hljs-built_in">read_block</span>(inode_p-&gt;<span class="hljs-built_in">get_indirect_block_id</span>(),<br>                             indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-comment">// 将indirect_block转换为block_id_t数组</span><br>  <span class="hljs-keyword">auto</span> indirect_block_p =<br>      <span class="hljs-built_in">reinterpret_cast</span>&lt;<span class="hljs-type">block_id_t</span> *&gt;(indirect_block.<span class="hljs-built_in">data</span>());<br>  <span class="hljs-comment">// 在indirect block中，从direct block的数量开始找</span><br>  bid = indirect_block_p[block_idx - inode_p-&gt;<span class="hljs-built_in">get_direct_block_num</span>()];<br><br>&#125;<br><br><span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> Write to current block.</span><br><span class="hljs-keyword">auto</span> write_res = <span class="hljs-keyword">this</span>-&gt;block_manager_-&gt;<span class="hljs-built_in">write_block</span>(bid, buffer.<span class="hljs-built_in">data</span>());<br><br>write_sz += sz;<br>block_idx += <span class="hljs-number">1</span>;<br></code></pre></td></tr></table></figure>
+
+<p>实现复杂的逻辑后，我们可以通过以下测试了：</p>
+<ul>
+<li><code>FileSystemTest.WriteLargeFile</code></li>
+<li><code>FileSystemTest.SetAttr</code></li>
+</ul>
+<h4 id="part-3C-operations-on-directory-entries"><a href="#part-3C-operations-on-directory-entries" class="headerlink" title="part 3C: operations on directory entries"></a>part 3C: operations on directory entries</h4><p>这一部分主要就是一些<code>std::string</code>操作，比较简单，<strong>但是一定要注意，content不是string类型，因此类型转换时要相当小心</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs parse_directory```函数是```dir_list_to_string```的反函数（后面会用到），使用stream来分割字符串即可，注意```std::string```和```inode_id_t```的类型转换可以使用内置的```string_to_inode_id```函数即可："><br>```cpp<br>void parse_directory(std::string &amp;src, std::list&lt;DirectoryEntry&gt; &amp;list) &#123;<br><br>  // TODO: Implement this function.<br>  // 使用stream来分割字符串<br>  std::stringstream ss(src);<br>  std::string item;<br>  while (std::getline(ss, item, &#x27;/&#x27;)) &#123;<br>    auto pos = item.find(&#x27;:&#x27;);<br>    if (pos != std::string::npos) &#123;<br>      DirectoryEntry entry;<br>      entry.name = item.substr(0, pos);<br>      std::string id_str = item.substr(pos + 1);<br>      entry.id = string_to_inode_id(id_str);<br>      list.push_back(entry); <br>    &#125;<br>  &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><figcaption><span>char*>```进行类型转换**，最后使用```parse_directory```函数将directory变成```std::list<DirectoryEntry>```即可：</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs read_directory```函数使用```read_file```函数将directory抽象成的file的```content.unwrap()```读取上来，**使用```reinterpret_cast<const"><br>```cpp<br>auto read_directory(FileOperation *fs, inode_id_t id,<br>                    std::list&lt;DirectoryEntry&gt; &amp;list) -&gt; ChfsNullResult &#123;<br>  <br>  // TODO: Implement this function.<br>  // 根据inode id找到directory所在的file<br>  auto content = fs-&gt;read_file(id);<br>  if (content.is_err()) &#123;<br>    return ChfsNullResult(content.unwrap_error());<br>  &#125;<br>  // 将存储的string转换成list&lt;entry&gt;<br>  const auto &amp;vec = content.unwrap();<br>  std::string data(reinterpret_cast&lt;const char*&gt;(vec.data()), vec.size());<br>  parse_directory(data, list);<br><br>  return KNullOk;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs append_to_directory```主要就是直接操作```std::string```："><br>```cpp<br>auto append_to_directory(std::string src, std::string filename, inode_id_t id)<br>    -&gt; std::string &#123;<br><br>  // TODO: Implement this function.<br>  //       Append the new directory entry to `src`.<br>  // 将&#x27;/&#x27;补上去<br>  if (!src.empty()) &#123;<br>    src += &#x27;/&#x27;;<br>  &#125;<br>  src += filename + &#x27;:&#x27; + inode_id_to_string(id);<br>  <br>  return src;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs rm_from_directory```将src遍历一次，将不是filename的部分写入到返回值即可："><br>```cpp<br>auto rm_from_directory(std::string src, std::string filename) -&gt; std::string &#123;<br><br>  auto res = std::string(&quot;&quot;);<br><br>  // TODO: Implement this function.<br>  //       Remove the directory entry from `src`.<br>  // 使用stream来分割字符串，将不等于filename的部分重新拼接起来<br>  std::stringstream ss(src);<br>  std::string item;<br>  bool first = true;<br>  while (std::getline(ss, item, &#x27;/&#x27;)) &#123;<br>    auto pos = item.find(&#x27;:&#x27;);<br>    if (pos != std::string::npos) &#123;<br>      std::string name = item.substr(0, pos);<br>      if (name != filename) &#123;<br>        if (!first) &#123;<br>          res += &#x27;/&#x27;;<br>        &#125;<br>        res += item;<br>        first = false;<br>      &#125;<br>    &#125;<br>  &#125; <br><br>  return res;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>现在我们可以通过以下测试了：</p>
+<ul>
+<li><code>FileSystemBase.Utilities</code></li>
+<li><code>FileSystemBase.UtilitiesRemove</code></li>
+<li><code>FileSystemTest.DirectOperationAdd</code></li>
+</ul>
+<h4 id="part-3D-combine-directory-and-file-together"><a href="#part-3D-combine-directory-and-file-together" class="headerlink" title="part 3D: combine directory and file together"></a>part 3D: combine directory and file together</h4><p>这部分主要是操作directory抽象成的file，活用上一部分的几个函数即可，还是注意<code>content.unwrap()</code>的类型转换即可，本攻略依然忽略部分冗余的错误处理以简化逻辑</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs lookup```函数要求我们使用```read_directory```函数获得```std::list<DirectoryEntry>```，遍历这个list即可："><br>```cpp<br>auto FileOperation::lookup(inode_id_t id, const char *name)<br>    -&gt; ChfsResult&lt;inode_id_t&gt; &#123;<br>  std::list&lt;DirectoryEntry&gt; list;<br><br>  // TODO: Implement this function.<br>  // 根据inode id找到directory所在的file<br>  auto read_res = read_directory(this, id, list);<br>  // 在list中寻找name对应的entry<br>  auto it = std::find_if(list.begin(), list.end(),<br>                         [name](const DirectoryEntry &amp;entry) &#123;<br>                           return entry.name == name;<br>                         &#125;);<br>  if (it != list.end()) &#123;<br>    return ChfsResult&lt;inode_id_t&gt;(it-&gt;id);<br>  &#125;<br><br>  return ChfsResult&lt;inode_id_t&gt;(ErrorType::NotExist);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs mk_helper```函数分为以下几步："><br>- 使用```lookup```函数判断是否已经在里面<br>- 为这个文件分配新的inode<br>- 将新的```filename &lt;-&gt; inode num```映射关系写回directory即可（当然这里步骤重复了，你可以不使用lookup函数，这样可以少一次```read_directory```；或者使用```append_to_directory```简化代码也可以）<br><br>实现如下：<br><br>```cpp<br>auto FileOperation::mk_helper(inode_id_t id, const char *name, InodeType type)<br>    -&gt; ChfsResult&lt;inode_id_t&gt; &#123;<br><br>  // TODO:<br>  // 1. Check if `name` already exists in the parent.<br>  //    If already exist, return ErrorType::AlreadyExist.<br>  // 直接使用lookup函数<br>  auto lookup_res = lookup(id, name);<br>  // 排除掉已存在和其他错误<br>  if (lookup_res.is_ok()) &#123;<br>    return ChfsResult&lt;inode_id_t&gt;(ErrorType::AlreadyExist);<br>  &#125; else if (lookup_res.unwrap_error() != ErrorType::NotExist) &#123;<br>    return ChfsResult&lt;inode_id_t&gt;(lookup_res.unwrap_error());<br>  &#125;<br>  // 2. Create the new inode.<br>  auto alloc_res = this-&gt;alloc_inode(type);<br>  inode_id_t new_inode_id = alloc_res.unwrap();<br>  // 3. Append the new entry to the parent directory.<br>  // 使用read directory函数得到list<br>  auto list = std::list&lt;DirectoryEntry&gt;();<br>  auto read_res = read_directory(this, id, list);<br>  // 将新inode添加到目录中<br>  list.push_back(DirectoryEntry&#123;std::string(name), new_inode_id&#125;);<br>  // 将list转换成string<br>  std::string data = dir_list_to_string(list);<br>  // 将string写回到文件中<br>  std::vector&lt;u8&gt; new_content(data.begin(), data.end());<br>  auto write_res = this-&gt;write_file(id, new_content);<br>  return ChfsResult&lt;inode_id_t&gt;(new_inode_id);<br><br>  // return ChfsResult&lt;inode_id_t&gt;(static_cast&lt;inode_id_t&gt;(0));<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后是<code>unlink</code>函数，步骤如下：</p>
+<ul>
+<li>使用<code>lookup</code>函数找到inode id来<code>remove_file</code>（参考<code>operations.h</code>）</li>
+<li>使用<code>read_directory</code>得到list，删除filename对应的条目后写回文件即可（类似于<code>mk_helper</code>的最后一步，当然也可以使用<code>rm_from_directory</code>简化代码）</li>
+</ul>
+<p>实现如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-keyword">auto</span> <span class="hljs-title">FileOperation::unlink</span><span class="hljs-params">(<span class="hljs-type">inode_id_t</span> parent, <span class="hljs-type">const</span> <span class="hljs-type">char</span> *name)</span></span><br><span class="hljs-function">    -&gt; ChfsNullResult </span>&#123;<br><br>  <span class="hljs-comment">// <span class="hljs-doctag">TODO:</span> </span><br>  <span class="hljs-comment">// 1. Remove the file, you can use the function `remove_file`</span><br>  <span class="hljs-comment">// 使用lookup找到对应的inode id</span><br>  <span class="hljs-keyword">auto</span> lookup_res = <span class="hljs-built_in">lookup</span>(parent, name);<br>  <span class="hljs-type">inode_id_t</span> target_id = lookup_res.<span class="hljs-built_in">unwrap</span>();<br>  <span class="hljs-keyword">auto</span> remove_res = <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">remove_file</span>(target_id);<br>  <span class="hljs-comment">// 2. Remove the entry from the directory.</span><br>  <span class="hljs-comment">// 使用read directory函数得到list</span><br>  <span class="hljs-keyword">auto</span> list = std::<span class="hljs-built_in">list</span>&lt;DirectoryEntry&gt;();<br>  <span class="hljs-keyword">auto</span> read_res = <span class="hljs-built_in">read_directory</span>(<span class="hljs-keyword">this</span>, parent, list);<br>  <span class="hljs-comment">// 在list中删除对应的entry</span><br>  list.<span class="hljs-built_in">remove_if</span>([name](<span class="hljs-type">const</span> DirectoryEntry &amp;entry) &#123;<br>    <span class="hljs-keyword">return</span> entry.name == name;<br>  &#125;);<br>  <span class="hljs-comment">// 将list转换成string</span><br>  std::string data = <span class="hljs-built_in">dir_list_to_string</span>(list);<br>  <span class="hljs-comment">// 将string写回到文件中</span><br>  <span class="hljs-function">std::vector&lt;u8&gt; <span class="hljs-title">new_content</span><span class="hljs-params">(data.begin(), data.end())</span></span>;<br>  <span class="hljs-keyword">auto</span> write_res = <span class="hljs-keyword">this</span>-&gt;<span class="hljs-built_in">write_file</span>(parent, new_content);<br>  <span class="hljs-keyword">return</span> KNullOk;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>完成最后一部分后，可以通过以下单元测试：</p>
+<ul>
+<li><code>FileSystemTest.mkdir</code></li>
+</ul>
+<p>跑完所有单元测试后，跑跑集成测试即可</p>
+<p>总结一下这个lab，难度不大，步骤注释都有写，根据头文件熟悉api即可，注意两个坑：</p>
+<ul>
+<li>write_file一定要在读取indirect block后及时写回</li>
+<li><code>std:vector&lt;u8&gt;</code>转换成<code>std::string</code>时，一定要使用<code>reinterpret_cast&lt;const char*&gt;</code>，这样<code>std::string</code>才能正确解读<code>u8 -&gt; char</code></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/se/" class="print-no-link">#se</a>
+      
+        <a href="/tags/cse/" class="print-no-link">#cse</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>CSE_lab1攻略</div>
+      <div>http://example.com/2025/09/27/CSE-lab1攻略/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>jietiDdd</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年9月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'jietiDdd/jietiDdd.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
