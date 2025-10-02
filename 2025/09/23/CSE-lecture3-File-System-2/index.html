@@ -29,8 +29,10 @@
 <meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/c8230670407bcb77627aae41d91fc0ac.png">
 <meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/3cf6e0694a37bc72f0029c1ca4bd0e68.png">
 <meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/6d38a963e25efe49cbd6d2831a2c03a1.png">
+<meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/a4dc455cd7c99c1613c5948ed6f6c6c4.png">
+<meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/2f79725c8cae374f6bddb0845b3dc3eb.png">
 <meta property="article:published_time" content="2025-09-23T08:02:33.000Z">
-<meta property="article:modified_time" content="2025-09-27T12:11:49.510Z">
+<meta property="article:modified_time" content="2025-10-02T11:24:01.196Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -228,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          901 字
+          1k 字
         
       </span>
     
@@ -239,7 +241,7 @@
         
         
         
-          8 分钟
+          9 分钟
         
       </span>
     
@@ -350,6 +352,18 @@
 <li><code>UNLINK(from_name)</code>: refcnt变回1</li>
 </ol>
 <p>在1和2之间断电，至少保证了from_name和to_name指向同一个文件</p>
+<h3 id="other-file-systems-not-inode"><a href="#other-file-systems-not-inode" class="headerlink" title="other file systems(not inode)"></a>other file systems(not inode)</h3><ul>
+<li>方法1：使用连续的block存储文件</li>
+<li>方法2：使用linked list，即FAT(file allcation table)：<img src="/2025/09/23/CSE-lecture3-File-System-2/a4dc455cd7c99c1613c5948ed6f6c6c4.png" srcset="/img/loading.gif" lazyload class="" title="FAT">
+<ul>
+<li>FAT为一个linked list，和block一一对应，这导致FAT的容错性差</li>
+<li>file number为list起始位置得索引</li>
+<li>将空的block视为一个大文件，对应一个free list</li>
+<li>写入文件时，从free list中获取空闲的block，并将它们link起来</li>
+<li>FAT的目录包含了file name, file number, next，因此也不支持硬链接，根目录在sector 0<img src="/2025/09/23/CSE-lecture3-File-System-2/2f79725c8cae374f6bddb0845b3dc3eb.png" srcset="/img/loading.gif" lazyload class="" title="directory in FAT"></li>
+</ul>
+</li>
+</ul>
 
                 
               </div>

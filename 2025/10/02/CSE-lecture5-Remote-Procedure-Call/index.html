@@ -19,25 +19,29 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Scalability in Practice: a Highly scalable web app互联网应用需要支撑的三个能力：  处理海量的请求 存储海量的数据 透明化的可拓展性(transparent scale)  因此我们需要构建一个scalable的系统 case study: an e-commerce web application一次点击可能需要上千的服务器处理 远古时代使用单个">
+    <meta name="description" content="Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture4:Distributed System">
-<meta property="og:url" content="http://example.com/2025/09/28/CSE-lecture4-Distributed-System/index.html">
+<meta property="og:title" content="CSE_lecture5:Remote Procedure Call">
+<meta property="og:url" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Scalability in Practice: a Highly scalable web app互联网应用需要支撑的三个能力：  处理海量的请求 存储海量的数据 透明化的可拓展性(transparent scale)  因此我们需要构建一个scalable的系统 case study: an e-commerce web application一次点击可能需要上千的服务器处理 远古时代使用单个">
+<meta property="og:description" content="Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/09/28/CSE-lecture4-Distributed-System/b606b7ce159f883c8096c36c7f2659d6.png">
-<meta property="article:published_time" content="2025-09-28T07:54:49.000Z">
-<meta property="article:modified_time" content="2025-10-01T14:41:25.957Z">
+<meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/ca5a0cd169e9a0ba6b37aeac0d06031a.png">
+<meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/96263d51ce570e304e3047161cf0ce03.png">
+<meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/fd22e083eed71a927efb9d4f8ef80a31.png">
+<meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/b1bcdc87b62594a6bfb45eb8e756b3d5.png">
+<meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/e5cd42d45f962faa66e26271b730392c.png">
+<meta property="article:published_time" content="2025-10-02T11:00:47.000Z">
+<meta property="article:modified_time" content="2025-10-02T12:51:39.038Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/09/28/CSE-lecture4-Distributed-System/b606b7ce159f883c8096c36c7f2659d6.png">
+<meta name="twitter:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/ca5a0cd169e9a0ba6b37aeac0d06031a.png">
   
   
   
-  <title>CSE_lecture4:Distributed System - jietiDdd的个人博客</title>
+  <title>CSE_lecture5:Remote Procedure Call - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -203,7 +207,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture4:Distributed System"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture5:Remote Procedure Call"></span>
           
         </div>
 
@@ -214,8 +218,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-09-28 15:54" pubdate>
-          2025年9月28日 下午
+        <time datetime="2025-10-02 19:00" pubdate>
+          2025年10月2日 晚上
         </time>
       </span>
     
@@ -226,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          630 字
         
       </span>
     
@@ -237,7 +241,7 @@
         
         
         
-          11 分钟
+          6 分钟
         
       </span>
     
@@ -274,64 +278,73 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture4:Distributed System</h1>
+            <h1 id="seo-header">CSE_lecture5:Remote Procedure Call</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="Scalability-in-Practice-a-Highly-scalable-web-app"><a href="#Scalability-in-Practice-a-Highly-scalable-web-app" class="headerlink" title="Scalability in Practice: a Highly scalable web app"></a>Scalability in Practice: a Highly scalable web app</h2><p>互联网应用需要支撑的三个能力：</p>
-<ul>
-<li>处理海量的请求</li>
-<li>存储海量的数据</li>
-<li>透明化的可拓展性(transparent scale)</li>
-</ul>
-<p>因此我们需要构建一个scalable的系统</p>
-<h3 id="case-study-an-e-commerce-web-application"><a href="#case-study-an-e-commerce-web-application" class="headerlink" title="case study: an e-commerce web application"></a>case study: an e-commerce web application</h3><p>一次点击可能需要上千的服务器处理</p>
-<p>远古时代使用单个服务器架构：应用层、文件系统、数据库集成在一起，但这也导致了一些问题</p>
-<p><em>问题一：存储容量无法满足要求</em></p>
-<h4 id="step-1-for-scalability-disaggregating-application-data"><a href="#step-1-for-scalability-disaggregating-application-data" class="headerlink" title="step 1 for scalability: disaggregating application &amp; data"></a>step 1 for scalability: disaggregating application &amp; data</h4><p>使用大公司提供的数据库和文件系统来存储海量数据，当需要存储更多数据时购买额外的服务即可</p>
-<p>但是每次访问数据都既要访问磁盘，又要网络请求，因此会非常慢</p>
-<h4 id="step-2-avoid-the-slow-data-accesses-caching"><a href="#step-2-avoid-the-slow-data-accesses-caching" class="headerlink" title="step 2 avoid the slow data accesses? caching"></a>step 2 avoid the slow data accesses? caching</h4><p>使用缓存来加速访问数据，这是考虑到大部分访问都是在访问那少部分数据</p>
-<p>但问题在于内存很小，只能放下很少的数据，因此使用多台server来存放cache</p>
-<p>memcached是一种distributed cache server，它使用key-value来标记，从而找到数据存放在个caching server；同时使用路由(routing)来实现key和ip的映射</p>
-<p>使用hash来根据key计算address，公式为 $address &#x3D; Hash(key);%;#server$，使用consistent hashing来保证增加新的server时miss不会太多</p>
-<img src="/2025/09/28/CSE-lecture4-Distributed-System/b606b7ce159f883c8096c36c7f2659d6.png" srcset="/img/loading.gif" lazyload class="" title="consistent hashing">
+                <h2 id="Remote-Procedure-Call"><a href="#Remote-Procedure-Call" class="headerlink" title="Remote Procedure Call"></a>Remote Procedure Call</h2><p>RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程</p>
+<p>为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub</p>
+<img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/ca5a0cd169e9a0ba6b37aeac0d06031a.png" srcset="/img/loading.gif" lazyload class="" title="RPC stub">
 
-<p><em>问题二：应用层使用CPU处理，但单个CPU的拓展能力有限，这是由于moore’s law和dennard scaling导致了无法通过提升硬件来解决问题</em></p>
-<h4 id="step-3-for-scalability-more-app-servers"><a href="#step-3-for-scalability-more-app-servers" class="headerlink" title="step 3 for scalability: more app servers"></a>step 3 for scalability: more app servers</h4><p>这对于stateless（即没有上下文）的请求效果良好，而对于stateful的请求效果较差（这是因为其他app server没有context），当然也可以使用一些手段来将stateful转换为stateless（比如将context存储在用户端）</p>
-<p>为了让多个app server的请求流量比较平均，使用load balance，如round-robin, random, hashing等等，好的balance能够考虑到不同请求的时间长短和各个server的不同处理能力</p>
-<h4 id="step-4-for-scalability-distributed-databases"><a href="#step-4-for-scalability-distributed-databases" class="headerlink" title="step 4 for scalability: distributed databases"></a>step 4 for scalability: distributed databases</h4><p>远古时代使用一个数据库只读，一个数据库只写的方法，但这样无法保证正确性</p>
-<p>因此现在使用将数据均匀地分配在不同的机器上，上层使用算法来保证多台机器和单台机器等价，即complex consistency management</p>
-<h4 id="step-5-for-scalability-distributed-file-system"><a href="#step-5-for-scalability-distributed-file-system" class="headerlink" title="step 5 for scalability: distributed file system"></a>step 5 for scalability: distributed file system</h4><p>经过前五步架构，当一个请求来了之后，先进行load balance来防止排队，从而抵达应用层；数据和文件分布在多台机器上，从而按需拓展；缓存层来加速数据访问。因此一次访问需要经过多台服务器</p>
-<p>不同的任务需要不同的scale方法</p>
-<h4 id="step-6-for-scalability-using-CDN"><a href="#step-6-for-scalability-using-CDN" class="headerlink" title="step 6 for scalability: using CDN"></a>step 6 for scalability: using CDN</h4><p>网络服务商上使用CDN来缓存一些数据，在应用层之前就获取到数据，这样离用户更近</p>
-<h4 id="step-7-for-scalability-separate-different-applications"><a href="#step-7-for-scalability-separate-different-applications" class="headerlink" title="step 7 for scalability: separate different applications"></a>step 7 for scalability: separate different applications</h4><p>使用容器来打包应用，使用k8s来管理多个容器</p>
-<p>复杂的请求需要复杂的计算，因此需要使用distributed computing，根据不同的计算场景使用不同的计算框架</p>
-<p>因此每一个应用层后面接一个计算框架，从而提供针对性的服务</p>
-<p>现在我们构成了一个并行与分布式系统，这是在现代数据中心的支持下实现的，这些数据中心都是有备份的</p>
-<h3 id="challenge-fault-handling"><a href="#challenge-fault-handling" class="headerlink" title="challenge: fault handling"></a>challenge: fault handling</h3><p>三种出错方式：</p>
+<p>client stub做以下事情：发请求，接受响应，进行convert</p>
+<img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/96263d51ce570e304e3047161cf0ce03.png" srcset="/img/loading.gif" lazyload class="" title="client stub">
+
+<p>server stub做以下事情：使用一个do forever不断接受请求，根据参数进行switch case，从而判断响应OK与否</p>
+<img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/fd22e083eed71a927efb9d4f8ef80a31.png" srcset="/img/loading.gif" lazyload class="" title="server stub">
+
+<p>其中message里面包括：</p>
 <ul>
-<li>fault: 可以是潜在的或激活的，可以是软件层面的，也可以是硬件层面的，这是很常见的</li>
-<li>error: 是激活fault的结果</li>
-<li>failure: 发生在错误没有被检测和屏蔽时</li>
+<li>service id</li>
+<li>service parameter</li>
+<li>marshal&#x2F;unmarshal: 即保证object以序列化的形式传输，从而替代指针，收到消息后根据规则进行反序列化</li>
 </ul>
-<p>总结一下：Fault（缺陷） -&gt; 激活 -&gt; Error（错误） -&gt; 未被检测&#x2F;屏蔽 -&gt; Failure（失效）</p>
-<p>分布式系统的规模实在太大，导致fault频发，然而，即使有少部分遇到failure，对外依然能够正确运行，而partial failure难以侦测</p>
-<p>以unreliable network为例，请求未响应的原因很多：</p>
+<p>RPC request message包括：</p>
 <ul>
-<li>远程服务器挂了</li>
-<li>请求包丢失了</li>
-<li>请求在队列里排队，导致不能及时响应</li>
-<li>垃圾回收的耗时导致远程服务器暂停响应</li>
-<li>响应丢失</li>
-<li>响应延迟</li>
+<li>Xid: 即transaction id，保证每个消息都有一个id，便于重发</li>
+<li>call&#x2F;reply</li>
+<li>rpc version</li>
+<li>program #: 调用哪个程序（库文件）</li>
+<li>program version</li>
+<li>procedure #: 调用哪个函数</li>
+<li>auth staff</li>
+<li>arguments: 需要序列化</li>
 </ul>
-<p>另一个常见的fault为network partition，即组内能通信，但组与组之间不能，这可能是因为机器或者交换机宕机，也可能是因为物理损坏</p>
-<p>而分布式系统需要处理fault来提供always-on的状态</p>
-<p>可用性是建立在以极快的速度处理fault的基础上，即提升可靠性</p>
-<p>为了达到高可用性，可以使用replications，即冗余，这样只要保证其中之一响应就好，但这样带来了consistency问题；或者使用retry，对于stateless的情况不会有一致性问题，而有些请求会有一致性问题</p>
-<h3 id="CAP-Consistency-availability-partition-tolerance"><a href="#CAP-Consistency-availability-partition-tolerance" class="headerlink" title="CAP: Consistency, availability, partition tolerance"></a>CAP: Consistency, availability, partition tolerance</h3><p>无法在网络分区的情况下同时保证一致性和高可用性，需要牺牲其中之一</p>
-<p>总而言之，分布式系统需要trade-off以下特性：scalability, performance, fault tolarance, consistency, ease of programming</p>
+<p>RPC reply message包括以下部分：</p>
+<ul>
+<li>Xid</li>
+<li>call&#x2F;reply</li>
+<li>accepted?: 用于判定RPC version</li>
+<li>auth staff</li>
+<li>success?: 用于判定prog&#x2F;proc</li>
+<li>results: 需要序列化</li>
+</ul>
+<p>binding用于寻找服务器，这是依靠服务注册实现的</p>
+<h3 id="how-to-pass-the-data-between-client-server"><a href="#how-to-pass-the-data-between-client-server" class="headerlink" title="how to pass the data between client &amp; server?"></a>how to pass the data between client &amp; server?</h3><p>参数传递充满挑战性：</p>
+<ul>
+<li>跨服务器无法pass by reference，因此需要转换成pointless</li>
+<li>大小端的问题</li>
+<li>client和server的兼容性</li>
+</ul>
+<p>为了表示数据，需要进行encoding，这一般不会是语言特化的</p>
+<p>standard encoding有JSON, XML, CSV等等，好处是人类可读，缺点是可能有二义性、binary strings支持困难等等</p>
+<p>而binary formats难以阅读，但更紧凑、更准确、性能更好</p>
+<p>JSON每次传输时都要出现字段名，而Thrift和Protocol Buffers使用schema来将字段及其类型进行编号吗，从而进行压缩</p>
+<p>以Thrift为例：</p>
+<img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/b1bcdc87b62594a6bfb45eb8e756b3d5.png" srcset="/img/loading.gif" lazyload class="" title="The BinaryProtocol of Thrift">
+
+<p>压缩还可以进一步进行，需要将这些0去除，比如记录field tag的差值，将数字变为链表存储等等：</p>
+<img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/e5cd42d45f962faa66e26271b730392c.png" srcset="/img/loading.gif" lazyload class="" title="Thrift CompactProtocol">
+
+<p>stub代码可以自动生成，这只需要头文件即可</p>
+<p>marshal&#x2F;unmarshal也有可能反而耗时，因此其适用于慢的网速，而网速快时反而不需要压缩</p>
+<h3 id="when-RPC-meets-failure"><a href="#when-RPC-meets-failure" class="headerlink" title="when RPC meets failure"></a>when RPC meets failure</h3><p>本地调用基本不会出错，但RPC却可能遇到各种各样的错误，而我们的目标为只需要一次调用，而现在有三种场景：</p>
+<ul>
+<li>at-least-once: 反复retry即可</li>
+<li>at-most-once: server记录Xid，出现retry时将过去的结果返回，但问题在于什么时候删除</li>
+<li>exactly-once: 很困难</li>
+</ul>
+<p>需要区分幂等性(idempotent)和非幂等性，幂等的操作反复执行结果是一致的，用于保证at-most-once</p>
 
                 
               </div>
@@ -400,8 +413,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture4:Distributed System</div>
-      <div>http://example.com/2025/09/28/CSE-lecture4-Distributed-System/</div>
+      <div>CSE_lecture5:Remote Procedure Call</div>
+      <div>http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/</div>
     </div>
     <div class="license-meta">
       
@@ -413,7 +426,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年9月28日</div>
+          <div>2025年10月2日</div>
         </div>
       
       
@@ -445,18 +458,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/" title="CSE_lecture5:Remote Procedure Call">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture5:Remote Procedure Call</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/09/23/CSE-lecture3-File-System-2/" title="CSE_lecture3:File System 2">
-                        <span class="hidden-mobile">CSE_lecture3:File System 2</span>
+                      <a href="/2025/09/28/CSE-lecture4-Distributed-System/" title="CSE_lecture4:Distributed System">
+                        <span class="hidden-mobile">CSE_lecture4:Distributed System</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
