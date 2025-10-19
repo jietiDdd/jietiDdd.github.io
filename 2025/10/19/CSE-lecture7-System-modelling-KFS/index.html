@@ -19,30 +19,28 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和">
+    <meta name="description" content="System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture6:DFS">
-<meta property="og:url" content="http://example.com/2025/10/15/CSE-lecture6-DFS/index.html">
+<meta property="og:title" content="CSE_lecture7:System modelling + KFS">
+<meta property="og:url" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和">
+<meta property="og:description" content="System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/3ac75d20310a673dd00501890965bcb1.png">
-<meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/58612290f90e7c6454c79bd4cd8d9295.png">
-<meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/3ad4af297aedeb3c17c0061f7240a6c4.png">
-<meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/1a0a0c392651717ac3dbf2f7a5ae8dd6.png">
-<meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/41a22ca3644617bef74f55276b112d34.png">
-<meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/f6cbc95d13a07bf05afdb94981a38003.png">
-<meta property="article:published_time" content="2025-10-15T07:35:13.000Z">
-<meta property="article:modified_time" content="2025-10-18T09:38:01.181Z">
+<meta property="og:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/de6866305fcd4829bcb018bdc2027b75.png">
+<meta property="og:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/d89ba88fc1dcea773f6ea9f116d9c01d.png">
+<meta property="og:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/fb147884a89dbe1c28f818e3a06bf2c7.png">
+<meta property="og:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/2b4b853979f4bd5da57aca36d0b95162.png">
+<meta property="article:published_time" content="2025-10-19T05:15:33.000Z">
+<meta property="article:modified_time" content="2025-10-19T08:32:43.775Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/3ac75d20310a673dd00501890965bcb1.png">
+<meta name="twitter:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/de6866305fcd4829bcb018bdc2027b75.png">
   
   
   
-  <title>CSE_lecture6:DFS - jietiDdd的个人博客</title>
+  <title>CSE_lecture7:System modelling + KFS - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -208,7 +206,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture6:DFS"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture7:System modelling + KFS"></span>
           
         </div>
 
@@ -219,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-10-15 15:35" pubdate>
-          2025年10月15日 下午
+        <time datetime="2025-10-19 13:15" pubdate>
+          2025年10月19日 下午
         </time>
       </span>
     
@@ -231,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          1.3k 字
         
       </span>
     
@@ -279,86 +277,83 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture6:DFS</h1>
+            <h1 id="seo-header">CSE_lecture7:System modelling + KFS</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="Distributed-file-system-DFS"><a href="#Distributed-file-system-DFS" class="headerlink" title="Distributed file system(DFS)"></a>Distributed file system(DFS)</h2><p>distributed file service有以下类型：</p>
+                <h2 id="System-modelling-Key-value-stores-KVS"><a href="#System-modelling-Key-value-stores-KVS" class="headerlink" title="System modelling &amp; Key-value stores(KVS)"></a>System modelling &amp; Key-value stores(KVS)</h2><h3 id="key-value-store-abstraction"><a href="#key-value-store-abstraction" class="headerlink" title="key-value store abstraction"></a>key-value store abstraction</h3><p>key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单</p>
+<p>一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，value为文件的内容。使用system modelling来进行量化</p>
+<h3 id="system-modelling"><a href="#system-modelling" class="headerlink" title="system modelling"></a>system modelling</h3><p>在设计系统前，建立其内部模型抽象，提炼出决定系统行为的主要组成部分，实现定性模型。相较于直觉更科学，相较于实验更加高效和普适（但不代表就不用实验了）</p>
+<p>现在使用定性模型(qualitative system model)来分析使用filesystem的key-value store：</p>
 <ul>
-<li>upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性</li>
-<li>remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题</li>
-</ul>
-<h3 id="NFS-with-RPC"><a href="#NFS-with-RPC" class="headerlink" title="NFS with RPC"></a>NFS with RPC</h3><p>即network file system，特点为：</p>
-<ul>
-<li>任何机器都可以作为服务端或者客户端</li>
-<li>支持diskless workstations</li>
-<li>支持异构部署，兼容性好</li>
-<li>访问透明性，支持远程访问模型</li>
-<li>具备故障恢复能力</li>
-<li>高性能，使用cache和read-ahead等优化</li>
-</ul>
-<p>要将inode file system中的system call变为RPC，此时多了<code>NULL()</code>和<code>LOOKUP()</code>，少了<code>OPEN()</code>和<code>CLOSE()</code>，fd则变为fh，多了offset</p>
-<img src="/2025/10/15/CSE-lecture6-DFS/3ac75d20310a673dd00501890965bcb1.png" srcset="/img/loading.gif" lazyload class="" title="RPC in NFS">
-
-<p>首先实现mount，即挂载，server上将shared directories写入配置文件，client进行mount，实现远程路径和本地路径的映射</p>
-<p>每个request都需要有一个permission，以检查一下client是否是某一用户，然后server返回一个file handler</p>
-<img src="/2025/10/15/CSE-lecture6-DFS/58612290f90e7c6454c79bd4cd8d9295.png" srcset="/img/loading.gif" lazyload class="" title="NFS read a file">
-
-<p>NFS client从本地向application提供OPEN, READ, WRITE, CLOSE等接口，从而保证application不必修改代码；另一边通过网络访问NFS server，这才会使用RPC的接口</p>
-<p>OPEN操作其实并没有在server上真的打开文件，因此CLOSE也不会访问到server；READ操作也不会传递buffer给server；file attributes用于更新本地的inode，同时由于存在其他client更改文件，故这可用于维护一致性</p>
-<p>server是无状态的，不存放cursor，因此两次访问server之间发生重启不会出现错误，从而保证容错性的同时减少资源的使用；client则是有状态的，即存在file table等，存放cursor等，因此多次调用READ，需要调整offset，而RPC本身的READ由于存在offset，因此是幂等的</p>
-<p>client和server之间不能传递fd，不然就需要打开文件，违背了无状态性，因此传递fh</p>
-<p>fh不能使用path name，否则在一个client打开文件后，另一个client重命名目录时会出现问题</p>
-<img src="/2025/10/15/CSE-lecture6-DFS/3ad4af297aedeb3c17c0061f7240a6c4.png" srcset="/img/loading.gif" lazyload class="" title="rename after open">
-
-<p>也不能使用inode number，否则在一个client打开文件后，另一个client删除这个inode并分配一个新的文件，也会出现读取到新文件的问题，这需要额外维护版本号(generation number)，这不得不违背本地unix规范</p>
-<img src="/2025/10/15/CSE-lecture6-DFS/1a0a0c392651717ac3dbf2f7a5ae8dd6.png" srcset="/img/loading.gif" lazyload class="" title="delete after open">
-
-<p>因此file handler包含inode number和generation number</p>
-<p>性能上，通常慢于本地访问，但不总是，这和file server的性能和网速有关。为了优化，应当在client使用cache，从而降低远程操作的次数，如file data, file attribute, pathname bindings，而server端自动进行buffer cache，因此不需要额外操作</p>
-<p>cache会带来一致性问题(cache coherence)，即能否read到最近一次write(read observes last write)，有两种：</p>
-<ul>
-<li>close-to-open consistency: open时比较是否与cache的状态一致，close时再将本地cache的write一起发回server，性能好，但容易引发一致性问题</li>
-<li>read&#x2F;write coherence: 能在本地read到最新的数据，NFS client全权保证read&#x2F;write coherence，或只保证其中一部分</li>
-</ul>
-<p>处理方法如下：</p>
-<ul>
-<li>close-to-open consistency: close时刷新cache</li>
-<li>read&#x2F;write coherence: client和server都维护timestamp，反复比较，远程更新时无效化本地的cache，cache还需要设置有效时间</li>
-</ul>
-<p>还可以使用以下方法进一步优化性能：</p>
-<ul>
-<li>每次多传一些数据</li>
-<li>read-ahead: 提前多传一些头部数据</li>
-</ul>
-<h3 id="GFS-the-google-file-system"><a href="#GFS-the-google-file-system" class="headerlink" title="GFS: the google file system"></a>GFS: the google file system</h3><p>google具备以下特性：大部分文件是append而非overwritten，因此random write几乎为零；workload主要是read</p>
-<p>因此GFS的设计目标为：可扩展的分布式文件系统(scalable distributed file system)；为大型数据密集型应用设计；错误容忍度高；高性能</p>
-<p>GFS并没有提供标准的OS级别API，基本操作为create&#x2F;delete&#x2F;open&#x2F;close&#x2F;read&#x2F;write，多了snapshot&#x2F;append，少了link&#x2F;symlink&#x2F;rename，否则rename容易引发一致性问题（因为有多个备份，避免了inode和server的高耦合）</p>
-<p>GFS的架构为一台master和很多台chunk server，master控制元数据信息，chunk server存放具体的数据（其中chunk非常大，为64MB，应用于大文件场景）</p>
-<p>每一个文件都有三个备份，用于容错，这些chunk被放在不同的chunk server上，master管理metadata，放在memory中</p>
-<img src="/2025/10/15/CSE-lecture6-DFS/41a22ca3644617bef74f55276b112d34.png" srcset="/img/loading.gif" lazyload class="" title="GFS files">
-
-<p>large chunk的优点在于：减少通信次数，减小metadata的大小</p>
-<p>chunk handle全局唯一</p>
-<p>master唯一的好处在于，metadata在内存中，从而实现super-fast；operation log用于保证master的崩溃引发的容错</p>
-<p>client GFS不必cache</p>
-<p>在GFS中read文件的步骤如下（前两步可以cache）：</p>
-<ul>
-<li>访问master</li>
-<li>得到文件的metadata，即chunk handles</li>
-<li>得到chunk handles的位置</li>
-<li>选一个可用的chunk server，后续不必再麻烦master了</li>
-</ul>
-<p>而write文件分两步：</p>
-<ul>
-<li><p>先只传递数据而不写，client拿到三备份，一主两从，选一个最近的replica，一个接一个pipeline来写完所有的chunk server</p>
-<img src="/2025/10/15/CSE-lecture6-DFS/f6cbc95d13a07bf05afdb94981a38003.png" srcset="/img/loading.gif" lazyload class="" title="send data in GFS">
+<li><p>定义系统的目标：低延迟，并使用少量空间存储更多的数据</p>
 </li>
-<li><p>将数据写入到文件中去，这需要修改master</p>
+<li><p>分析：以Insert为例，为CREATE + WRITE，共两次system call，并将system call进一步展开</p>
+<img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/de6866305fcd4829bcb018bdc2027b75.png" srcset="/img/loading.gif" lazyload class="" title="system modelling analysis">
+
+<p>现在只要知道disk read&#x2F;write的latency就可以在不实现具体系统的情况下进行分析。</p>
 </li>
 </ul>
-<p>在GFS中进行naming时，实际上是没有目录的概念的，而是直接进行文件名和chunk server的哈希，好处是没有任何的link，同时查找速度极快</p>
+<p>结论是并不高效，额外的操作太多。但实际上在value特别大时还是能够接受的。因此在system modelling时需要考虑参数(parameterized)，如static parameters（如disk read&#x2F;write time）, input parameters（如key-value sizes）, runtime parameters</p>
+<p>一般来说，key-value store用于数据大小很小的时候，因此不考虑该实现，即理想状况下只进行一次block write；另一方面这也造成了很大的空间浪费</p>
+<h3 id="build-key-value-store-system"><a href="#build-key-value-store-system" class="headerlink" title="build key-value store system"></a>build key-value store system</h3><p>核心想法是：将多个key-value放到同一个文件中，减少空间浪费和延迟</p>
+<img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/d89ba88fc1dcea773f6ea9f116d9c01d.png" srcset="/img/loading.gif" lazyload class="" title="key-value store &amp; file system">
+
+<p>使用filesystem而不是直接进行disk操作是因为这样更加方便，同时兼容性好</p>
+<h4 id="step-1-a-naive-key-value-storage"><a href="#step-1-a-naive-key-value-storage" class="headerlink" title="step 1: a naive key-value storage"></a>step 1: a naive key-value storage</h4><p>将所有的key-value都放在一个单一文件中，以update为例，有两种方法：</p>
+<ul>
+<li>file in-place write: 根据offset进行file write来修改，这需要一次random disk write</li>
+<li>file append: 在文件末尾追加更新值，这一般只需要进行一次sequential disk write</li>
+</ul>
+<p>比较之后，append更加高效。</p>
+<p>insert和update类似，而delete则会append一个NULL entry，后续进行垃圾回收</p>
+<h4 id="step-2-log-structure-key-value-stores-L-KVS"><a href="#step-2-log-structure-key-value-stores-L-KVS" class="headerlink" title="step 2: log-structure key-value stores(L-KVS)"></a>step 2: log-structure key-value stores(L-KVS)</h4><p>log-structured file是append-only的</p>
+<p>此时get操作难以高效实现，需要倒序遍历文件</p>
+<h4 id="step-3-L-KVS-index"><a href="#step-3-L-KVS-index" class="headerlink" title="step 3: L-KVS + index"></a>step 3: L-KVS + index</h4><p>加一层index组件，用于key -&gt; offset的映射，这一层不需要持久化</p>
+<h5 id="step-3-1-in-memory-hash-index-log-structured-data-file"><a href="#step-3-1-in-memory-hash-index-log-structured-data-file" class="headerlink" title="step 3.1: in-memory hash index + log-structured data file"></a>step 3.1: in-memory hash index + log-structured data file</h5><p>在内存维护一个map来实现key -&gt; byte offset，问题在于index能否在内存中放下，因此需要允许index放在磁盘上</p>
+<h4 id="step-4-L-KVS-in-memory-disk-hybrid-index"><a href="#step-4-L-KVS-in-memory-disk-hybrid-index" class="headerlink" title="step 4: L-KVS + (in-memory &amp; disk hybrid index)"></a>step 4: L-KVS + (in-memory &amp; disk hybrid index)</h4><img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/fb147884a89dbe1c28f818e3a06bf2c7.png" srcset="/img/loading.gif" lazyload class="" title="bucket-based hashing index">
+
+<p>使用fat pointer，其既可以指向虚拟内存地址，也可以指向文件的offset</p>
+<p>当index既可能在内存中，也可能在磁盘中时，可能导致多次磁盘访问，甚至导致随机磁盘访问，因此不能使用linked-list-based hashing，改进方法为：</p>
+<ul>
+<li>一个entry放入多个key，减小链的长度</li>
+<li>使用更高级的hashing方法，如cuckoo hashing</li>
+</ul>
+<p>目前的架构还有以下问题：</p>
+<ul>
+<li>log file是永远在增大的，最终导致磁盘空间用尽</li>
+<li>不支持范围查找</li>
+</ul>
+<p>使用compaction来防止log file无限增大，即通过压缩来删除重复的数据，但当文件特别大的时候相当耗时</p>
+<p>因此将文件分为多个segment，compaction时挑选一部分segment，并以segment的粒度来进行压缩，同时在segment之间进行merge；在compaction时还能顺便进行垃圾回收，实现删除。此时模型更加复杂了，在compact&#x2F;merge时进行get性能会受限，因此建模时还需要考虑compact&#x2F;merge的频率</p>
+<h5 id="step-4-1-L-KVS-w-compaction-merging-in-memory-disk-hybrid-hashing-index"><a href="#step-4-1-L-KVS-w-compaction-merging-in-memory-disk-hybrid-hashing-index" class="headerlink" title="step 4.1: L-KVS(w&#x2F; compaction &amp; merging) + (in-memory &amp; disk hybrid hashing index)"></a>step 4.1: L-KVS(w&#x2F; compaction &amp; merging) + (in-memory &amp; disk hybrid hashing index)</h5><p>此时还是没有解决范围查找的问题。解决方法为使用B+树作为index，实现key的排序和高效的范围查找，但这和log-structured file不太兼容</p>
+<h4 id="step-5-B-tree-based-KVS"><a href="#step-5-B-tree-based-KVS" class="headerlink" title="step 5: B+ tree-based KVS"></a>step 5: B+ tree-based KVS</h4><p>B+树中，update&#x2F;insert需要多次磁盘访问，尤其是随机磁盘访问；但范围查找效果很好</p>
+<h4 id="step-6-SSTables-sorted-string-table-KVS"><a href="#step-6-SSTables-sorted-string-table-KVS" class="headerlink" title="step 6: SSTables(sorted string table) KVS"></a>step 6: SSTables(sorted string table) KVS</h4><p>SSTable基于segmented log file，同时有两个更新：</p>
+<ul>
+<li>每个segment中的key都排好序</li>
+<li>segment不可修改，因此不是append-only</li>
+</ul>
+<p>SSTable的好处在于：</p>
+<ul>
+<li>key的查找很高效：index只存放一部分key的offset，实际查找时夹逼即可</li>
+<li>支持segment里的范围查找</li>
+</ul>
+<p>使用memtable来实现内存的修改，从而将SSTable的修改batch在一起。以insert为例：</p>
+<ul>
+<li>在memtable中insert</li>
+<li>当memtable大到一定程度后，排序并写入SSTable</li>
+<li>当SSTable过多时，进行compact + merge</li>
+</ul>
+<p>而查找时，先在memtable查找，再依序查找SSTable，可以在每个SSTable上保留一个稀疏的in-memory index来进行优化</p>
+<p>范围查找则需要segment之间也进行排序</p>
+<p>SSTable不应当简单地顺序存储，因此还需要优化</p>
+<h4 id="step-7-LSM-trees"><a href="#step-7-LSM-trees" class="headerlink" title="step 7: LSM trees"></a>step 7: LSM trees</h4><p>将SSTable摆放为多层架构，除了L0之外，每层的文件都排好序，且没有重复的key；上层的数据比下层的数据更新</p>
+<img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/2b4b853979f4bd5da57aca36d0b95162.png" srcset="/img/loading.gif" lazyload class="" title="analysis of different system models for KVS">
+
+<p>任何系统都可能出现corner case，比如LSM tree可能出现写阻塞(write stall)，这是因为前一次写入过于耗时（多次compact）导致的</p>
+<p>对于错误处理，比如memtable丢失，可以使用log来恢复memtable</p>
+<p>相较于B+ tree，好处时写的性能更好，坏处是range性能稍差</p>
 
                 
               </div>
@@ -427,8 +422,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture6:DFS</div>
-      <div>http://example.com/2025/10/15/CSE-lecture6-DFS/</div>
+      <div>CSE_lecture7:System modelling + KFS</div>
+      <div>http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/</div>
     </div>
     <div class="license-meta">
       
@@ -440,7 +435,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年10月15日</div>
+          <div>2025年10月19日</div>
         </div>
       
       
@@ -472,18 +467,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/10/19/CSE-lecture7-System-modelling-KFS/" title="CSE_lecture7:System modelling + KFS">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture7:System modelling + KFS</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/" title="CSE_lecture5:Remote Procedure Call">
-                        <span class="hidden-mobile">CSE_lecture5:Remote Procedure Call</span>
+                      <a href="/2025/10/15/CSE-lecture6-DFS/" title="CSE_lecture6:DFS">
+                        <span class="hidden-mobile">CSE_lecture6:DFS</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
