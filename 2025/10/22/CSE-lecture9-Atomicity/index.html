@@ -19,19 +19,22 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Consistency under failure: The requirement of atomicity">
+    <meta name="description" content="Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record &#x3D; mmap(bank">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture9:Atomicity">
 <meta property="og:url" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Consistency under failure: The requirement of atomicity">
+<meta property="og:description" content="Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record &#x3D; mmap(bank">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/128288a329e0593f1423271f2dd0b47f.png">
+<meta property="og:image" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/fa8c99c5419e503f485c6592685866ea.png">
 <meta property="article:published_time" content="2025-10-22T02:00:28.000Z">
-<meta property="article:modified_time" content="2025-10-22T02:01:48.592Z">
+<meta property="article:modified_time" content="2025-10-23T03:11:17.946Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/128288a329e0593f1423271f2dd0b47f.png">
   
   
   
@@ -224,7 +227,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2 字
+          703 字
         
       </span>
     
@@ -235,7 +238,7 @@
         
         
         
-          1 分钟
+          6 分钟
         
       </span>
     
@@ -277,7 +280,35 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Consistency-under-failure-The-requirement-of-atomicity"><a href="#Consistency-under-failure-The-requirement-of-atomicity" class="headerlink" title="Consistency under failure: The requirement of atomicity"></a>Consistency under failure: The requirement of atomicity</h2>
+                <h2 id="Consistency-under-failure-The-requirement-of-atomicity"><a href="#Consistency-under-failure-The-requirement-of-atomicity" class="headerlink" title="Consistency under failure: The requirement of atomicity"></a>Consistency under failure: The requirement of atomicity</h2><p>即使不考虑分布式，故障的发生也可能引发不一致性</p>
+<p>fail-stop发生时，整个系统的所有部分都出现failure</p>
+<p>以下面的代码为例，必须保证bank(a) + bank(b)不变：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">transfer(bank, a, b, amt):<br>    record = mmap(bank, ...)        <span class="hljs-comment"># 将文件数据加载到内存页表中，从而像操作内存一样操作文件</span><br>    records[a] = records[a] - amt<br>    records[b] = records[b] + amt<br>    fsync(bank, ...)                <span class="hljs-comment"># 将内存flush汇磁盘中</span><br>    notify_the_user()<br></code></pre></td></tr></table></figure>
+
+<p>其中fsync的本质是将内存页表的数据一个接一个写回到磁盘中，分为Write(A)和Write(B)两步</p>
+<p>如果error发生在fsync前，不会发生问题，因为没有修改文件；但如果error发生在fsync执行过程中，比如写到一半就挂了，就可能出现问题。因此需要系统提供atomicity的能力，即保证一系列操作all-or-nothing</p>
+<p>shadow copy的思想为先不修改原来的文件，而是备份一个正确的数据，修改copy的数据，最后将copy的数据变成原来的数据即可</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># shadow copy</span><br>transfer(bank, a, b, amt):<br>    fcopy(bank, bank_temp)<br>    records = mmap(bank_temp, ...)<br>    records[a] = records[a] - amt<br>    records[b] = records[b] + amt<br>    fsync(bank_temp, ...)<br>    rename(bank_temp, bank)<br></code></pre></td></tr></table></figure>
+
+<p>当crash发生在fcopy或者fsync执行时，由于bank本身没有被修改，所以不影响一致性；当crash发生在rename执行时，由于bank_temp和bank这两个文件都是保证了一致性的，因此问题在于filesystem的实现，严重时可能导致filesystem挂掉</p>
+<p>原来的rename操作需要依次修改inode num和refcnt，因此需要让filesystem也具备all-or-nothing，现在不能再使用shadow copy了，否则会递归下去。使用journaling的方法，其思想为允许数据被改错，只要能保证能修复即可，在进行正式的数据更新前，先把即将进行的修改内容记录到日志文件中</p>
+<p>journaling的方法为：</p>
+<ul>
+<li>将修改记录在journal中</li>
+<li>提交journal，即将journal写入磁盘</li>
+<li>更新，按照journal进行真正的数据修改</li>
+</ul>
+<p>如果crash发生在commit前，数据并没有真正修改；发生在commit后时，将journal里的操作重做一次即可</p>
+<p>通过journaling进行rename的操作为：</p>
+<img src="/2025/10/22/CSE-lecture9-Atomicity/128288a329e0593f1423271f2dd0b47f.png" srcset="/img/loading.gif" lazyload class="" title="rename via journaling">
+
+<p>涉及到多个block修改的操作都可以通过journaling来保证一致性，如append a file：</p>
+<img src="/2025/10/22/CSE-lecture9-Atomicity/fa8c99c5419e503f485c6592685866ea.png" srcset="/img/loading.gif" lazyload class="" title="append a file via journaling">
+
+<p>journaling也有缺点：需要额外的写操作（两倍），当文件极大时磁盘压力很大。解决方法为选择快速操作，只保证一部分重要的操作是原子性的</p>
+<p>当crash发生在journal commit时，由于厂商保证disk写入一个sector时一定是原子性的，故journal commit也是all-or-nothing的；即使没有，也可以使用校验码验证，但有开销</p>
+<p>现在shadow copy就实现原子性了，但其有一定缺点，比如难以实现多个client操作同一个文件的不同部分时</p>
+
                 
               </div>
             
