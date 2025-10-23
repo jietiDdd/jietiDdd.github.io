@@ -19,26 +19,25 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record &#x3D; mmap(bank">
+    <meta name="description" content="Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture9:Atomicity">
-<meta property="og:url" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/index.html">
+<meta property="og:title" content="CSE_lecture10:Atomicity-Logging">
+<meta property="og:url" content="http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record &#x3D; mmap(bank">
+<meta property="og:description" content="Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/128288a329e0593f1423271f2dd0b47f.png">
-<meta property="og:image" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/fa8c99c5419e503f485c6592685866ea.png">
-<meta property="article:published_time" content="2025-10-22T02:00:28.000Z">
-<meta property="article:modified_time" content="2025-10-23T10:12:28.118Z">
+<meta property="og:image" content="http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/3812e2ce061f6e67e00ab0f91c9718f5.png">
+<meta property="article:published_time" content="2025-10-23T10:00:40.000Z">
+<meta property="article:modified_time" content="2025-10-23T11:20:38.141Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/10/22/CSE-lecture9-Atomicity/128288a329e0593f1423271f2dd0b47f.png">
+<meta name="twitter:image" content="http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/3812e2ce061f6e67e00ab0f91c9718f5.png">
   
   
   
-  <title>CSE_lecture9:Atomicity - jietiDdd的个人博客</title>
+  <title>CSE_lecture10:Atomicity-Logging - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -204,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture9:Atomicity"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture10:Atomicity-Logging"></span>
           
         </div>
 
@@ -215,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-10-22 10:00" pubdate>
-          2025年10月22日 上午
+        <time datetime="2025-10-23 18:00" pubdate>
+          2025年10月23日 晚上
         </time>
       </span>
     
@@ -227,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          837 字
+          725 字
         
       </span>
     
@@ -275,44 +274,29 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture9:Atomicity</h1>
+            <h1 id="seo-header">CSE_lecture10:Atomicity-Logging</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="Consistency-under-failure-The-requirement-of-atomicity"><a href="#Consistency-under-failure-The-requirement-of-atomicity" class="headerlink" title="Consistency under failure: The requirement of atomicity"></a>Consistency under failure: The requirement of atomicity</h2><p>即使不考虑分布式，故障的发生也可能引发不一致性</p>
-<p>fail-stop发生时，整个系统的所有部分都出现failure</p>
-<p>以下面的代码为例，必须保证bank(a) + bank(b)不变：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">transfer(bank, a, b, amt):<br>    record = mmap(bank, ...)        <span class="hljs-comment"># 将文件数据加载到内存页表中，从而像操作内存一样操作文件</span><br>    records[a] = records[a] - amt<br>    records[b] = records[b] + amt<br>    fsync(bank, ...)                <span class="hljs-comment"># 将内存flush汇磁盘中</span><br>    notify_the_user()<br></code></pre></td></tr></table></figure>
+                <h2 id="Realizing-atomicity-Logging-Checkpoint"><a href="#Realizing-atomicity-Logging-Checkpoint" class="headerlink" title="Realizing atomicity: Logging + Checkpoint"></a>Realizing atomicity: Logging + Checkpoint</h2><h3 id="logging-for-atomicity"><a href="#logging-for-atomicity" class="headerlink" title="logging for atomicity"></a>logging for atomicity</h3><p>logging是journaling的扩展，更加通用</p>
+<p>log entry是一个原子性的单元，维护能恢复用户数据的修改</p>
+<p>transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时transaction的操作才认为是有效的（即log完全刷盘之前都是nothing，完全刷盘后就是all）</p>
+<p>TX.begin()到TX.commit()这部分中间的内容被存放在log entry中</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">transfer(bank, a, b, amt, log):<br>    records = mmap(bank, ...)<br>    new_a = records[a] - amt<br>    new_b = records[b] + amt<br><br>    commit_log = <span class="hljs-string">&quot;log start: a:&quot;</span> + new_a + <span class="hljs-string">&quot;\b:&quot;</span> + new_b<br>    log.append(commit_log).sync()<br><br>    records[a] = new_a<br>    records[b] = new_b<br></code></pre></td></tr></table></figure>
 
-<p>其中fsync的本质是将内存页表的数据一个接一个写回到磁盘中，分为Write(A)和Write(B)两步</p>
-<p>如果error发生在fsync前，不会发生问题，因为没有修改文件；但如果error发生在fsync执行过程中，比如写到一半就挂了，就可能出现问题。因此需要系统提供atomicity的能力，即保证一系列操作all-or-nothing</p>
-<p>shadow copy的思想为先不修改原来的文件，而是备份一个正确的数据，修改copy的数据，最后将copy的数据变成原来的数据即可</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># shadow copy</span><br>transfer(bank, a, b, amt):<br>    fcopy(bank, bank_temp)<br>    records = mmap(bank_temp, ...)<br>    records[a] = records[a] - amt<br>    records[b] = records[b] + amt<br>    fsync(bank_temp, ...)<br>    rename(bank_temp, bank)<br></code></pre></td></tr></table></figure>
+<p>在确保修改一定能被恢复之前不要真的写入数据，比如可以在内存上临时写入；再写入log保存修改的信息，这一部分有两行代码，但其实不用维护原子性，只要能检测到log是否完整写完即可；logging结束后再写入磁盘，更新完后不必fsync，而是只需要定期刷盘（如内存不够），重启后从log中恢复，刷盘前read先访问内存即可</p>
+<p>完成<code>log.append(commit_log).sync()</code>这一步后，认为是commit point</p>
+<p>redo-only logging只保证系统从旧的状态变为新的状态，注意REDO和DO不一定要一样</p>
+<img src="/2025/10/23/CSE-lecture10-Atomicity-Logging/3812e2ce061f6e67e00ab0f91c9718f5.png" srcset="/img/loading.gif" lazyload class="" title="redo-only logging">
 
-<p>当crash发生在fcopy或者fsync执行时，由于bank本身没有被修改，所以不影响一致性；当crash发生在rename执行时，由于bank_temp和bank这两个文件都是保证了一致性的，因此问题在于filesystem的实现，严重时可能导致filesystem挂掉</p>
-<p>原来的rename操作需要依次修改inode num和refcnt，因此需要让filesystem也具备all-or-nothing，现在不能再使用shadow copy了，否则会递归下去。使用journaling的方法，其思想为允许数据被改错，只要能保证能修复即可，在进行正式的数据更新前，先把即将进行的修改内容记录到日志文件中</p>
-<p>journaling的方法为：</p>
-<ul>
-<li>将修改记录在journal中</li>
-<li>提交journal，即将journal写入磁盘</li>
-<li>更新，按照journal进行真正的数据修改</li>
-</ul>
-<p>如果crash发生在commit前，数据并没有真正修改；发生在commit后时，将journal里的操作重做一次即可</p>
-<p>通过journaling进行rename的操作为：</p>
-<img src="/2025/10/22/CSE-lecture9-Atomicity/128288a329e0593f1423271f2dd0b47f.png" srcset="/img/loading.gif" lazyload class="" title="rename via journaling">
+<p>value logging记录的是值，恢复时将log里面的值替换到旧的值上即可，但这样就相当于value写了两次；operation logging则是记录做了什么操作，但这样需要重新跑一遍。需要权衡</p>
+<p>redo-only logging的性能很好，唯一的开销是多一次log的写入，而log是只追加的，优于随机写。缺点是更新全都缓存在内存中，内存压力大；log一直在增加，而实际上已经有大部分操作已经写回到磁盘了</p>
+<p>操作系统会在内存不够时，将部分页表swap到磁盘上，从而释放一些内存。这种系统对于redo-only logging并不友好，一方面swap后会额外占用磁盘空间，另一方面swap的性能难以建模，且强依赖操作系统</p>
+<p>为了解决内存不够的问题，需要直接在原有的位置上进行修改，此时需要维护undo log来维护修改之前的原来的数据。但依然需要redo log，从而不必等待数据落盘（赋值只是修改了内存映射区），只保证log落盘即可。使用undo-redo log实现旧的值和新的值同时写入log</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">transfer(bank, a, b, amt, log):<br>    records = mmap(bank, ...)<br>    <span class="hljs-comment"># log记录为Action(file name, offset, old &amp; new values)</span><br>    log.append(...).sync()<br>    records[a] = records[a] - amt<br>    log.append(...).sync()<br>    records[b] = records[b] + amt<br>    log.append(<span class="hljs-string">&quot;TX &#123;id&#125; commit&quot;</span>).sync()<br></code></pre></td></tr></table></figure>
 
-<p>涉及到多个block修改的操作都可以通过journaling来保证一致性，如append a file：</p>
-<img src="/2025/10/22/CSE-lecture9-Atomicity/fa8c99c5419e503f485c6592685866ea.png" srcset="/img/loading.gif" lazyload class="" title="append a file via journaling">
-
-<p>journaling也有缺点：需要额外的写操作（两倍），当文件极大时磁盘压力很大。解决方法为选择快速操作，只保证一部分重要的操作是原子性的，因此journaling只用于关键的操作，这也是shadow copy依然需要的原因</p>
-<p>当crash发生在journal commit时，由于厂商保证disk写入一个sector时一定是原子性的，故journal commit也是all-or-nothing的；即使没有，也可以使用校验码验证，但有开销</p>
-<p>现在shadow copy就实现原子性了，但其有一定缺点：</p>
-<ul>
-<li>一次只能进行一个操作：多个client同时操作同一个文件的不同部分时，直接copy会导致覆写，此时只能共享文件，且必须等待所有client完成时才能写回。这样的性能很差，故shadow copy只用于简单的场景</li>
-<li>难以修改多个文件：需要大量的复制，同时只有放在同一目录下才能勉强保证原子性</li>
-<li>微小的改动都会引发整个文件的copy，可以通过copy-on-write优化</li>
-</ul>
+<p>redo-only logging每次只append一个log entry，对应一个transaction；而undo-redo logging需要append多个log records，当多个transaction并行操作时，会导致log record不连续，出现交错，此时在log里维护一个指针指向前一个record，将同一个transaction的record串起来</p>
 
                 
               </div>
@@ -381,8 +365,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture9:Atomicity</div>
-      <div>http://example.com/2025/10/22/CSE-lecture9-Atomicity/</div>
+      <div>CSE_lecture10:Atomicity-Logging</div>
+      <div>http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/</div>
     </div>
     <div class="license-meta">
       
@@ -394,7 +378,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年10月22日</div>
+          <div>2025年10月23日</div>
         </div>
       
       
@@ -426,18 +410,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/10/23/CSE-lecture10-Atomicity-Logging/" title="CSE_lecture10:Atomicity-Logging">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture10:Atomicity-Logging</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/10/20/CSE-lecture8-Consistency/" title="CSE_lecture8:Consistency">
-                        <span class="hidden-mobile">CSE_lecture8:Consistency</span>
+                      <a href="/2025/10/22/CSE-lecture9-Atomicity/" title="CSE_lecture9:Atomicity">
+                        <span class="hidden-mobile">CSE_lecture9:Atomicity</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
