@@ -27,7 +27,7 @@
 <meta property="og:description" content="lab2: Distributed FileSystem在lab1中，我们已经实现了基本的inode filesystem，并能够操作directory；而在lab2中，我们需要实现一个分布式的文件系统，该系统分为以下三部分，它们通过rpc进行通信：  filesystem client: 文件系统服务器，向metadata server发送请求获取元数据，再向各个data server发送请求修">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-10-25T03:33:50.000Z">
-<meta property="article:modified_time" content="2025-10-25T10:52:52.973Z">
+<meta property="article:modified_time" content="2025-10-25T11:00:17.814Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -299,7 +299,7 @@
 <p>如遇失败，使用以下指令清理残留的中间状态，防止下一次测试又失败：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make clean-fs<br></code></pre></td></tr></table></figure>
 
-<p>而集成测试比较麻烦，需要额外设置环境：</p>
+<p>而集成测试比较麻烦，需要额外设置环境，在<code>scripts/lab2</code>目录下执行：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># pull cse-lab2-base image</span><br>docker pull registry.cn-shenzhen.aliyuncs.com/cse-lab/cse-lab2-base<br><span class="hljs-comment"># rename the image</span><br>docker tag registry.cn-shenzhen.aliyuncs.com/cse-lab/cse-lab2-base cse-lab2-base<br><span class="hljs-comment"># set up the environment</span><br>docker compose up<br></code></pre></td></tr></table></figure>
 
 <p>这时终端会停在某一页面，这反而说明<code>docker compose</code>成功，新建一个终端并执行以下命令：</p>
@@ -491,11 +491,6 @@
 </ul>
 <p>最后运行一下压力测试和集成测试即可</p>
 <p>总结一下这个lab，由于part 3变为选做部分，难度下降了很多，注意chfs的耦合度较高即可</p>
-<blockquote>
-<p>TODO:</p>
-<p>write data error handler</p>
-<p>only one mutex</p>
-</blockquote>
 
                 
               </div>
