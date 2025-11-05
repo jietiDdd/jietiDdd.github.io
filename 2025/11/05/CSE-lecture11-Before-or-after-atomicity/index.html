@@ -30,8 +30,11 @@
 <meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/dc58cfd6cbc36b4bbde1109078932e9c.png">
 <meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/0c6e78a463ada00690344a1b30d4697b.png">
 <meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/497c9e20e7ba2156b8884c8dd142b907.png">
+<meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/c530ec45c0012f1bbd2d044c35cf8c25.png">
+<meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/d345ab3b5e149d0ee280271110311b8d.png">
+<meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/3aec3c88631164596f4a50c9e4a4c30f.png">
 <meta property="article:published_time" content="2025-11-05T08:03:57.000Z">
-<meta property="article:modified_time" content="2025-11-05T10:20:24.991Z">
+<meta property="article:modified_time" content="2025-11-05T12:34:09.787Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -229,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          681 字
+          978 字
         
       </span>
     
@@ -240,7 +243,7 @@
         
         
         
-          6 分钟
+          9 分钟
         
       </span>
     
@@ -312,7 +315,28 @@
 <p>conflict serializability只需要找到所有conflict的顺序等价于某一个串行的conflict关系。可以认为事务是节点，conflict是有向边（方向为第一个操作发生在哪个事务中），只要其为无环图，就能找到一个拓扑排序，从而实现conflict serializability</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/497c9e20e7ba2156b8884c8dd142b907.png" srcset="/img/loading.gif" lazyload class="" title="conflict serializability">
 
-<p>但事实上就算有环，也可以找到一个等价的串行执行（写最终正确，每个操作的读正确），因此认为 $view serializability \supset conflict serializability$</p>
+<p>但事实上就算有环，也可以找到一个等价的串行执行（写最终正确，每个操作的读正确），因此认为 $\text{view serializability} \supset \text{conflict serializability}$ ，conflict serializability虽然定义更严格，但实现更容易</p>
+<p>2PL能够实现conflict serializability，可以用反证法证明</p>
+<img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/c530ec45c0012f1bbd2d044c35cf8c25.png" srcset="/img/loading.gif" lazyload class="" title="proof of 2PL">
+
+<p>然而2PL其实并不见得一定能保证conflict serializability，因为可能出现错拿锁漏拿锁，比如下图新插入的老师没有涨薪，因为锁是存在在成员内部的，即幻读问题(phantom problem)</p>
+<img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/d345ab3b5e149d0ee280271110311b8d.png" srcset="/img/loading.gif" lazyload class="" title="phantom problem">
+
+<p>解决幻读问题可以用以下方法：</p>
+<ul>
+<li>谓词锁(predicate lock)，即锁住满足某个条件的所有数据，但开销大</li>
+<li>为B树非叶子节点上锁，实现范围上锁，或锁住整张表</li>
+<li>忽略</li>
+</ul>
+<p>2PL的另一个问题就是死锁。2PL本身是一个悲观锁(pessimistic)，即认为race condition一定发生，故访问数据前一定上锁，但这样可能引发死锁，即互相等待对方释放锁</p>
+<img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/3aec3c88631164596f4a50c9e4a4c30f.png" srcset="/img/loading.gif" lazyload class="" title="deadlock">
+
+<p>死锁的解决方法如下，但事实上都各有各的问题：</p>
+<ul>
+<li>让大家都按照同一个顺序访问各个数据(pre-defined order)，但难以提前知道要访问哪些数据</li>
+<li>找到环，并放弃环中的一个事务，但开销极大，而且该事务重做后可能再次被放弃</li>
+<li>超时后就放弃</li>
+</ul>
 
                 
               </div>

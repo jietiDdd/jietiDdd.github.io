@@ -237,7 +237,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture12-Transaction/" target="_self">
         <div>
-          Serializability, OCC &amp; Transaction
+          Serializability, OCC &amp; TransactionOCC: optimistic concurrency control死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放入r
         </div>
       </a>
 
