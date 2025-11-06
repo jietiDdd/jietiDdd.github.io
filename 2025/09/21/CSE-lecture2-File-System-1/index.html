@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="From single to distributed: inode-based File System使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据   single-n">
+    <meta name="description" content="From single to distributed: inode-based File System 使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据  single-n">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture2:File System 1">
 <meta property="og:url" content="http://example.com/2025/09/21/CSE-lecture2-File-System-1/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="From single to distributed: inode-based File System使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据   single-n">
+<meta property="og:description" content="From single to distributed: inode-based File System 使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据  single-n">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/09/21/CSE-lecture2-File-System-1/f168499e6e2c216911f11ae3f177bf53.png">
 <meta property="og:image" content="http://example.com/2025/09/21/CSE-lecture2-File-System-1/0f669c904929ad467e9ef39d73689358.png">
@@ -287,69 +287,64 @@
             
               <div class="markdown-body">
                 
-                <h2 id="From-single-to-distributed-inode-based-File-System"><a href="#From-single-to-distributed-inode-based-File-System" class="headerlink" title="From single to distributed: inode-based File System"></a>From single to distributed: inode-based File System</h2><p>使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据</p>
+                <h2 id="From-single-to-distributed-inode-based-File-System">From single to distributed: inode-based File System</h2>
+<p>使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/f168499e6e2c216911f11ae3f177bf53.png" srcset="/img/loading.gif" lazyload class="" title="架构">
-
-<h3 id="single-node-inode-based-filesystem"><a href="#single-node-inode-based-filesystem" class="headerlink" title="single-node inode-based filesystem"></a>single-node inode-based filesystem</h3><p>文件包含两个特性：durable, name</p>
+<h3 id="single-node-inode-based-filesystem">single-node inode-based filesystem</h3>
+<p>文件包含两个特性：durable, name</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/0f669c904929ad467e9ef39d73689358.png" srcset="/img/loading.gif" lazyload class="" title="文件的实现">
-
 <p>disk driver的抽象：</p>
 <ul>
 <li>分为一个一个的sector（早期512B，现在为4KB），注意sector为磁盘扇区的概念，而block为操作系统的概念</li>
 <li>API为read和write</li>
 <li>需要进一步抽象成file system，如果是直接分配sector index，会出现难以寻找空闲sector，难以放大文件，难以命名，可用性和安全性都不足</li>
 </ul>
-<h3 id="inode-7-software-layers"><a href="#inode-7-software-layers" class="headerlink" title="inode: 7 software layers"></a>inode: 7 software layers</h3><h4 id="L1-block-layer"><a href="#L1-block-layer" class="headerlink" title="L1: block layer"></a>L1: block layer</h4><p>提供block id，得到4KB数据；或者提供block id和要写的数据，将其写入到对应的block，即实现block number-&gt;block data</p>
+<h3 id="inode-7-software-layers">inode: 7 software layers</h3>
+<h4 id="L1-block-layer">L1: block layer</h4>
+<p>提供block id，得到4KB数据；或者提供block id和要写的数据，将其写入到对应的block，即实现block number-&gt;block data</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure BLOCK_NUMBER_TO_BLOCK(integer b) -&gt; block<br>    <span class="hljs-keyword">return</span> devices[b]<br></code></pre></td></tr></table></figure>
-
 <p>为什么使用block而非sector？因为file system的最小单位是block，而磁盘的最小单位是sector，只是恰好这俩大小一致罢了，而这是可以调整的</p>
 <p>如何决定block size？权衡efficiency和utilization，以及内部的碎片</p>
 <p>如何得知block size？使用磁盘开头的super block记录metadata，super block包含block size, num of free blocks, a list of free blocks, etc.</p>
 <p>使用bitmap for free blocks记录哪些block被用过，哪些没有</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/95d6c1a886a13c3019898be5d3f29abb.png" srcset="/img/loading.gif" lazyload class="" title="block layer">
-
-<h4 id="L2-file-layer"><a href="#L2-file-layer" class="headerlink" title="L2: file layer"></a>L2: file layer</h4><p>记录某一个文件使用了哪些block，即inode，包含block_nums[N]和size，size为精确值，从而保证了安全性（之前回收的文件不会清零），其中N可以不用太大，当文件过大时，使用indirect block解决，而当文件过小时，其实可以直接存在inode里面，并修改type</p>
+<h4 id="L2-file-layer">L2: file layer</h4>
+<p>记录某一个文件使用了哪些block，即inode，包含block_nums[N]和size，size为精确值，从而保证了安全性（之前回收的文件不会清零），其中N可以不用太大，当文件过大时，使用indirect block解决，而当文件过小时，其实可以直接存在inode里面，并修改type</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/b11191fe13bc85fb45260278566f86d0.png" srcset="/img/loading.gif" lazyload class="" title="indirect block">
-
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure INODE_TO_BLOCK(integer offset, inode i) -&gt; block<br>    o &lt;- offset / BLOCKSIZE<br>    b &lt;- INDEX_TO_BLOCK_NUMBER(i, o)<br>    <span class="hljs-keyword">return</span> BLOCK_NUMBER_TO_BLOCK(b)<br><br>procedure INDEX_TO_BLOCK_NUMBER(inode i, integer index) -&gt; integer<br>    <span class="hljs-keyword">return</span> i.block_nums[index]<br></code></pre></td></tr></table></figure>
-
-<h4 id="L3-inode-number-layer"><a href="#L3-inode-number-layer" class="headerlink" title="L3: inode number layer"></a>L3: inode number layer</h4><p>实现inode num-&gt;inode，即inode table，是一个大数组</p>
+<h4 id="L3-inode-number-layer">L3: inode number layer</h4>
+<p>实现inode num-&gt;inode，即inode table，是一个大数组</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure INODE_NUMBER_TO_INODE(integer num) -&gt; inode<br>    <span class="hljs-keyword">return</span> inode_table[num]<br></code></pre></td></tr></table></figure>
-
 <img src="/2025/09/21/CSE-lecture2-File-System-1/6af3e44202425edaa4ac21d28e617156.png" srcset="/img/loading.gif" lazyload class="" title="inode table">
-
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure INODE_NUMBER_TO_BLOCK(integer offset, integer inode_number) -&gt; block<br>    inode i = INODE_NUMBER_TO_INODE(inode_number)<br>    o &lt;- offset / BLOCKSIZE<br>    b &lt;- INDEX_TO_BLOCK_NUMBER(i, o)<br>    <span class="hljs-keyword">return</span> BLOCK_NUMBER_TO_BLOCK(b)<br></code></pre></td></tr></table></figure>
-
-<h4 id="L4-file-name-layer"><a href="#L4-file-name-layer" class="headerlink" title="L4: file name layer"></a>L4: file name layer</h4><p>实现file name和inode number的一一对应关系，存放在directory，而这个directory也抽象成file，存放在inode中，因此inode内部增加type来区分目录和普通文件</p>
+<h4 id="L4-file-name-layer">L4: file name layer</h4>
+<p>实现file name和inode number的一一对应关系，存放在directory，而这个directory也抽象成file，存放在inode中，因此inode内部增加type来区分目录和普通文件</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure NAME_TO_INODE(string filename, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    <span class="hljs-keyword">return</span> LOOKUP(<span class="hljs-built_in">dir</span>, filename)<br><br>procedure LOOKUP(string filename, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    block b<br>    inode i = INODE_NUMBER_TO_INODE(<span class="hljs-built_in">dir</span>)<br>    <span class="hljs-keyword">if</span> i.<span class="hljs-built_in">type</span> != DIRECTORY then <span class="hljs-keyword">return</span> FAILURE<br>    <span class="hljs-keyword">for</span> offset <span class="hljs-keyword">from</span> <span class="hljs-number">0</span> to i.size - <span class="hljs-number">1</span> do<br>        b &lt;- INODE_NUMBER_TO_BLOCK(offset, <span class="hljs-built_in">dir</span>)<br>        <span class="hljs-keyword">if</span> STRING_MATCH(filename, b) then<br>            <span class="hljs-keyword">return</span> INODE_NUMBER(filename, b)<br>        offset &lt;- offset + BLOCKSIZE<br>    <span class="hljs-keyword">return</span> FAILURE<br></code></pre></td></tr></table></figure>
-
-<h4 id="L5-path-name-layer"><a href="#L5-path-name-layer" class="headerlink" title="L5: path name layer"></a>L5: path name layer</h4><p>层次化的directory为path，直接层层递归即可</p>
+<h4 id="L5-path-name-layer">L5: path name layer</h4>
+<p>层次化的directory为path，直接层层递归即可</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure PATH_TO_INODE_NUMBER(string path, integer <span class="hljs-built_in">dir</span>) -&gt; integer<br>    <span class="hljs-keyword">if</span> PLAIN_NAME(path) <span class="hljs-keyword">return</span> NAME_TO_INODE_NUMBER(path, <span class="hljs-built_in">dir</span>)<br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-built_in">dir</span> &lt;- LOOKUP(FIRST(path), <span class="hljs-built_in">dir</span>)<br>        path &lt;- REST(path)<br>        <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, <span class="hljs-built_in">dir</span>)<br></code></pre></td></tr></table></figure>
-
-<h5 id="Links"><a href="#Links" class="headerlink" title="Links"></a>Links</h5><p>link让不同的文件名指向相同的inode num，而unlink取消filename和inode num之间的联系，这是hard link，而hard link不能跨文件系统建立，否则会出现inode num冲突</p>
-<p>在inode里面添加一项refcnt，link时+1，unlink时-1，当refcnt &#x3D; 0时才清除这个inode对应的file</p>
+<h5 id="Links">Links</h5>
+<p>link让不同的文件名指向相同的inode num，而unlink取消filename和inode num之间的联系，这是hard link，而hard link不能跨文件系统建立，否则会出现inode num冲突</p>
+<p>在inode里面添加一项refcnt，link时+1，unlink时-1，当refcnt = 0时才清除这个inode对应的file</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">block_nums</span>[<span class="hljs-title">N</span>]</span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">size</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">type</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">refcnt</span></span><br></code></pre></td></tr></table></figure>
-
 <p>link不能构成环，否则会导致内存泄漏，因此规定目录不能link，除了两个例外：<code>.</code>和 <code>..</code>这两个hard link</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/3f524b6babd481f7da974ba72d96dc6e.png" srcset="/img/loading.gif" lazyload class="" title="no cycle for link">
-
-<h5 id="renaming"><a href="#renaming" class="headerlink" title="renaming"></a>renaming</h5><p>编辑文件时会创建一个临时文件，重命名时，顺序为：</p>
+<h5 id="renaming">renaming</h5>
+<p>编辑文件时会创建一个临时文件，重命名时，顺序为：</p>
 <ol>
 <li><code>UNLINK(to_name)</code></li>
 <li><code>LINK(from_name, to_name)</code></li>
 <li><code>UNLINK(from_name)</code></li>
 </ol>
 <p>但如果计算机在1和2之间突然断电呢？这会使得to_name丢失。因此要保证原子性操作</p>
-<h4 id="L6-absolute-path-name-layer"><a href="#L6-absolute-path-name-layer" class="headerlink" title="L6: absolute path name layer"></a>L6: absolute path name layer</h4><p>引入根目录<code>/</code>，其中<code>/.</code>和<code>/..</code>依然是根目录</p>
+<h4 id="L6-absolute-path-name-layer">L6: absolute path name layer</h4>
+<p>引入根目录<code>/</code>，其中<code>/.</code>和<code>/..</code>依然是根目录</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure GENERATEPATH_TO_INODE_NUMBER(string path) -&gt; integer<br>    <span class="hljs-keyword">if</span> path[<span class="hljs-number">0</span>] = <span class="hljs-string">&quot;/&quot;</span> <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, <span class="hljs-number">1</span>)<br>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> PATH_TO_INODE_NUMBER(path, wd)<br></code></pre></td></tr></table></figure>
-
 <p>参考一个例子来理解file system layers，约定俗成root在inode table的第一个位置</p>
 <img src="/2025/09/21/CSE-lecture2-File-System-1/b0743f32e0ad6521c0344a432de87d33.png" srcset="/img/loading.gif" lazyload class="" title="an example">
-
 <img src="/2025/09/21/CSE-lecture2-File-System-1/44b20884d3907caa236f17a905ecf9b7.png" srcset="/img/loading.gif" lazyload class="" title="dump a directory">
-
-<h4 id="L7-symbolic-link-layer"><a href="#L7-symbolic-link-layer" class="headerlink" title="L7: symbolic link layer"></a>L7: symbolic link layer</h4><img src="/2025/09/21/CSE-lecture2-File-System-1/d44dfec3bb652eb23a7c445b1c6bd7b1.png" srcset="/img/loading.gif" lazyload class="" title="dump a symbolic link">
-
+<h4 id="L7-symbolic-link-layer">L7: symbolic link layer</h4>
+<img src="/2025/09/21/CSE-lecture2-File-System-1/d44dfec3bb652eb23a7c445b1c6bd7b1.png" srcset="/img/loading.gif" lazyload class="" title="dump a symbolic link">
 <p>区分hard link和soft link：</p>
 <ul>
 <li>hard link强调两个filename都指向同一个inode num，而soft link强调一个filename指向另一个filename，当文件被删除时，hard link连接的文件能够正常访问，而soft link连接的文件会打不开（注意谁指向谁）</li>

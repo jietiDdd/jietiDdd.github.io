@@ -19,15 +19,15 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络">
+    <meta name="description" content="Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture14:2PC+Replication">
 <meta property="og:url" content="http://example.com/2025/11/06/CSE-lecture14-2PC-Replication/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络">
+<meta property="og:description" content="Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2025-11-06T04:18:42.000Z">
-<meta property="article:modified_time" content="2025-11-06T06:36:03.391Z">
+<meta property="article:modified_time" content="2025-11-06T11:55:15.579Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -224,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          744 字
+          970 字
         
       </span>
     
@@ -235,7 +235,7 @@
         
         
         
-          7 分钟
+          9 分钟
         
       </span>
     
@@ -277,7 +277,9 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Consistency-under-partial-failure-2PC-replicated-state-machine"><a href="#Consistency-under-partial-failure-2PC-replicated-state-machine" class="headerlink" title="Consistency under partial failure: 2PC &amp; replicated state machine"></a>Consistency under partial failure: 2PC &amp; replicated state machine</h2><h3 id="2PC-and-CAP"><a href="#2PC-and-CAP" class="headerlink" title="2PC and CAP"></a>2PC and CAP</h3><p>CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络分区的前提下，保证在消息丢失或系统故障下正常运行）三者不能兼得</p>
+                <h2 id="Consistency-under-partial-failure-2PC-replicated-state-machine">Consistency under partial failure: 2PC &amp; replicated state machine</h2>
+<h3 id="2PC-and-CAP">2PC and CAP</h3>
+<p>CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络分区的前提下，保证在消息丢失或系统故障下正常运行）三者不能兼得</p>
 <p>2PC保证了consistency，使用replication保证availability，而replication难以保证操作顺序，解决方法为：</p>
 <ul>
 <li>optimistic replication: eventual consistency</li>
@@ -296,10 +298,26 @@
 <p>由于primary要等待所有的backup的ACK，当backup挂了时，反而导致了系统不工作；可以让primary只等待一部分backup的ACK，但选择新的primary时需要额外处理，即需要从多台机器中读取最新的数据拼接起来来恢复，事实上很快</p>
 <p>quorum要求，写入时挑选 $Q_w$ 台机器写入，恢复时从 $Q_r$ 台机器中读取出来，只要保证 $Q_r + Q_w &gt; \text{Nreplicas}$ 即可</p>
 <p>最后的问题是view server挂了怎么办，因此需要引入paxos</p>
-<h3 id="paxos"><a href="#paxos" class="headerlink" title="paxos"></a>paxos</h3><p>当只有一台writer时，遵循quorum即可，但问题在于怎么处理多台writer</p>
-<p>paxos的角色有client, proposer, acceptor, learner，每个paxos node有后三者</p>
-<p>proposer要判断自己是否是唯一的writer(leader)，即当它的proposer number最大时为唯一的writer（只需要询问超过半数的机器，从而保证冲突，需要存放highest proposal number seen）</p>
-<p>client向proposer发送请求，leader选择一个大于previous proposal number seen的N发给acceptor；如果N大于acceptor见过的最大的都大，就返回highest past proposal number，并保证会忽略小于N的proposal ID，否则拒绝；leader如果收到超过半数机器返回OK，它就可以认为是唯一的writer（因为另一个proposer在询问时势必会访问到重叠的acceptor，从而保证能决定冲突）；现在写的时候也请求超过一半机器即可，两次半数请求能够保证其始终是唯一的writer</p>
+<h3 id="paxos">paxos</h3>
+<p>当只有一台writer时，遵循quorum即可，但问题在于怎么处理多台writer</p>
+<p>paxos的角色有client, proposer, acceptor, learner，每个paxos node为后三者三合一，即每个节点充当里面的所有职责：</p>
+<p>proposer要判断自己是否是唯一的writer(leader)，即当它的proposer number最大时为唯一的writer（只需要询问超过半数的机器，从而保证冲突，需要存放highest proposal number seen）（因为另一个proposer在询问时势必会访问到重叠的acceptor，从而保证能决定冲突</p>
+<p>single-decree paxos的流程如下：</p>
+<ul>
+<li>prepare:
+<ul>
+<li>proposer接收到client的请求后，生成一个递增的proposal number N（为轮次/server id对，先比较前者）（N应当大于previous proposal number seen），并发送给所有的acceptor（当然理论上发送给半数以上就可以了，但这是为了更保险）</li>
+<li>acceptor收到消息后，与自己已经做出承诺的proposal number比较，当N大于它时作出承诺，且当已经有接受的提案时返回额外的acceptedProposal和acceptedValue；否则拒绝或忽略。proposal收到半数以上的promise后，认为可以进入accept阶段（这里就会更新已作出承诺的proposal number，而acceptedProposal还没更新）</li>
+</ul>
+</li>
+<li>accept:
+<ul>
+<li>proposal收到多数派后，选择acceptedProposal最大的哪个acceptedValue，否则才能由自己决定value，并发送消息给多数派</li>
+<li>acceptor收到消息后，还是要检查N是否大于已作出承诺的proposal number，通过后再更新acceptedProposal和acceptedValue（注意这里才更新acceptedProposal）</li>
+</ul>
+</li>
+</ul>
+<p>可以认为slot, one single-decree paxos, client request一一对应；而被拒绝的request后续会对应到新的slot和single-decree paxos上去；而learner一般只读，作为一个可选的部分，在系统紧张时才参与进来；在phase 1结束后，那个获得多数派承诺的proposer成为leader，直到它挂了</p>
 
                 
               </div>

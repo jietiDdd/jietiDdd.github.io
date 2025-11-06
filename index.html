@@ -237,7 +237,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/06/CSE-lecture14-2PC-Replication/" target="_self">
         <div>
-          Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络
+          Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在
         </div>
       </a>
 
@@ -321,7 +321,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/" target="_self">
         <div>
-          Transaction &amp; Multi-site Transactiontransaction with high-performance在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 123456
+          Transaction &amp; Multi-site Transaction transaction with high-performance 在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 1234
         </div>
       </a>
 
@@ -405,7 +405,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture12-Transaction/" target="_self">
         <div>
-          Serializability, OCC &amp; TransactionOCC: optimistic concurrency control死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放入r
+          Serializability, OCC &amp; Transaction OCC: optimistic concurrency control 死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放
         </div>
       </a>
 
@@ -489,7 +489,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/" target="_self">
         <div>
-          Before-or-after atomicity and Serializability并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system t
+          Before-or-after atomicity and Serializability 并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system
         </div>
       </a>
 
@@ -573,7 +573,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/23/CSE-lecture10-Atomicity-Logging/" target="_self">
         <div>
-          Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时
+          Realizing atomicity: Logging + Checkpoint logging for atomicity logging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，
         </div>
       </a>
 
@@ -657,7 +657,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/22/CSE-lecture9-Atomicity/" target="_self">
         <div>
-          Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record = mmap(bank
+          Consistency under failure: The requirement of atomicity 即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record = mmap(ban
         </div>
       </a>
 
@@ -741,7 +741,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/20/CSE-lecture8-Consistency/" target="_self">
         <div>
-          Consistency when executing operations concurrentlyimplement ChatAPP最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上(r
+          Consistency when executing operations concurrently implement ChatAPP 最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上
         </div>
       </a>
 
@@ -825,7 +825,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/19/CSE-lecture7-System-modelling-KFS/" target="_self">
         <div>
-          System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，
+          System modelling &amp; Key-value stores(KVS) key-value store abstraction key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件
         </div>
       </a>
 
@@ -909,7 +909,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/CSE-lecture6-DFS/" target="_self">
         <div>
-          Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和
+          Distributed file system(DFS) distributed file service有以下类型：  upload/download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题
         </div>
       </a>
 
@@ -993,7 +993,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/" target="_self">
         <div>
-          Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一
+          Remote Procedure Call RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub  client stub做以下事情：发请求，接受响应，进行convert  server stub做以下事情：使用一个
         </div>
       </a>
 
