@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Consistency when executing operations concurrently implement ChatAPP 最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上">
+    <meta name="description" content="Consistency when executing operations concurrentlyimplement ChatAPP最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上(r">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture8:Consistency">
 <meta property="og:url" content="http://example.com/2025/10/20/CSE-lecture8-Consistency/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Consistency when executing operations concurrently implement ChatAPP 最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上">
+<meta property="og:description" content="Consistency when executing operations concurrentlyimplement ChatAPP最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上(r">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/10/20/CSE-lecture8-Consistency/e90f0a83c9b42f005142e8e541537a44.png">
 <meta property="og:image" content="http://example.com/2025/10/20/CSE-lecture8-Consistency/c244b12cd3c87796836b9c7b1dfd2c36.png">
@@ -287,9 +287,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Consistency-when-executing-operations-concurrently">Consistency when executing operations concurrently</h2>
-<h3 id="implement-ChatAPP">implement ChatAPP</h3>
-<p>最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：</p>
+                <h2 id="Consistency-when-executing-operations-concurrently"><a href="#Consistency-when-executing-operations-concurrently" class="headerlink" title="Consistency when executing operations concurrently"></a>Consistency when executing operations concurrently</h2><h3 id="implement-ChatAPP"><a href="#implement-ChatAPP" class="headerlink" title="implement ChatAPP"></a>implement ChatAPP</h3><p>最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：</p>
 <ul>
 <li>每次post都要网络通信，都要等待response</li>
 <li>每次read都要等待RPC</li>
@@ -301,6 +299,7 @@
 <p>如果向所有备份同步，会导致低性能，同时当部分server挂了时就同步不了</p>
 <p>一个常用的方法是只同步在一部分server上，这样可以离线读取聊天记录，但反映不了聊天记录的全貌。因此需要定期同步数据，或者被动接收同步数据</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/e90f0a83c9b42f005142e8e541537a44.png" srcset="/img/loading.gif" lazyload class="" title="read the local copy + periodically sync">
+
 <p>现在的挑战在于：</p>
 <ul>
 <li>不能同步所有的服务器</li>
@@ -309,10 +308,11 @@
 </ul>
 <p>这样又带来一个问题，即不同人看到的聊天记录是不一致的</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/c244b12cd3c87796836b9c7b1dfd2c36.png" srcset="/img/loading.gif" lazyload class="" title="can replicated approach reorder operations?">
+
 <p>consistency model定义了乱序现象会不会出现，有强弱之分，依情况选择合适的模型</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/fb97fb01c65b8874205abade6d99e74d.png" srcset="/img/loading.gif" lazyload class="" title="spectrum of consistency models">
-<h3 id="eventual-consistency">eventual consistency</h3>
-<p>我们的目标有：</p>
+
+<h3 id="eventual-consistency"><a href="#eventual-consistency" class="headerlink" title="eventual consistency"></a>eventual consistency</h3><p>我们的目标有：</p>
 <ul>
 <li>一旦能联网就能通信</li>
 <li>打开微信不一定需要看到最新的消息，可以容忍一定的延迟，但要保证最终消息顺序是一样的</li>
@@ -320,6 +320,7 @@
 <p>eventual consistency的读写都是只向任意一台服务器发起的，定期进行同步操作即可，即只保证最终一致性</p>
 <p>eventual consistency可能出现一段时间数据不一致现象，但能保证最终数据是一致的，要求为：一旦服务器收到的消息一致，那么给用户呈现的消息也应当一致，即需要保证确定的顺序</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/18b93122084d52ec5edde924db79c0cd.png" srcset="/img/loading.gif" lazyload class="" title="ordering challenge">
+
 <p>将收到的消息缓存在log中，再按照相同的规则进行排序，最后将排序好的聊天记录覆写过去</p>
 <p>问题在于怎么实现排序，需要一个total order的timestamp：</p>
 <ul>
@@ -328,6 +329,7 @@
 </ul>
 <p>但由于不同设备之间的时钟可能不一致，仍然可能出现被引用内容排在引用后面的情况</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/d65896ee7328d652441c7d1835a5fa80.png" srcset="/img/loading.gif" lazyload class="" title="unsynchronized clock time">
+
 <p>定义casual relationship X -&gt; Y如下：</p>
 <ul>
 <li>同一台机器中X发生在Y之前</li>
@@ -338,8 +340,7 @@
 <ul>
 <li>每个server维护一个自己的时钟</li>
 <li>时钟每隔一定时间加一</li>
-<li>收到其他server（时间戳为T’）的消息时，将自己的时间戳更新为 T = Max(T, T’ + 1)<img src="/2025/10/20/CSE-lecture8-Consistency/a8932a35620cc7dd22215ea11510292b.png" srcset="/img/loading.gif" lazyload class="" title="lamport clock algorithms">
-</li>
+<li>收到其他server（时间戳为T’）的消息时，将自己的时间戳更新为 T &#x3D; Max(T, T’ + 1)<img src="/2025/10/20/CSE-lecture8-Consistency/a8932a35620cc7dd22215ea11510292b.png" srcset="/img/loading.gif" lazyload class="" title="lamport clock algorithms"></li>
 </ul>
 <p>假设TS(event #1) &lt; TS(event #2)，且在不同node上能否说明以下几点：</p>
 <ul>
@@ -353,10 +354,9 @@
 <li>如果没有明确的casual relationship，应当回退</li>
 <li>使用更强的一致性模型</li>
 </ul>
-<p>因此应当增加partial order，即存在不能排序的情况。因此使用vector clock，只有每一项都比另一个大时才能排序。实现方法为向量包含本地的lamport clock和它观测到的其他server的lamport clock，未通信时只增加自己的lamport clock；同步时保证每一项都有T = Max(T, T’ + 1)</p>
+<p>因此应当增加partial order，即存在不能排序的情况。因此使用vector clock，只有每一项都比另一个大时才能排序。实现方法为向量包含本地的lamport clock和它观测到的其他server的lamport clock，未通信时只增加自己的lamport clock；同步时保证每一项都有T &#x3D; Max(T, T’ + 1)</p>
 <p>当出现不能排序的情况时，由应用自己决定怎么解决，这也是缺点之一</p>
-<h3 id="strong-consistency-model">strong consistency model</h3>
-<p>另一个方法是使用更强的一致性模型，此时能保证大家看到的都是一个确定的顺序，而不同强一致性模型的区别就是按照什么顺序</p>
+<h3 id="strong-consistency-model"><a href="#strong-consistency-model" class="headerlink" title="strong consistency model"></a>strong consistency model</h3><p>另一个方法是使用更强的一致性模型，此时能保证大家看到的都是一个确定的顺序，而不同强一致性模型的区别就是按照什么顺序</p>
 <p>strict consistency严格按照issue time，即操作的发起时间。使用中心化服务器的挑战在于网络延迟：</p>
 <ul>
 <li>这不能使用本地时间解决</li>
@@ -373,12 +373,15 @@
 </ul>
 <p>这需要保证primary和backup的顺序一致，但网络可能导致乱序，因此需要维护一个全局的seq number</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/6ab8e18c30dc1b0d9406ab37c53ec126.png" srcset="/img/loading.gif" lazyload class="" title="seq number">
+
 <p>允许read发生在write forward之前，这样虽然读取不到最新的write，但顺序是没有乱的，这样保证了高性能</p>
 <p>primary-backup的缺点为性能远不及eventual consistency，同时容错性维护很复杂（如出现多台primary）</p>
-<p>sequential consistency进一步优化，即可以在backup上read，下面例子的最后两次read违反了completion-to-issue，即pre-process issuing/completion order</p>
+<p>sequential consistency进一步优化，即可以在backup上read，下面例子的最后两次read违反了completion-to-issue，即pre-process issuing&#x2F;completion order</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/ba1c2d56d7c817cf90f371d7a2cc747e.png" srcset="/img/loading.gif" lazyload class="" title="sequential consistency">
+
 <p>eventual和linearizability比较：</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/f3fe8e5bf285c52311e9c1f570d0d540.png" srcset="/img/loading.gif" lazyload class="" title="eventual vs linearizability">
+
 <p>使用哪种模型应当由具体场景决定</p>
 
                 

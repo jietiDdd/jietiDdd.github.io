@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Transaction &amp; Multi-site Transaction transaction with high-performance 在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 1234">
+    <meta name="description" content="Transaction &amp; Multi-site Transactiontransaction with high-performance在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 123456">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture13:Transaction and Multi-site Transaction">
 <meta property="og:url" content="http://example.com/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Transaction &amp; Multi-site Transaction transaction with high-performance 在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 1234">
+<meta property="og:description" content="Transaction &amp; Multi-site Transactiontransaction with high-performance在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 123456">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/2a10913e0bbcaf4b5d118dc52db316e3.png">
 <meta property="og:image" content="http://example.com/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/0da1647616cfd053898f2fb2076a09d5.png">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          811 字
+          814 字
         
       </span>
     
@@ -283,34 +283,38 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Transaction-Multi-site-Transaction">Transaction &amp; Multi-site Transaction</h2>
-<h3 id="transaction-with-high-performance">transaction with high-performance</h3>
-<p>在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行</p>
+                <h2 id="Transaction-Multi-site-Transaction"><a href="#Transaction-Multi-site-Transaction" class="headerlink" title="Transaction &amp; Multi-site Transaction"></a>Transaction &amp; Multi-site Transaction</h2><h3 id="transaction-with-high-performance"><a href="#transaction-with-high-performance" class="headerlink" title="transaction with high-performance"></a>transaction with high-performance</h3><p>在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行</p>
 <p>对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">Data</span>&#123;</span><br>    value: List&lt;VersionedData&gt;<br>    lock: <span class="hljs-type">lock_t</span><br>&#125;<br><br><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">VersionedData</span>&#123;</span><br>    value: u8[...]<br>    version: u64<br>&#125;<br></code></pre></td></tr></table></figure>
+
 <p>在事务读之前维护一个时钟，即所有读只读某一个版本的数据，而写的时候需要引入新版本（这个版本应当约等于事务提交时间），可以使用global counter来FAA(fetch and add)时间戳，事务开始和提交时都需要FAA</p>
 <p>对OCC的改进方法为，事务开始时获取开始时钟，从而确定read时的snapshot，而write还是要缓存在write set中；提交时获取提交时钟，write时的version为该时钟，并保留以前的snapshot；现在不需要再validate了</p>
 <p>但snapshot可能出现写到一半就被别人FAA的问题，因此需要保证整个写都原子化</p>
 <img src="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/2a10913e0bbcaf4b5d118dc52db316e3.png" srcset="/img/loading.gif" lazyload class="" title="partial snapshot example">
+
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python">Commit(tx):<br>   <span class="hljs-keyword">for</span> record <span class="hljs-keyword">in</span> tx.write_set: <br>       lock(record)<br>   let commit_ts = FAA(global_counter)<br>   <span class="hljs-keyword">for</span> record <span class="hljs-keyword">in</span> tx.write_set:<br>       record.insert_new_version(commit_ts, ...) <br>       unlock(record) <br><br><br>Get(tx, record):<br>   <span class="hljs-keyword">while</span> record.is_locked():<br>         <span class="hljs-keyword">pass</span><br>   <span class="hljs-keyword">for</span> version,value <span class="hljs-keyword">in</span> record.sort_version_in_decreasing():<br>       <span class="hljs-keyword">if</span> version &lt;= tx.start_time: <br>          <span class="hljs-keyword">return</span> value <br><br></code></pre></td></tr></table></figure>
+
 <p>注意要先拿锁，再commit FAA，否则还是会读到原来的snapshot</p>
 <p>此时write还是可能出现漏加的情况，因此写操作不能从同一个snapshot来修改，因此还是需要validate</p>
 <p>多版本并发控制(MVCC)的流程如下，即validate检查在start time后是否出现了新的snapshot：</p>
 <img src="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/0da1647616cfd053898f2fb2076a09d5.png" srcset="/img/loading.gif" lazyload class="" title="MVCC">
+
 <p>MVCC实际上并没有保证before-or-after，由于validate阶段没有检查read，会出现写偏斜(write skew)</p>
 <img src="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/a3067afa7843695809f4232dd51fd880.png" srcset="/img/loading.gif" lazyload class="" title="write skew anomaly">
+
 <p>为了保证conflict serializability，可以在read-write事务中检查read set，虽然会退化到OCC，但实际用的不少（因为读远多于写，而只读事务不用检查read set）；或者不考虑(snapshot isolation, SI)</p>
-<h3 id="multi-site-transaction-multi-site-atomicity">multi-site transaction &amp; multi-site atomicity</h3>
-<p>用于处理事务的partial failure，出现场景为跨机器访问数据（数据切块），此时希望全提交或全放弃</p>
+<h3 id="multi-site-transaction-multi-site-atomicity"><a href="#multi-site-transaction-multi-site-atomicity" class="headerlink" title="multi-site transaction &amp; multi-site atomicity"></a>multi-site transaction &amp; multi-site atomicity</h3><p>用于处理事务的partial failure，出现场景为跨机器访问数据（数据切块），此时希望全提交或全放弃</p>
 <p>因此需要一个中心化的事务决定是否提交，即high-layer TX，具体操作单台机器的操作为low-layer TX，所有的low-layer TX要么全提交，要么都放弃</p>
 <p>此时需要two-phase commit:</p>
 <ul>
-<li>preparation/voting: low-layer TX只能tentatively commit/abort，high-layer TX评估lower的情况</li>
+<li>preparation&#x2F;voting: low-layer TX只能tentatively commit&#x2F;abort，high-layer TX评估lower的情况</li>
 <li>commitment: hight-layer决定low-layer是提交还是放弃</li>
 </ul>
 <img src="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/b11cd266bc0dda09d03aeaa7de0947b2.png" srcset="/img/loading.gif" lazyload class="" title="2PC">
+
 <img src="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/279c7fb78c49ecc34f553a971aeedb4b.png" srcset="/img/loading.gif" lazyload class="" title="2PC TX">
-<p>2PC会导致通信量增加，此时会出现unreliable communication，此时需要coordinator将abort/commit的决定写入log，worker在收到coordinator的消息前都应该等待</p>
+
+<p>2PC会导致通信量增加，此时会出现unreliable communication，此时需要coordinator将abort&#x2F;commit的决定写入log，worker在收到coordinator的消息前都应该等待</p>
 <p>prepare failure有以下情况：</p>
 <ul>
 <li>prepare消息丢失：超时就重发</li>

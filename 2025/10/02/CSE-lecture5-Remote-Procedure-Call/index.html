@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Remote Procedure Call RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub  client stub做以下事情：发请求，接受响应，进行convert  server stub做以下事情：使用一个">
+    <meta name="description" content="Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture5:Remote Procedure Call">
 <meta property="og:url" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Remote Procedure Call RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub  client stub做以下事情：发请求，接受响应，进行convert  server stub做以下事情：使用一个">
+<meta property="og:description" content="Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/ca5a0cd169e9a0ba6b37aeac0d06031a.png">
 <meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/96263d51ce570e304e3047161cf0ce03.png">
@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/b1bcdc87b62594a6bfb45eb8e756b3d5.png">
 <meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/e5cd42d45f962faa66e26271b730392c.png">
 <meta property="article:published_time" content="2025-10-02T11:00:47.000Z">
-<meta property="article:modified_time" content="2025-10-02T12:51:39.038Z">
+<meta property="article:modified_time" content="2025-11-09T06:09:51.490Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          625 字
+          658 字
         
       </span>
     
@@ -283,24 +283,26 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Remote-Procedure-Call">Remote Procedure Call</h2>
-<p>RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程</p>
+                <h2 id="Remote-Procedure-Call"><a href="#Remote-Procedure-Call" class="headerlink" title="Remote Procedure Call"></a>Remote Procedure Call</h2><p>RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程</p>
 <p>为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub</p>
 <img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/ca5a0cd169e9a0ba6b37aeac0d06031a.png" srcset="/img/loading.gif" lazyload class="" title="RPC stub">
+
 <p>client stub做以下事情：发请求，接受响应，进行convert</p>
 <img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/96263d51ce570e304e3047161cf0ce03.png" srcset="/img/loading.gif" lazyload class="" title="client stub">
+
 <p>server stub做以下事情：使用一个do forever不断接受请求，根据参数进行switch case，从而判断响应OK与否</p>
 <img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/fd22e083eed71a927efb9d4f8ef80a31.png" srcset="/img/loading.gif" lazyload class="" title="server stub">
+
 <p>其中message里面包括：</p>
 <ul>
 <li>service id</li>
 <li>service parameter</li>
-<li>marshal/unmarshal: 即保证object以序列化的形式传输，从而替代指针，收到消息后根据规则进行反序列化</li>
+<li>marshal&#x2F;unmarshal: 即保证object以序列化的形式传输，从而替代指针，收到消息后根据规则进行反序列化</li>
 </ul>
 <p>RPC request message包括：</p>
 <ul>
 <li>Xid: 即transaction id，保证每个消息都有一个id，便于重发</li>
-<li>call/reply</li>
+<li>call&#x2F;reply</li>
 <li>rpc version</li>
 <li>program #: 调用哪个程序（库文件）</li>
 <li>program version</li>
@@ -311,15 +313,14 @@
 <p>RPC reply message包括以下部分：</p>
 <ul>
 <li>Xid</li>
-<li>call/reply</li>
+<li>call&#x2F;reply</li>
 <li>accepted?: 用于判定RPC version</li>
 <li>auth staff</li>
-<li>success?: 用于判定prog/proc</li>
+<li>success?: 用于判定prog&#x2F;proc</li>
 <li>results: 需要序列化</li>
 </ul>
 <p>binding用于寻找服务器，这是依靠服务注册实现的</p>
-<h3 id="how-to-pass-the-data-between-client-server">how to pass the data between client &amp; server?</h3>
-<p>参数传递充满挑战性：</p>
+<h3 id="how-to-pass-the-data-between-client-server"><a href="#how-to-pass-the-data-between-client-server" class="headerlink" title="how to pass the data between client &amp; server?"></a>how to pass the data between client &amp; server?</h3><p>参数传递充满挑战性：</p>
 <ul>
 <li>跨服务器无法pass by reference，因此需要转换成pointless</li>
 <li>大小端的问题</li>
@@ -328,15 +329,16 @@
 <p>为了表示数据，需要进行encoding，这一般不会是语言特化的</p>
 <p>standard encoding有JSON, XML, CSV等等，好处是人类可读，缺点是可能有二义性、binary strings支持困难等等</p>
 <p>而binary formats难以阅读，但更紧凑、更准确、性能更好</p>
-<p>JSON每次传输时都要出现字段名，而Thrift和Protocol Buffers使用schema来将字段及其类型进行编号吗，从而进行压缩</p>
+<p>JSON每次传输时都要出现字段名，而Thrift和Protocol Buffers使用schema来将字段及其类型进行编号码，从而进行压缩</p>
 <p>以Thrift为例：</p>
 <img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/b1bcdc87b62594a6bfb45eb8e756b3d5.png" srcset="/img/loading.gif" lazyload class="" title="The BinaryProtocol of Thrift">
+
 <p>压缩还可以进一步进行，需要将这些0去除，比如记录field tag的差值，将数字变为链表存储等等：</p>
 <img src="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/e5cd42d45f962faa66e26271b730392c.png" srcset="/img/loading.gif" lazyload class="" title="Thrift CompactProtocol">
+
 <p>stub代码可以自动生成，这只需要头文件即可</p>
-<p>marshal/unmarshal也有可能反而耗时，因此其适用于慢的网速，而网速快时反而不需要压缩</p>
-<h3 id="when-RPC-meets-failure">when RPC meets failure</h3>
-<p>本地调用基本不会出错，但RPC却可能遇到各种各样的错误，而我们的目标为只需要一次调用，而现在有三种场景：</p>
+<p>marshal&#x2F;unmarshal也有可能反而耗时，因此其适用于慢的网速，而网速快时反而不需要压缩（这里是说是否有必要利用marshal的压缩功能，对于指针参数，marshal是必要的）</p>
+<h3 id="when-RPC-meets-failure"><a href="#when-RPC-meets-failure" class="headerlink" title="when RPC meets failure"></a>when RPC meets failure</h3><p>本地调用基本不会出错，但RPC却可能遇到各种各样的错误，而我们的目标为只需要一次调用，而现在有三种场景：</p>
 <ul>
 <li>at-least-once: 反复retry即可</li>
 <li>at-most-once: server记录Xid，出现retry时将过去的结果返回，但问题在于什么时候删除</li>

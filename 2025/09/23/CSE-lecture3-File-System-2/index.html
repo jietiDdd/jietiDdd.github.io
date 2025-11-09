@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="File System API and Disk I&#x2F;O implement the file system API API有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据放到磁">
+    <meta name="description" content="File System API and Disk I&#x2F;Oimplement the file system APIAPI有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture3:File System 2">
 <meta property="og:url" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="File System API and Disk I&#x2F;O implement the file system API API有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据放到磁">
+<meta property="og:description" content="File System API and Disk I&#x2F;Oimplement the file system APIAPI有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/c8230670407bcb77627aae41d91fc0ac.png">
 <meta property="og:image" content="http://example.com/2025/09/23/CSE-lecture3-File-System-2/3cf6e0694a37bc72f0029c1ca4bd0e68.png">
@@ -283,9 +283,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="File-System-API-and-Disk-I-O">File System API and Disk I/O</h2>
-<h3 id="implement-the-file-system-API">implement the file system API</h3>
-<p>API有以下几个：</p>
+                <h2 id="File-System-API-and-Disk-I-O"><a href="#File-System-API-and-Disk-I-O" class="headerlink" title="File System API and Disk I&#x2F;O"></a>File System API and Disk I&#x2F;O</h2><h3 id="implement-the-file-system-API"><a href="#implement-the-file-system-API" class="headerlink" title="implement the file system API"></a>implement the file system API</h3><p>API有以下几个：</p>
 <ul>
 <li><code>CHDIR</code>（即cd）, <code>MKDIR</code></li>
 <li><code>CREAT</code>, <code>LINK</code>, <code>UNLINK</code>, <code>RENAME</code></li>
@@ -300,7 +298,7 @@
 <li>open是来自操作系统的system call，而fopen是c语言规范中libc的一个API</li>
 <li>open返回一个fd，而fopen返回一个指向文件的指针</li>
 <li>只有fopen在windows和linux上都同名，而open不见得</li>
-<li>fopen具备更好的性能，因为fopen使用了一个buffer I/O，可能并没有直接写入磁盘</li>
+<li>fopen具备更好的性能，因为fopen使用了一个buffer I&#x2F;O，可能并没有直接写入磁盘</li>
 </ul>
 <p>inode是file的metadata，里面除了上节课讲的几个之外，还有：</p>
 <ul>
@@ -309,6 +307,7 @@
 <li>time stamps: access time（管理read）, modify time（管理write）, change of time（管理link）</li>
 </ul>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">inode</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">block_nums</span>[<span class="hljs-title">N</span>]</span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">size</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">type</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">refcnt</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">userid</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">groupid</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">mode</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">atime</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">mtime</span></span><br><span class="hljs-class">    <span class="hljs-title">integer</span> <span class="hljs-title">ctime</span></span><br></code></pre></td></tr></table></figure>
+
 <p>open时的过程为：</p>
 <ul>
 <li>通过id和mode检查是否有打开的权限</li>
@@ -325,14 +324,19 @@
 <p>fd要求返回当前可用fd中最小的那个，而这就导致了当open过多时要加锁，导致性能下降</p>
 <p>文件被打开时，file cursor默认指向0的位置，而read和write时，cursor向前移动，同时read和write也是从当前cursor开始的，使用<code>SEEK</code>来任意移动file cursor</p>
 <p>sharing file cursor: 父进程将fd传给子进程，在写log时有用；not sharing file cursor: 两个进程打开同一个文件</p>
-<p>使用fd_table和file_table维护file cursor（这些都是in memory的），其中file_table全局，而file_table里面的refcnt与inode里面的区分，而是表明有多少进程共享同一个index，而当refcnt = 0时回收资源</p>
+<p>使用fd_table和file_table维护file cursor（这些都是in memory的），其中file_table全局，而file_table里面的refcnt与inode里面的区分，而是表明有多少进程共享同一个index，而当refcnt &#x3D; 0时回收资源</p>
 <img src="/2025/09/23/CSE-lecture3-File-System-2/c8230670407bcb77627aae41d91fc0ac.png" srcset="/img/loading.gif" lazyload class="" title="fd_table &amp; file_table">
+
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure OPEN(string filename, integer flags, integer mod) -&gt; integer<br>    inode_number &lt;- PATH_TO_INODE_NUMBER(filename, wd)<br>    <span class="hljs-keyword">if</span> inode_number = FAILURE <span class="hljs-keyword">and</span> flags = O_CREATE then     <span class="hljs-comment"># 创建文件？</span><br>        inode_number &lt;- CREATE(filename, mode)<br>    <span class="hljs-keyword">if</span> inode_number = FAILURE then<br>        <span class="hljs-keyword">return</span> FAILURE<br>    inode &lt;- INODE_NUMBER_TO_INODE(inode_number)<br>    <span class="hljs-keyword">if</span> PERMITTED(inode, flags) then                         <span class="hljs-comment"># 是否具备权限？</span><br>        file_index &lt;- INSERT(file_table, inode_number)<br>        fd &lt;- FIND_UNUSED_ENTRY(fd_table)                   <span class="hljs-comment"># 在fd_table寻找最小空闲fd</span><br>        fd_table[fd] &lt;- file_index                          <span class="hljs-comment"># 将fd和file index关联起来</span><br>        <span class="hljs-keyword">return</span> fd<br>    <span class="hljs-keyword">else</span> <span class="hljs-keyword">return</span> FAILURE<br></code></pre></td></tr></table></figure>
+
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python">procedure READ(integer fd, character[] &amp;buf, integer n) -&gt; integer<br>    file_index &lt;- fd_table[fd]<br>    cursor &lt;- file_table[file_index].cursor<br>    inode &lt;- INODE_NUMBER_TO_INODE(file_table[file_index].inode_number)<br>    m &lt;- MINIMUM(inode.size - cursor, n)<br>    atime of inode &lt;- now()<br>    <span class="hljs-keyword">if</span> m = <span class="hljs-number">0</span> then <span class="hljs-keyword">return</span> END_OF_FILE<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">from</span> <span class="hljs-number">0</span> to m - <span class="hljs-number">1</span> do<br>        b &lt;- INODE_NUMBER_TO_BLOCK(cursor + i, inode_number)<br>        COPY(b, buf, MINIMUN(m - i, BLOCKSIZE))<br>        i &lt;- i + MINIMUM(m - i, BLOCKSIZE)<br>    file_table[file_index].cursor &lt;- cursor + m<br>    <span class="hljs-keyword">return</span> m<br></code></pre></td></tr></table></figure>
+
 <p>每次<code>OPEN</code>, <code>READ</code>, <code>CREATION</code>时到底调用了多少次read和write？见以下两张图</p>
 <img src="/2025/09/23/CSE-lecture3-File-System-2/3cf6e0694a37bc72f0029c1ca4bd0e68.png" srcset="/img/loading.gif" lazyload class="" title="open &amp; read timeline">
+
 <p>每次READ时都要在inode里面write，很麻烦，因此添加参数<code>-no-atime</code>，并在close的时候再一并更新atime</p>
 <img src="/2025/09/23/CSE-lecture3-File-System-2/6d38a963e25efe49cbd6d2831a2c03a1.png" srcset="/img/loading.gif" lazyload class="" title="creation timeline">
+
 <p>注意在create到bar inode时要先read再write，这是因为write的粒度都是4KB，而inode只有1KB，因此只能先读上来4KB；而create最后foo inode因为先前已经read过了，所以就只用write了；像bar inode[0]就直接write了，因为直接write 4KB就行</p>
 <p>以下三个写操作顺序，哪个最合理？检查什么时候断电，权衡后选择第一个，但也不完美</p>
 <ul>
@@ -348,8 +352,7 @@
 <li><code>UNLINK(from_name)</code>: refcnt变回1</li>
 </ol>
 <p>在1和2之间断电，至少保证了from_name和to_name指向同一个文件</p>
-<h3 id="other-file-systems-not-inode">other file systems(not inode)</h3>
-<ul>
+<h3 id="other-file-systems-not-inode"><a href="#other-file-systems-not-inode" class="headerlink" title="other file systems(not inode)"></a>other file systems(not inode)</h3><ul>
 <li>方法1：使用连续的block存储文件</li>
 <li>方法2：使用linked list，即FAT(file allcation table)：<img src="/2025/09/23/CSE-lecture3-File-System-2/a4dc455cd7c99c1613c5948ed6f6c6c4.png" srcset="/img/loading.gif" lazyload class="" title="FAT">
 <ul>
@@ -357,8 +360,7 @@
 <li>file number为list起始位置得索引</li>
 <li>将空的block视为一个大文件，对应一个free list</li>
 <li>写入文件时，从free list中获取空闲的block，并将它们link起来</li>
-<li>FAT的目录包含了file name, file number, next，因此也不支持硬链接，根目录在sector 0<img src="/2025/09/23/CSE-lecture3-File-System-2/2f79725c8cae374f6bddb0845b3dc3eb.png" srcset="/img/loading.gif" lazyload class="" title="directory in FAT">
-</li>
+<li>FAT的目录包含了file name, file number, next，因此也不支持硬链接，根目录在sector 0<img src="/2025/09/23/CSE-lecture3-File-System-2/2f79725c8cae374f6bddb0845b3dc3eb.png" srcset="/img/loading.gif" lazyload class="" title="directory in FAT"></li>
 </ul>
 </li>
 </ul>

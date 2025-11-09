@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Distributed file system(DFS) distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题">
+    <meta name="description" content="Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture6:DFS">
 <meta property="og:url" content="http://example.com/2025/10/15/CSE-lecture6-DFS/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Distributed file system(DFS) distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题">
+<meta property="og:description" content="Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/3ac75d20310a673dd00501890965bcb1.png">
 <meta property="og:image" content="http://example.com/2025/10/15/CSE-lecture6-DFS/58612290f90e7c6454c79bd4cd8d9295.png">
@@ -284,14 +284,12 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Distributed-file-system-DFS">Distributed file system(DFS)</h2>
-<p>distributed file service有以下类型：</p>
+                <h2 id="Distributed-file-system-DFS"><a href="#Distributed-file-system-DFS" class="headerlink" title="Distributed file system(DFS)"></a>Distributed file system(DFS)</h2><p>distributed file service有以下类型：</p>
 <ul>
-<li>upload/download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性</li>
+<li>upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性</li>
 <li>remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题</li>
 </ul>
-<h3 id="NFS-with-RPC">NFS with RPC</h3>
-<p>即network file system，特点为：</p>
+<h3 id="NFS-with-RPC"><a href="#NFS-with-RPC" class="headerlink" title="NFS with RPC"></a>NFS with RPC</h3><p>即network file system，特点为：</p>
 <ul>
 <li>任何机器都可以作为服务端或者客户端</li>
 <li>支持diskless workstations</li>
@@ -302,41 +300,45 @@
 </ul>
 <p>要将inode file system中的system call变为RPC，此时多了<code>NULL()</code>和<code>LOOKUP()</code>，少了<code>OPEN()</code>和<code>CLOSE()</code>，fd则变为fh，多了offset</p>
 <img src="/2025/10/15/CSE-lecture6-DFS/3ac75d20310a673dd00501890965bcb1.png" srcset="/img/loading.gif" lazyload class="" title="RPC in NFS">
+
 <p>首先实现mount，即挂载，server上将shared directories写入配置文件，client进行mount，实现远程路径和本地路径的映射</p>
 <p>每个request都需要有一个permission，以检查一下client是否是某一用户，然后server返回一个file handler</p>
 <img src="/2025/10/15/CSE-lecture6-DFS/58612290f90e7c6454c79bd4cd8d9295.png" srcset="/img/loading.gif" lazyload class="" title="NFS read a file">
+
 <p>NFS client从本地向application提供OPEN, READ, WRITE, CLOSE等接口，从而保证application不必修改代码；另一边通过网络访问NFS server，这才会使用RPC的接口</p>
 <p>OPEN操作其实并没有在server上真的打开文件，因此CLOSE也不会访问到server；READ操作也不会传递buffer给server；file attributes用于更新本地的inode，同时由于存在其他client更改文件，故这可用于维护一致性</p>
 <p>server是无状态的，不存放cursor，因此两次访问server之间发生重启不会出现错误，从而保证容错性的同时减少资源的使用；client则是有状态的，即存在file table等，存放cursor等，因此多次调用READ，需要调整offset，而RPC本身的READ由于存在offset，因此是幂等的</p>
 <p>client和server之间不能传递fd，不然就需要打开文件，违背了无状态性，因此传递fh</p>
 <p>fh不能使用path name，否则在一个client打开文件后，另一个client重命名目录时会出现问题</p>
 <img src="/2025/10/15/CSE-lecture6-DFS/3ad4af297aedeb3c17c0061f7240a6c4.png" srcset="/img/loading.gif" lazyload class="" title="rename after open">
+
 <p>也不能使用inode number，否则在一个client打开文件后，另一个client删除这个inode并分配一个新的文件，也会出现读取到新文件的问题，这需要额外维护版本号(generation number)，这不得不违背本地unix规范</p>
 <img src="/2025/10/15/CSE-lecture6-DFS/1a0a0c392651717ac3dbf2f7a5ae8dd6.png" srcset="/img/loading.gif" lazyload class="" title="delete after open">
+
 <p>因此file handler包含inode number和generation number</p>
 <p>性能上，通常慢于本地访问，但不总是，这和file server的性能和网速有关。为了优化，应当在client使用cache，从而降低远程操作的次数，如file data, file attribute, pathname bindings，而server端自动进行buffer cache，因此不需要额外操作</p>
 <p>cache会带来一致性问题(cache coherence)，即能否read到最近一次write(read observes last write)，有两种：</p>
 <ul>
 <li>close-to-open consistency: open时比较是否与cache的状态一致，close时再将本地cache的write一起发回server，性能好，但容易引发一致性问题</li>
-<li>read/write coherence: 能在本地read到最新的数据，NFS client全权保证read/write coherence，或只保证其中一部分</li>
+<li>read&#x2F;write coherence: 能在本地read到最新的数据，NFS client全权保证read&#x2F;write coherence，或只保证其中一部分</li>
 </ul>
 <p>处理方法如下：</p>
 <ul>
 <li>close-to-open consistency: close时刷新cache</li>
-<li>read/write coherence: client和server都维护timestamp，反复比较，远程更新时无效化本地的cache，cache还需要设置有效时间</li>
+<li>read&#x2F;write coherence: client和server都维护timestamp，反复比较，远程更新时无效化本地的cache，cache还需要设置有效时间</li>
 </ul>
 <p>还可以使用以下方法进一步优化性能：</p>
 <ul>
 <li>每次多传一些数据</li>
 <li>read-ahead: 提前多传一些头部数据</li>
 </ul>
-<h3 id="GFS-the-google-file-system">GFS: the google file system</h3>
-<p>google具备以下特性：大部分文件是append而非overwritten，因此random write几乎为零；workload主要是read</p>
+<h3 id="GFS-the-google-file-system"><a href="#GFS-the-google-file-system" class="headerlink" title="GFS: the google file system"></a>GFS: the google file system</h3><p>google具备以下特性：大部分文件是append而非overwritten，因此random write几乎为零；workload主要是read</p>
 <p>因此GFS的设计目标为：可扩展的分布式文件系统(scalable distributed file system)；为大型数据密集型应用设计；错误容忍度高；高性能</p>
-<p>GFS并没有提供标准的OS级别API，基本操作为create/delete/open/close/read/write，多了snapshot/append，少了link/symlink/rename，否则rename容易引发一致性问题（因为有多个备份，避免了inode和server的高耦合）</p>
+<p>GFS并没有提供标准的OS级别API，基本操作为create&#x2F;delete&#x2F;open&#x2F;close&#x2F;read&#x2F;write，多了snapshot&#x2F;append，少了link&#x2F;symlink&#x2F;rename，否则rename容易引发一致性问题（因为有多个备份，避免了inode和server的高耦合）</p>
 <p>GFS的架构为一台master和很多台chunk server，master控制元数据信息，chunk server存放具体的数据（其中chunk非常大，为64MB，应用于大文件场景）</p>
 <p>每一个文件都有三个备份，用于容错，这些chunk被放在不同的chunk server上，master管理metadata，放在memory中</p>
 <img src="/2025/10/15/CSE-lecture6-DFS/41a22ca3644617bef74f55276b112d34.png" srcset="/img/loading.gif" lazyload class="" title="GFS files">
+
 <p>large chunk的优点在于：减少通信次数，减小metadata的大小</p>
 <p>chunk handle全局唯一</p>
 <p>master唯一的好处在于，metadata在内存中，从而实现super-fast；operation log用于保证master的崩溃引发的容错</p>
@@ -350,12 +352,10 @@
 </ul>
 <p>而write文件分两步：</p>
 <ul>
-<li>
-<p>先只传递数据而不写，client拿到三备份，一主两从，选一个最近的replica，一个接一个pipeline来写完所有的chunk server</p>
+<li><p>先只传递数据而不写，client拿到三备份，一主两从，选一个最近的replica，一个接一个pipeline来写完所有的chunk server</p>
 <img src="/2025/10/15/CSE-lecture6-DFS/f6cbc95d13a07bf05afdb94981a38003.png" srcset="/img/loading.gif" lazyload class="" title="send data in GFS">
 </li>
-<li>
-<p>将数据写入到文件中去，这需要修改master</p>
+<li><p>将数据写入到文件中去，这需要修改master</p>
 </li>
 </ul>
 <p>在GFS中进行naming时，实际上是没有目录的概念的，而是直接进行文件名和chunk server的哈希，好处是没有任何的link，同时查找速度极快</p>
