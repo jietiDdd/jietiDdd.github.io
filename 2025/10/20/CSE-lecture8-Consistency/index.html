@@ -36,7 +36,7 @@
 <meta property="og:image" content="http://example.com/2025/10/20/CSE-lecture8-Consistency/ba1c2d56d7c817cf90f371d7a2cc747e.png">
 <meta property="og:image" content="http://example.com/2025/10/20/CSE-lecture8-Consistency/f3fe8e5bf285c52311e9c1f570d0d540.png">
 <meta property="article:published_time" content="2025-10-20T09:54:10.000Z">
-<meta property="article:modified_time" content="2025-10-22T12:32:43.905Z">
+<meta property="article:modified_time" content="2025-11-09T08:46:22.512Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -317,7 +317,7 @@
 <li>一旦能联网就能通信</li>
 <li>打开微信不一定需要看到最新的消息，可以容忍一定的延迟，但要保证最终消息顺序是一样的</li>
 </ul>
-<p>eventual consistency的读写都是只向任意一台服务器发起的，定期进行同步操作即可，即只保证最终一致性</p>
+<p>eventual consistency的读写都是只向任意一台服务器发起的，定期进行同步操作即可，即只保证最终一致性（或本地副本读取，写的时候还需要广播）</p>
 <p>eventual consistency可能出现一段时间数据不一致现象，但能保证最终数据是一致的，要求为：一旦服务器收到的消息一致，那么给用户呈现的消息也应当一致，即需要保证确定的顺序</p>
 <img src="/2025/10/20/CSE-lecture8-Consistency/18b93122084d52ec5edde924db79c0cd.png" srcset="/img/loading.gif" lazyload class="" title="ordering challenge">
 

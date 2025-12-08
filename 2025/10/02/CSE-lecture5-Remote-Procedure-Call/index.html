@@ -32,7 +32,7 @@
 <meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/b1bcdc87b62594a6bfb45eb8e756b3d5.png">
 <meta property="og:image" content="http://example.com/2025/10/02/CSE-lecture5-Remote-Procedure-Call/e5cd42d45f962faa66e26271b730392c.png">
 <meta property="article:published_time" content="2025-10-02T11:00:47.000Z">
-<meta property="article:modified_time" content="2025-11-09T06:09:51.490Z">
+<meta property="article:modified_time" content="2025-11-09T08:13:23.431Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          658 字
+          661 字
         
       </span>
     
@@ -344,7 +344,7 @@
 <li>at-most-once: server记录Xid，出现retry时将过去的结果返回，但问题在于什么时候删除</li>
 <li>exactly-once: 很困难</li>
 </ul>
-<p>需要区分幂等性(idempotent)和非幂等性，幂等的操作反复执行结果是一致的，用于保证at-most-once</p>
+<p>需要区分幂等性(idempotent)和非幂等性，幂等的操作反复执行结果是一致的，配合at-least-once可以实现exactly-once</p>
 
                 
               </div>
