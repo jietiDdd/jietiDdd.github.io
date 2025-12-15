@@ -19,29 +19,37 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Introduction to Networklayers in network最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用   Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点">
+    <meta name="description" content="Network Layer: All about routingIP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访问">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture16:network-link">
-<meta property="og:url" content="http://example.com/2025/12/08/CSE-lecture16-network-link/index.html">
+<meta property="og:title" content="CSE_lecture17:network-ip">
+<meta property="og:url" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Introduction to Networklayers in network最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用   Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点">
+<meta property="og:description" content="Network Layer: All about routingIP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访问">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/9fa412a3963e954ad17aa4fcf7f38df9.png">
-<meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/eb78f118cc24804f5b721f96fbdd57ba.png">
-<meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/eef35275fd80bcd92f7a3b00a21650a0.png">
-<meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/617275ee4949654f49f26873ec0943ab.png">
-<meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/0df24885b6da39b2146ed4a42f65064d.png">
-<meta property="article:published_time" content="2025-12-08T03:12:14.000Z">
-<meta property="article:modified_time" content="2025-12-09T09:13:41.650Z">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/52671670be8fedf8f2606592c1b8b768.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/fea953ba3bf431c6656d65a848382d2d.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/7ca0ac10213251cab1c89597c378145b.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/8ed7ea8f229bb19140d59e2a24dfad10.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/8d701e4653a97f34b3233837199765e3.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/59f5efe74d87236cf59d38710e5dc8c1.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/fc423095879406d336607abd9b6b0917.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/d055e59a521506f03b8a6dd2d9fb7892.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/525010a64bbfacdc65f1a6b444efdbb8.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/26922538fb9a4d2eda3d3e0bad47adc4.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/41b49f81be6335788083ad5ed73a797a.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/b02d3d027271c0124a16bbba18e6c2e0.png">
+<meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/e55a9a1dfb5e56f325bf4df3b300d984.png">
+<meta property="article:published_time" content="2025-12-09T03:58:25.000Z">
+<meta property="article:modified_time" content="2025-12-15T07:26:11.407Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/9fa412a3963e954ad17aa4fcf7f38df9.png">
+<meta name="twitter:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/52671670be8fedf8f2606592c1b8b768.png">
   
   
   
-  <title>CSE_lecture16:network-link - jietiDdd的个人博客</title>
+  <title>CSE_lecture17:network-ip - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -207,7 +215,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture16:network-link"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture17:network-ip"></span>
           
         </div>
 
@@ -218,8 +226,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-08 11:12" pubdate>
-          2025年12月8日 上午
+        <time datetime="2025-12-09 11:58" pubdate>
+          2025年12月9日 中午
         </time>
       </span>
     
@@ -230,7 +238,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          620 字
+          955 字
         
       </span>
     
@@ -241,7 +249,7 @@
         
         
         
-          6 分钟
+          8 分钟
         
       </span>
     
@@ -278,62 +286,104 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture16:network-link</h1>
+            <h1 id="seo-header">CSE_lecture17:network-ip</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="Introduction-to-Network"><a href="#Introduction-to-Network" class="headerlink" title="Introduction to Network"></a>Introduction to Network</h2><h3 id="layers-in-network"><a href="#layers-in-network" class="headerlink" title="layers in network"></a>layers in network</h3><p>最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：</p>
+                <h2 id="Network-Layer-All-about-routing"><a href="#Network-Layer-All-about-routing" class="headerlink" title="Network Layer: All about routing"></a>Network Layer: All about routing</h2><p>IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的</p>
+<p>与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现</p>
+<p>这一层有network_send和network_handle，后者可能处理，也可能转发</p>
+<p>路由有很多网口，实现了跨子网之间的访问，其中路由表记录了子网和网口的对应关系，而路由器与路由器之间的路由表会进行合并，从而进行多个子网之间的通信</p>
+<p>control-plane控制了数据的流动，如随时更新路由表或确定路由算法，重点在于正确性；data-plane则用于快速查表，重点在于性能</p>
+<p>路由器往往有两个硬件，即CPU和NPU，前者用于处理control-plane，后者用于快速实现data-plane，如使用大的cache</p>
+<h3 id="routing"><a href="#routing" class="headerlink" title="routing"></a>routing</h3><p>路由的目标为能找到任意起点和终点之间的路径，且这条路径是最快的（时间上的，金钱上的）</p>
+<p>难点在于分布式路由的实现，分为三步：</p>
 <ul>
-<li>Application</li>
-<li>Transport</li>
-<li>Network</li>
-<li>Link</li>
+<li>HELLO protocol: 节点向邻居打招呼，获得邻居的信息</li>
+<li>advertisements: 获得可达节点的信息</li>
+<li>minimum-cost: 根据已知路由确定最小成本路由</li>
 </ul>
-<p>OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用</p>
-<img src="/2025/12/08/CSE-lecture16-network-link/9fa412a3963e954ad17aa4fcf7f38df9.png" srcset="/img/loading.gif" lazyload class="" title="layers in network">
+<p>两种类型的routing protocol:</p>
+<ul>
+<li>link-state: 一个节点的advertisement包括它的邻居和到达这些邻居的成本，通过泛洪(flooding)将到达邻居的成本发给所有节点，最后通过Dijkstra最短路径算法进行整合</li>
+<li>distance-vector: 只给邻居告诉它已知的所有节点的成本，使用Bellman-Ford算法进行整合</li>
+</ul>
+<img src="/2025/12/09/CSE-lecture17-network-ip/52671670be8fedf8f2606592c1b8b768.png" srcset="/img/loading.gif" lazyload class="" title="link-state flooding">
 
-<p>Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点的通路，End-to-end Layer处理具体怎么传输数据</p>
-<p>无论软硬件规定了多少协议，都需要IP协议来进行收束，从而统一标准</p>
-<p>网络发包时会被各层包装，事实上socket buffer的data也是从中间写的，预留出前面的空间来存放header</p>
-<img src="/2025/12/08/CSE-lecture16-network-link/eb78f118cc24804f5b721f96fbdd57ba.png" srcset="/img/loading.gif" lazyload class="" title="packet encapsulation">
+<img src="/2025/12/09/CSE-lecture17-network-ip/fea953ba3bf431c6656d65a848382d2d.png" srcset="/img/loading.gif" lazyload class="" title="link-state Dijkstra">
 
-<p>port用于在IP相同时标识server提供的服务和进程</p>
-<p>gateway提供了网络与网络之间的连接</p>
-<ul>
-<li>每一层都会添加&#x2F;去掉自己的报头</li>
-<li>每一层可能会拆分更高一层的数据</li>
-<li>每一层会复用多个更高一层的数据</li>
-<li>每一层对更高层来说（大多是）透明的</li>
-</ul>
-<h3 id="link-layer"><a href="#link-layer" class="headerlink" title="link layer"></a>link layer</h3><p>Link Layer实现了将数据传输给物理邻居：</p>
-<ul>
-<li>物理传输</li>
-<li>链路复用</li>
-<li>对比特与比特序列进行成帧处理</li>
-<li>检测传输错误</li>
-<li>为上一层提供一个有用的接口</li>
-</ul>
-<p>为了实现链路复用，可以使用同步通信和异步通信</p>
-<ul>
-<li>isochronous connection: 每人分配一小块时间传输数据，好处在于互不影响，缺点在于利用率不高，因此多用于音频网络<img src="/2025/12/08/CSE-lecture16-network-link/eef35275fd80bcd92f7a3b00a21650a0.png" srcset="/img/loading.gif" lazyload class="" title="isochronous"></li>
-<li>asynchronous connection: 用于数据网络，通过发包的方式通信，因此包与包之间需要排队，排队策略很多</li>
-</ul>
-<p>现在基本都使用后者了，声音传输也使用数据传输</p>
-<p>为了维护frame，需要使用特殊的序列来标识frame的开始和结束，一个简单的方法是：收到7个1 bit时分离出frame，而数据中如果包含连续的6个1 bit，就在后面额外加一个0 bit</p>
-<p>对于错误处理，可以添加error detection code，如在结尾添加一个checksum，并使用error correction code纠正，纠正不了才选择重传</p>
-<p>一般来说只会有1个bit出现问题，因此通过hamming coding扩充冗余bit位数，达到校验的目的，位数设置的目的是为了直接相加得到真正错误的位数</p>
-<img src="/2025/12/08/CSE-lecture16-network-link/617275ee4949654f49f26873ec0943ab.png" srcset="/img/loading.gif" lazyload class="" title="hamming coding">
+<p>注意到link-state的路由只记录其选择的邻居，而不是完整的路径</p>
+<p>link-state的容错性好且收敛快，但缺点在于网络建立初期，flooding的网络开销极大，因此只适用于规模较小的自组织网络</p>
+<p>相较于link-state在flooding时发送的都是同一信息，distance-vector的邻居节点消化完信息后，会发送新的认知信息，从而让原来的节点更新自己的路由表，并再次发送认知信息（可能停不下来，即持续更新）</p>
+<img src="/2025/12/09/CSE-lecture17-network-ip/7ca0ac10213251cab1c89597c378145b.png" srcset="/img/loading.gif" lazyload class="" title="distance-vector first advertisement">
 
-<p>point-to-point protocol是指一系列的协议，包括：</p>
-<ul>
-<li>framing method</li>
-<li>link control protocol</li>
-<li>network control protocol</li>
-</ul>
-<img src="/2025/12/08/CSE-lecture16-network-link/0df24885b6da39b2146ed4a42f65064d.png" srcset="/img/loading.gif" lazyload class="" title="PPP framing and error detection">
+<img src="/2025/12/09/CSE-lecture17-network-ip/8ed7ea8f229bb19140d59e2a24dfad10.png" srcset="/img/loading.gif" lazyload class="" title="B" alt="s first advertisement">
 
-<p>在正式发送数据之前，会先发送LCP包，用于检查对方是否做好准备，接收者也会返回并协商格式</p>
+<img src="/2025/12/09/CSE-lecture17-network-ip/8d701e4653a97f34b3233837199765e3.png" srcset="/img/loading.gif" lazyload class="" title="D" alt="s first advertisement">
+
+<img src="/2025/12/09/CSE-lecture17-network-ip/59f5efe74d87236cf59d38710e5dc8c1.png" srcset="/img/loading.gif" lazyload class="" title="distance-vector second advertisement">
+
+<img src="/2025/12/09/CSE-lecture17-network-ip/fc423095879406d336607abd9b6b0917.png" srcset="/img/loading.gif" lazyload class="" title="link-state vs distance-vector">
+
+<p>distance-vector不能一开始就得到最优解，其容错性要差些，因此failure handling是其缺点，如problem of INFINITY</p>
+<img src="/2025/12/09/CSE-lecture17-network-ip/d055e59a521506f03b8a6dd2d9fb7892.png" srcset="/img/loading.gif" lazyload class="" title="INFINITY">
+
+<p>因此advertisement里面不应当包含A-&gt;B的路径</p>
+<img src="/2025/12/09/CSE-lecture17-network-ip/525010a64bbfacdc65f1a6b444efdbb8.png" srcset="/img/loading.gif" lazyload class="" title="split horizon">
+
+<p>distance-vector的优点在于低开销，缺点在于收敛时间长且与路径长度有关，还有infinity问题，因此也只适用于小型网络</p>
+<h3 id="scale-the-routing"><a href="#scale-the-routing" class="headerlink" title="scale the routing"></a>scale the routing</h3><p>三种扩大规模的方法：</p>
+<ul>
+<li>hierarchy of routing: 即划分region，将多个节点抽象成一个点</li>
+<li>path-vector routing: advertisement将包含完整的path信息</li>
+<li>topological addressing: 将多个地址合并在一起，使路由表变小，如18.0.0.0到18.0.0.255的所有地址压缩成18.0.0.0&#x2F;24，即前24位都相同</li>
+</ul>
+<img src="/2025/12/09/CSE-lecture17-network-ip/26922538fb9a4d2eda3d3e0bad47adc4.png" srcset="/img/loading.gif" lazyload class="" title="hierarchical address assignment &amp; routing">
+
+<p>而跨region应当使用BGP，是一种path-vector protocol</p>
+<p>path-vector将整个path记录下来，有助于检查有无环，防止出现INFINITY问题，还能顺便进行access policy，即检查不能去的节点，最后扩大了规模，收敛时间下降。缺点在于advertisement变大</p>
+<img src="/2025/12/09/CSE-lecture17-network-ip/41b49f81be6335788083ad5ed73a797a.png" srcset="/img/loading.gif" lazyload class="" title="path-vector exchange">
+
+<img src="/2025/12/09/CSE-lecture17-network-ip/b02d3d027271c0124a16bbba18e6c2e0.png" srcset="/img/loading.gif" lazyload class="" title="path vector &amp; forwarding table">
+
+<p>当graph变化时，即某个节点go down，path-vector只需要检查path里面有没有这个节点，修改受到影响的节点即可</p>
+<img src="/2025/12/09/CSE-lecture17-network-ip/e55a9a1dfb5e56f325bf4df3b300d984.png" srcset="/img/loading.gif" lazyload class="" title="IGP vs EGP">
+
+<table>
+<thead>
+<tr>
+<th><strong>特性</strong></th>
+<th><strong>内部网关协议（IGP）</strong></th>
+<th><strong>外部网关协议（EGP）</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>范围</strong></td>
+<td>自治系统（AS）内部</td>
+<td>自治系统（AS）之间</td>
+</tr>
+<tr>
+<td><strong>主要目标</strong></td>
+<td>找到最佳路径；快速收敛</td>
+<td>应用路由策略；控制路径传播</td>
+</tr>
+<tr>
+<td><strong>典型协议</strong></td>
+<td>OSPF、IS-IS、RIP、EIGRP</td>
+<td>BGP（当前唯一使用的 EGP）</td>
+</tr>
+<tr>
+<td><strong>关注点</strong></td>
+<td>速度、效率、网络拓扑</td>
+<td>策略、可达性、AS 路径</td>
+</tr>
+<tr>
+<td><strong>规模</strong></td>
+<td>管理数百到数千条路由</td>
+<td>管理全球互联网（数十万条路由）</td>
+</tr>
+</tbody></table>
 
                 
               </div>
@@ -402,8 +452,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture16:network-link</div>
-      <div>http://example.com/2025/12/08/CSE-lecture16-network-link/</div>
+      <div>CSE_lecture17:network-ip</div>
+      <div>http://example.com/2025/12/09/CSE-lecture17-network-ip/</div>
     </div>
     <div class="license-meta">
       
@@ -415,7 +465,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月8日</div>
+          <div>2025年12月9日</div>
         </div>
       
       
@@ -447,18 +497,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/09/CSE-lecture17-network-ip/" title="CSE_lecture17:network-ip">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture17:network-ip</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/11/06/CSE-lecture14-2PC-Replication/" title="CSE_lecture14:2PC+Replication">
-                        <span class="hidden-mobile">CSE_lecture14:2PC+Replication</span>
+                      <a href="/2025/12/08/CSE-lecture16-network-link/" title="CSE_lecture16:network-link">
+                        <span class="hidden-mobile">CSE_lecture16:network-link</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
