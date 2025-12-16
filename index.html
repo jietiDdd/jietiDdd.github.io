@@ -229,6 +229,97 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/12/16/CSE-lecture19-network-end2end/" target="_self">
+          CSE_lecture19:network-end2end
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/16/CSE-lecture19-network-end2end/" target="_self">
+        <div>
+          End-to-end Layer: Best-effort is not enoughend-to-end layer UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-16 15:25" pubdate>
+              2025-12-16
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/object-Object/" class="category-chain-item">[object Object]</a>
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/se/">#se</a>
+            
+              <a href="/tags/cse/">#cse</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/12/15/CSE-lecture18-network-ip-2/" target="_self">
           CSE_lecture18:network-ip-2
         </a>
@@ -237,7 +328,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/15/CSE-lecture18-network-ip-2/" target="_self">
         <div>
-          Network Layer - 2 case study: BGP 每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer/provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付费
+          Network Layer - 2case study: BGP每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付
         </div>
       </a>
 
@@ -321,7 +412,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/09/CSE-lecture17-network-ip/" target="_self">
         <div>
-          Network Layer: All about routing IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访
+          Network Layer: All about routingIP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访问
         </div>
       </a>
 
@@ -405,7 +496,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/08/CSE-lecture16-network-link/" target="_self">
         <div>
-          Introduction to Network layers in network 最常见的为四层架构分层，这是根据TCP/IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP/IP四层架构更加实用  Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点的通路，End-t
+          Introduction to Networklayers in network最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用   Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点
         </div>
       </a>
 
@@ -489,7 +580,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/06/CSE-lecture14-2PC-Replication/" target="_self">
         <div>
-          Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在
+          Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络
         </div>
       </a>
 
@@ -573,7 +664,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/" target="_self">
         <div>
-          Transaction &amp; Multi-site Transaction transaction with high-performance 在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 1234
+          Transaction &amp; Multi-site Transactiontransaction with high-performance在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 123456
         </div>
       </a>
 
@@ -657,7 +748,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture12-Transaction/" target="_self">
         <div>
-          Serializability, OCC &amp; Transaction OCC: optimistic concurrency control 死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放
+          Serializability, OCC &amp; TransactionOCC: optimistic concurrency control死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放入r
         </div>
       </a>
 
@@ -741,7 +832,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/" target="_self">
         <div>
-          Before-or-after atomicity and Serializability 并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system
+          Before-or-after atomicity and Serializability并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system t
         </div>
       </a>
 
@@ -825,7 +916,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/25/CSE-lab2%E6%94%BB%E7%95%A5/" target="_self">
         <div>
-          lab2: Distributed FileSystem 在lab1中，我们已经实现了基本的inode filesystem，并能够操作directory；而在lab2中，我们需要实现一个分布式的文件系统，该系统分为以下三部分，它们通过rpc进行通信：  filesystem client: 文件系统服务器，向metadata server发送请求获取元数据，再向各个data server发送请求
+          lab2: Distributed FileSystem在lab1中，我们已经实现了基本的inode filesystem，并能够操作directory；而在lab2中，我们需要实现一个分布式的文件系统，该系统分为以下三部分，它们通过rpc进行通信：  filesystem client: 文件系统服务器，向metadata server发送请求获取元数据，再向各个data server发送请求修
         </div>
       </a>
 
@@ -909,7 +1000,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/23/CSE-lecture10-Atomicity-Logging/" target="_self">
         <div>
-          Realizing atomicity: Logging + Checkpoint logging for atomicity logging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，
+          Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时
         </div>
       </a>
 
@@ -919,90 +1010,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2025-10-23 18:00" pubdate>
               2025-10-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
-  
-  
-
-  
-
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/se/">#se</a>
-            
-              <a href="/tags/cse/">#cse</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/10/22/CSE-lecture9-Atomicity/" target="_self">
-          CSE_lecture9:Atomicity
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/10/22/CSE-lecture9-Atomicity/" target="_self">
-        <div>
-          Consistency under failure: The requirement of atomicity 即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record = mmap(ban
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-10-22 10:00" pubdate>
-              2025-10-22
             </time>
           </div>
         

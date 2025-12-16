@@ -229,6 +229,90 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/10/22/CSE-lecture9-Atomicity/" target="_self">
+          CSE_lecture9:Atomicity
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/10/22/CSE-lecture9-Atomicity/" target="_self">
+        <div>
+          Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record = mmap(bank
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-10-22 10:00" pubdate>
+              2025-10-22
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
+  
+  
+
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/se/">#se</a>
+            
+              <a href="/tags/cse/">#cse</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/10/20/CSE-lecture8-Consistency/" target="_self">
           CSE_lecture8:Consistency
         </a>
@@ -237,7 +321,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/20/CSE-lecture8-Consistency/" target="_self">
         <div>
-          Consistency when executing operations concurrently implement ChatAPP 最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上
+          Consistency when executing operations concurrentlyimplement ChatAPP最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上(r
         </div>
       </a>
 
@@ -321,7 +405,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/19/CSE-lecture7-System-modelling-KFS/" target="_self">
         <div>
-          System modelling &amp; Key-value stores(KVS) key-value store abstraction key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件
+          System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，
         </div>
       </a>
 
@@ -405,7 +489,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/CSE-lecture6-DFS/" target="_self">
         <div>
-          Distributed file system(DFS) distributed file service有以下类型：  upload/download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题
+          Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和
         </div>
       </a>
 
@@ -489,7 +573,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/" target="_self">
         <div>
-          Remote Procedure Call RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub  client stub做以下事情：发请求，接受响应，进行convert  server stub做以下事情：使用一个
+          Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一
         </div>
       </a>
 
@@ -573,7 +657,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/28/CSE-lecture4-Distributed-System/" target="_self">
         <div>
-          Scalability in Practice: a Highly scalable web app 互联网应用需要支撑的三个能力：  处理海量的请求 存储海量的数据 透明化的可拓展性(transparent scale)  因此我们需要构建一个scalable的系统 case study: an e-commerce web application 一次点击可能需要上千的服务器处理 远古时代使用
+          Scalability in Practice: a Highly scalable web app互联网应用需要支撑的三个能力：  处理海量的请求 存储海量的数据 透明化的可拓展性(transparent scale)  因此我们需要构建一个scalable的系统 case study: an e-commerce web application一次点击可能需要上千的服务器处理 远古时代使用单个
         </div>
       </a>
 
@@ -657,7 +741,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/27/CSE-lab1%E6%94%BB%E7%95%A5/" target="_self">
         <div>
-          lab1: Basic Filesystem 在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等director
+          lab1: Basic Filesystem在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等directory
         </div>
       </a>
 
@@ -741,7 +825,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/23/CSE-lecture3-File-System-2/" target="_self">
         <div>
-          File System API and Disk I/O implement the file system API API有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据放到磁
+          File System API and Disk I&#x2F;Oimplement the file system APIAPI有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据
         </div>
       </a>
 
@@ -825,7 +909,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/21/CSE-lecture2-File-System-1/" target="_self">
         <div>
-          From single to distributed: inode-based File System 使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据  single-n
+          From single to distributed: inode-based File System使用不同的存储系统来对应不同的服务：scalable file system, scalable database, scalable key-value store，其中key-value store存放不必精确的数据，定期更新就行，而database用于精确存放准确的数据   single-n
         </div>
       </a>
 
@@ -909,7 +993,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/14/hot100%E6%95%B4%E7%90%86%E4%B9%8Bpython%E7%89%88/" target="_self">
         <div>
-          hot100整理之python版 哈希 最长连续序列  给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。 请你设计并实现时间复杂度为 O(n) 的算法解决此问题。  12345678910111213class Solution:    def longestConsecutive(self, nums: List[int]) -&gt; int
+          hot100整理之python版哈希最长连续序列 给定一个未排序的整数数组 nums ，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。请你设计并实现时间复杂度为 O(n) 的算法解决此问题。  12345678910111213class Solution:    def longestConsecutive(self, nums: List[int]) -&gt; int:
         </div>
       </a>
 
@@ -958,67 +1042,6 @@
               <a href="/tags/leetcode/">#leetcode</a>
             
               <a href="/tags/hot100/">#hot100</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/09/14/leetcode%E6%89%80%E9%9C%80python%E7%9B%B8%E5%85%B3api%E6%95%B4%E7%90%86/" target="_self">
-          leetcode所需python相关api整理
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/14/leetcode%E6%89%80%E9%9C%80python%E7%9B%B8%E5%85%B3api%E6%95%B4%E7%90%86/" target="_self">
-        <div>
-          Python 刷 LeetCode时常用的 list 方法  1. 列表创建与访问  创建：nums = [1, 2, 3] 访问单个元素：nums[0]，nums[-1] 切片：nums[1:3]，nums[:]，nums[::-1]（逆序）   2. 增加元素  尾部添加：nums.append(x) 任意位置插入：nums.insert(i, x) 合并另一个列表：nums.extend([
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-09-14 13:18" pubdate>
-              2025-09-14
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%8A%9B%E6%89%A3/" class="category-chain-item">力扣</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/leetcode/">#leetcode</a>
             
           </div>
         

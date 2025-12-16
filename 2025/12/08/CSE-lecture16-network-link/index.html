@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Introduction to Network layers in network 最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用  Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点的通路，End-t">
+    <meta name="description" content="Introduction to Networklayers in network最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用   Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture16:network-link">
 <meta property="og:url" content="http://example.com/2025/12/08/CSE-lecture16-network-link/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Introduction to Network layers in network 最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用  Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点的通路，End-t">
+<meta property="og:description" content="Introduction to Networklayers in network最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用   Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/9fa412a3963e954ad17aa4fcf7f38df9.png">
 <meta property="og:image" content="http://example.com/2025/12/08/CSE-lecture16-network-link/eb78f118cc24804f5b721f96fbdd57ba.png">
@@ -230,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          617 字
+          620 字
         
       </span>
     
@@ -283,31 +283,30 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Introduction-to-Network">Introduction to Network</h2>
-<h3 id="layers-in-network">layers in network</h3>
-<p>最常见的为四层架构分层，这是根据TCP/IP系统分层的：</p>
+                <h2 id="Introduction-to-Network"><a href="#Introduction-to-Network" class="headerlink" title="Introduction to Network"></a>Introduction to Network</h2><h3 id="layers-in-network"><a href="#layers-in-network" class="headerlink" title="layers in network"></a>layers in network</h3><p>最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：</p>
 <ul>
 <li>Application</li>
 <li>Transport</li>
 <li>Network</li>
 <li>Link</li>
 </ul>
-<p>OSI标准定义的则是七层架构，但TCP/IP四层架构更加实用</p>
+<p>OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用</p>
 <img src="/2025/12/08/CSE-lecture16-network-link/9fa412a3963e954ad17aa4fcf7f38df9.png" srcset="/img/loading.gif" lazyload class="" title="layers in network">
+
 <p>Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点的通路，End-to-end Layer处理具体怎么传输数据</p>
 <p>无论软硬件规定了多少协议，都需要IP协议来进行收束，从而统一标准</p>
 <p>网络发包时会被各层包装，事实上socket buffer的data也是从中间写的，预留出前面的空间来存放header</p>
 <img src="/2025/12/08/CSE-lecture16-network-link/eb78f118cc24804f5b721f96fbdd57ba.png" srcset="/img/loading.gif" lazyload class="" title="packet encapsulation">
+
 <p>port用于在IP相同时标识server提供的服务和进程</p>
 <p>gateway提供了网络与网络之间的连接</p>
 <ul>
-<li>每一层都会添加/去掉自己的报头</li>
+<li>每一层都会添加&#x2F;去掉自己的报头</li>
 <li>每一层可能会拆分更高一层的数据</li>
 <li>每一层会复用多个更高一层的数据</li>
 <li>每一层对更高层来说（大多是）透明的</li>
 </ul>
-<h3 id="link-layer">link layer</h3>
-<p>Link Layer实现了将数据传输给物理邻居：</p>
+<h3 id="link-layer"><a href="#link-layer" class="headerlink" title="link layer"></a>link layer</h3><p>Link Layer实现了将数据传输给物理邻居：</p>
 <ul>
 <li>物理传输</li>
 <li>链路复用</li>
@@ -317,8 +316,7 @@
 </ul>
 <p>为了实现链路复用，可以使用同步通信和异步通信</p>
 <ul>
-<li>isochronous connection: 每人分配一小块时间传输数据，好处在于互不影响，缺点在于利用率不高，因此多用于音频网络<img src="/2025/12/08/CSE-lecture16-network-link/eef35275fd80bcd92f7a3b00a21650a0.png" srcset="/img/loading.gif" lazyload class="" title="isochronous">
-</li>
+<li>isochronous connection: 每人分配一小块时间传输数据，好处在于互不影响，缺点在于利用率不高，因此多用于音频网络<img src="/2025/12/08/CSE-lecture16-network-link/eef35275fd80bcd92f7a3b00a21650a0.png" srcset="/img/loading.gif" lazyload class="" title="isochronous"></li>
 <li>asynchronous connection: 用于数据网络，通过发包的方式通信，因此包与包之间需要排队，排队策略很多</li>
 </ul>
 <p>现在基本都使用后者了，声音传输也使用数据传输</p>
@@ -326,6 +324,7 @@
 <p>对于错误处理，可以添加error detection code，如在结尾添加一个checksum，并使用error correction code纠正，纠正不了才选择重传</p>
 <p>一般来说只会有1个bit出现问题，因此通过hamming coding扩充冗余bit位数，达到校验的目的，位数设置的目的是为了直接相加得到真正错误的位数</p>
 <img src="/2025/12/08/CSE-lecture16-network-link/617275ee4949654f49f26873ec0943ab.png" srcset="/img/loading.gif" lazyload class="" title="hamming coding">
+
 <p>point-to-point protocol是指一系列的协议，包括：</p>
 <ul>
 <li>framing method</li>
@@ -333,6 +332,7 @@
 <li>network control protocol</li>
 </ul>
 <img src="/2025/12/08/CSE-lecture16-network-link/0df24885b6da39b2146ed4a42f65064d.png" srcset="/img/loading.gif" lazyload class="" title="PPP framing and error detection">
+
 <p>在正式发送数据之前，会先发送LCP包，用于检查对方是否做好准备，接收者也会返回并协商格式</p>
 
                 

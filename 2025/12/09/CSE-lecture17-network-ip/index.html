@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Network Layer: All about routing IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访">
+    <meta name="description" content="Network Layer: All about routingIP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访问">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture17:network-ip">
 <meta property="og:url" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Network Layer: All about routing IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访">
+<meta property="og:description" content="Network Layer: All about routingIP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访问">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/52671670be8fedf8f2606592c1b8b768.png">
 <meta property="og:image" content="http://example.com/2025/12/09/CSE-lecture17-network-ip/fea953ba3bf431c6656d65a848382d2d.png">
@@ -238,7 +238,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          954 字
+          955 字
         
       </span>
     
@@ -291,15 +291,13 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Network-Layer-All-about-routing">Network Layer: All about routing</h2>
-<p>IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的</p>
+                <h2 id="Network-Layer-All-about-routing"><a href="#Network-Layer-All-about-routing" class="headerlink" title="Network Layer: All about routing"></a>Network Layer: All about routing</h2><p>IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的</p>
 <p>与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现</p>
 <p>这一层有network_send和network_handle，后者可能处理，也可能转发</p>
 <p>路由有很多网口，实现了跨子网之间的访问，其中路由表记录了子网和网口的对应关系，而路由器与路由器之间的路由表会进行合并，从而进行多个子网之间的通信</p>
 <p>control-plane控制了数据的流动，如随时更新路由表或确定路由算法，重点在于正确性；data-plane则用于快速查表，重点在于性能</p>
 <p>路由器往往有两个硬件，即CPU和NPU，前者用于处理control-plane，后者用于快速实现data-plane，如使用大的cache</p>
-<h3 id="routing">routing</h3>
-<p>路由的目标为能找到任意起点和终点之间的路径，且这条路径是最快的（时间上的，金钱上的）</p>
+<h3 id="routing"><a href="#routing" class="headerlink" title="routing"></a>routing</h3><p>路由的目标为能找到任意起点和终点之间的路径，且这条路径是最快的（时间上的，金钱上的）</p>
 <p>难点在于分布式路由的实现，分为三步：</p>
 <ul>
 <li>HELLO protocol: 节点向邻居打招呼，获得邻居的信息</li>
@@ -312,34 +310,46 @@
 <li>distance-vector: 只给邻居告诉它已知的所有节点的成本，使用Bellman-Ford算法进行整合</li>
 </ul>
 <img src="/2025/12/09/CSE-lecture17-network-ip/52671670be8fedf8f2606592c1b8b768.png" srcset="/img/loading.gif" lazyload class="" title="link-state flooding">
+
 <img src="/2025/12/09/CSE-lecture17-network-ip/fea953ba3bf431c6656d65a848382d2d.png" srcset="/img/loading.gif" lazyload class="" title="link-state Dijkstra">
+
 <p>注意到link-state的路由只记录其选择的邻居，而不是完整的路径</p>
 <p>link-state的容错性好且收敛快，但缺点在于网络建立初期，flooding的网络开销极大，因此只适用于规模较小的自组织网络</p>
 <p>相较于link-state在flooding时发送的都是同一信息，distance-vector的邻居节点消化完信息后，会发送新的认知信息，从而让原来的节点更新自己的路由表，并再次发送认知信息（可能停不下来，即持续更新）</p>
 <img src="/2025/12/09/CSE-lecture17-network-ip/7ca0ac10213251cab1c89597c378145b.png" srcset="/img/loading.gif" lazyload class="" title="distance-vector first advertisement">
+
 <img src="/2025/12/09/CSE-lecture17-network-ip/8ed7ea8f229bb19140d59e2a24dfad10.png" srcset="/img/loading.gif" lazyload class="" title="B" alt="s first advertisement">
+
 <img src="/2025/12/09/CSE-lecture17-network-ip/8d701e4653a97f34b3233837199765e3.png" srcset="/img/loading.gif" lazyload class="" title="D" alt="s first advertisement">
+
 <img src="/2025/12/09/CSE-lecture17-network-ip/59f5efe74d87236cf59d38710e5dc8c1.png" srcset="/img/loading.gif" lazyload class="" title="distance-vector second advertisement">
+
 <img src="/2025/12/09/CSE-lecture17-network-ip/fc423095879406d336607abd9b6b0917.png" srcset="/img/loading.gif" lazyload class="" title="link-state vs distance-vector">
+
 <p>distance-vector不能一开始就得到最优解，其容错性要差些，因此failure handling是其缺点，如problem of INFINITY</p>
 <img src="/2025/12/09/CSE-lecture17-network-ip/d055e59a521506f03b8a6dd2d9fb7892.png" srcset="/img/loading.gif" lazyload class="" title="INFINITY">
+
 <p>因此advertisement里面不应当包含A-&gt;B的路径</p>
 <img src="/2025/12/09/CSE-lecture17-network-ip/525010a64bbfacdc65f1a6b444efdbb8.png" srcset="/img/loading.gif" lazyload class="" title="split horizon">
+
 <p>distance-vector的优点在于低开销，缺点在于收敛时间长且与路径长度有关，还有infinity问题，因此也只适用于小型网络</p>
-<h3 id="scale-the-routing">scale the routing</h3>
-<p>三种扩大规模的方法：</p>
+<h3 id="scale-the-routing"><a href="#scale-the-routing" class="headerlink" title="scale the routing"></a>scale the routing</h3><p>三种扩大规模的方法：</p>
 <ul>
 <li>hierarchy of routing: 即划分region，将多个节点抽象成一个点</li>
 <li>path-vector routing: advertisement将包含完整的path信息</li>
-<li>topological addressing: 将多个地址合并在一起，使路由表变小，如18.0.0.0到18.0.0.255的所有地址压缩成18.0.0.0/24，即前24位都相同</li>
+<li>topological addressing: 将多个地址合并在一起，使路由表变小，如18.0.0.0到18.0.0.255的所有地址压缩成18.0.0.0&#x2F;24，即前24位都相同</li>
 </ul>
 <img src="/2025/12/09/CSE-lecture17-network-ip/26922538fb9a4d2eda3d3e0bad47adc4.png" srcset="/img/loading.gif" lazyload class="" title="hierarchical address assignment &amp; routing">
+
 <p>而跨region应当使用BGP，是一种path-vector protocol</p>
 <p>path-vector将整个path记录下来，有助于检查有无环，防止出现INFINITY问题，还能顺便进行access policy，即检查不能去的节点，最后扩大了规模，收敛时间下降。缺点在于advertisement变大</p>
 <img src="/2025/12/09/CSE-lecture17-network-ip/41b49f81be6335788083ad5ed73a797a.png" srcset="/img/loading.gif" lazyload class="" title="path-vector exchange">
+
 <img src="/2025/12/09/CSE-lecture17-network-ip/b02d3d027271c0124a16bbba18e6c2e0.png" srcset="/img/loading.gif" lazyload class="" title="path vector &amp; forwarding table">
+
 <p>当graph变化时，即某个节点go down，path-vector只需要检查path里面有没有这个节点，修改受到影响的节点即可</p>
 <img src="/2025/12/09/CSE-lecture17-network-ip/e55a9a1dfb5e56f325bf4df3b300d984.png" srcset="/img/loading.gif" lazyload class="" title="IGP vs EGP">
+
 <table>
 <thead>
 <tr>
@@ -348,8 +358,7 @@
 <th><strong>外部网关协议（EGP）</strong></th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td><strong>范围</strong></td>
 <td>自治系统（AS）内部</td>
 <td>自治系统（AS）之间</td>
@@ -374,8 +383,7 @@
 <td>管理数百到数千条路由</td>
 <td>管理全球互联网（数十万条路由）</td>
 </tr>
-</tbody>
-</table>
+</tbody></table>
 
                 
               </div>

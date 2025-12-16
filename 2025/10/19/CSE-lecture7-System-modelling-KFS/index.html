@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="System modelling &amp; Key-value stores(KVS) key-value store abstraction key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件">
+    <meta name="description" content="System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture7:System modelling + KFS">
 <meta property="og:url" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="System modelling &amp; Key-value stores(KVS) key-value store abstraction key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件">
+<meta property="og:description" content="System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/de6866305fcd4829bcb018bdc2027b75.png">
 <meta property="og:image" content="http://example.com/2025/10/19/CSE-lecture7-System-modelling-KFS/d89ba88fc1dcea773f6ea9f116d9c01d.png">
@@ -229,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.2k 字
+          1.3k 字
         
       </span>
     
@@ -282,46 +282,38 @@
             
               <div class="markdown-body">
                 
-                <h2 id="System-modelling-Key-value-stores-KVS">System modelling &amp; Key-value stores(KVS)</h2>
-<h3 id="key-value-store-abstraction">key-value store abstraction</h3>
-<p>key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单</p>
+                <h2 id="System-modelling-Key-value-stores-KVS"><a href="#System-modelling-Key-value-stores-KVS" class="headerlink" title="System modelling &amp; Key-value stores(KVS)"></a>System modelling &amp; Key-value stores(KVS)</h2><h3 id="key-value-store-abstraction"><a href="#key-value-store-abstraction" class="headerlink" title="key-value store abstraction"></a>key-value store abstraction</h3><p>key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单</p>
 <p>一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，value为文件的内容。使用system modelling来进行量化</p>
-<h3 id="system-modelling">system modelling</h3>
-<p>在设计系统前，建立其内部模型抽象，提炼出决定系统行为的主要组成部分，实现定性模型。相较于直觉更科学，相较于实验更加高效和普适（但不代表就不用实验了）</p>
+<h3 id="system-modelling"><a href="#system-modelling" class="headerlink" title="system modelling"></a>system modelling</h3><p>在设计系统前，建立其内部模型抽象，提炼出决定系统行为的主要组成部分，实现定性模型。相较于直觉更科学，相较于实验更加高效和普适（但不代表就不用实验了）</p>
 <p>现在使用定性模型(qualitative system model)来分析使用filesystem的key-value store：</p>
 <ul>
-<li>
-<p>定义系统的目标：低延迟，并使用少量空间存储更多的数据</p>
+<li><p>定义系统的目标：低延迟，并使用少量空间存储更多的数据</p>
 </li>
-<li>
-<p>分析：以Insert为例，为CREATE + WRITE，共两次system call，并将system call进一步展开</p>
+<li><p>分析：以Insert为例，为CREATE + WRITE，共两次system call，并将system call进一步展开</p>
 <img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/de6866305fcd4829bcb018bdc2027b75.png" srcset="/img/loading.gif" lazyload class="" title="system modelling analysis">
-<p>现在只要知道disk read/write的latency就可以在不实现具体系统的情况下进行分析。</p>
+
+<p>现在只要知道disk read&#x2F;write的latency就可以在不实现具体系统的情况下进行分析。</p>
 </li>
 </ul>
-<p>结论是并不高效，额外的操作太多。但实际上在value特别大时还是能够接受的。因此在system modelling时需要考虑参数(parameterized)，如static parameters（如disk read/write time）, input parameters（如key-value sizes）, runtime parameters</p>
+<p>结论是并不高效，额外的操作太多。但实际上在value特别大时还是能够接受的。因此在system modelling时需要考虑参数(parameterized)，如static parameters（如disk read&#x2F;write time）, input parameters（如key-value sizes）, runtime parameters</p>
 <p>一般来说，key-value store用于数据大小很小的时候，因此不考虑该实现，即理想状况下只进行一次block write；另一方面这也造成了很大的空间浪费</p>
-<h3 id="build-key-value-store-system">build key-value store system</h3>
-<p>核心想法是：将多个key-value放到同一个文件中，减少空间浪费和延迟</p>
+<h3 id="build-key-value-store-system"><a href="#build-key-value-store-system" class="headerlink" title="build key-value store system"></a>build key-value store system</h3><p>核心想法是：将多个key-value放到同一个文件中，减少空间浪费和延迟</p>
 <img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/d89ba88fc1dcea773f6ea9f116d9c01d.png" srcset="/img/loading.gif" lazyload class="" title="key-value store &amp; file system">
+
 <p>使用filesystem而不是直接进行disk操作是因为这样更加方便，同时兼容性好</p>
-<h4 id="step-1-a-naive-key-value-storage">step 1: a naive key-value storage</h4>
-<p>将所有的key-value都放在一个单一文件中，以update为例，有两种方法：</p>
+<h4 id="step-1-a-naive-key-value-storage"><a href="#step-1-a-naive-key-value-storage" class="headerlink" title="step 1: a naive key-value storage"></a>step 1: a naive key-value storage</h4><p>将所有的key-value都放在一个单一文件中，以update为例，有两种方法：</p>
 <ul>
 <li>file in-place write: 根据offset进行file write来修改，这需要一次random disk write</li>
 <li>file append: 在文件末尾追加更新值，这一般只需要进行一次sequential disk write</li>
 </ul>
 <p>比较之后，append更加高效。</p>
 <p>insert和update类似，而delete则会append一个NULL entry，后续进行垃圾回收</p>
-<h4 id="step-2-log-structure-key-value-stores-L-KVS">step 2: log-structure key-value stores(L-KVS)</h4>
-<p>log-structured file是append-only的</p>
+<h4 id="step-2-log-structure-key-value-stores-L-KVS"><a href="#step-2-log-structure-key-value-stores-L-KVS" class="headerlink" title="step 2: log-structure key-value stores(L-KVS)"></a>step 2: log-structure key-value stores(L-KVS)</h4><p>log-structured file是append-only的</p>
 <p>此时get操作难以高效实现，需要倒序遍历文件</p>
-<h4 id="step-3-L-KVS-index">step 3: L-KVS + index</h4>
-<p>加一层index组件，用于key -&gt; offset的映射，这一层不需要持久化</p>
-<h5 id="step-3-1-in-memory-hash-index-log-structured-data-file">step 3.1: in-memory hash index + log-structured data file</h5>
-<p>在内存维护一个map来实现key -&gt; byte offset，问题在于index能否在内存中放下，因此需要允许index放在磁盘上</p>
-<h4 id="step-4-L-KVS-in-memory-disk-hybrid-index">step 4: L-KVS + (in-memory &amp; disk hybrid index)</h4>
-<img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/fb147884a89dbe1c28f818e3a06bf2c7.png" srcset="/img/loading.gif" lazyload class="" title="bucket-based hashing index">
+<h4 id="step-3-L-KVS-index"><a href="#step-3-L-KVS-index" class="headerlink" title="step 3: L-KVS + index"></a>step 3: L-KVS + index</h4><p>加一层index组件，用于key -&gt; offset的映射，这一层不需要持久化</p>
+<h5 id="step-3-1-in-memory-hash-index-log-structured-data-file"><a href="#step-3-1-in-memory-hash-index-log-structured-data-file" class="headerlink" title="step 3.1: in-memory hash index + log-structured data file"></a>step 3.1: in-memory hash index + log-structured data file</h5><p>在内存维护一个map来实现key -&gt; byte offset，问题在于index能否在内存中放下，因此需要允许index放在磁盘上</p>
+<h4 id="step-4-L-KVS-in-memory-disk-hybrid-index"><a href="#step-4-L-KVS-in-memory-disk-hybrid-index" class="headerlink" title="step 4: L-KVS + (in-memory &amp; disk hybrid index)"></a>step 4: L-KVS + (in-memory &amp; disk hybrid index)</h4><img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/fb147884a89dbe1c28f818e3a06bf2c7.png" srcset="/img/loading.gif" lazyload class="" title="bucket-based hashing index">
+
 <p>使用fat pointer，其既可以指向虚拟内存地址，也可以指向文件的offset</p>
 <p>当index既可能在内存中，也可能在磁盘中时，可能导致多次磁盘访问，甚至导致随机磁盘访问，因此不能使用linked-list-based hashing，改进方法为：</p>
 <ul>
@@ -334,13 +326,10 @@
 <li>不支持范围查找</li>
 </ul>
 <p>使用compaction来防止log file无限增大，即通过压缩来删除重复的数据，但当文件特别大的时候相当耗时</p>
-<p>因此将文件分为多个segment，compaction时挑选一部分segment，并以segment的粒度来进行压缩，同时在segment之间进行merge；在compaction时还能顺便进行垃圾回收，实现删除。此时模型更加复杂了，在compact/merge时进行get性能会受限，因此建模时还需要考虑compact/merge的频率</p>
-<h5 id="step-4-1-L-KVS-w-compaction-merging-in-memory-disk-hybrid-hashing-index">step 4.1: L-KVS(w/ compaction &amp; merging) + (in-memory &amp; disk hybrid hashing index)</h5>
-<p>此时还是没有解决范围查找的问题。解决方法为使用B+树作为index，实现key的排序和高效的范围查找，但这和log-structured file不太兼容</p>
-<h4 id="step-5-B-tree-based-KVS">step 5: B+ tree-based KVS</h4>
-<p>B+树中，update/insert需要多次磁盘访问，尤其是随机磁盘访问；但范围查找效果很好</p>
-<h4 id="step-6-SSTables-sorted-string-table-KVS">step 6: SSTables(sorted string table) KVS</h4>
-<p>SSTable基于segmented log file，同时有两个更新：</p>
+<p>因此将文件分为多个segment，compaction时挑选一部分segment，并以segment的粒度来进行压缩，同时在segment之间进行merge；在compaction时还能顺便进行垃圾回收，实现删除。此时模型更加复杂了，在compact&#x2F;merge时进行get性能会受限，因此建模时还需要考虑compact&#x2F;merge的频率</p>
+<h5 id="step-4-1-L-KVS-w-compaction-merging-in-memory-disk-hybrid-hashing-index"><a href="#step-4-1-L-KVS-w-compaction-merging-in-memory-disk-hybrid-hashing-index" class="headerlink" title="step 4.1: L-KVS(w&#x2F; compaction &amp; merging) + (in-memory &amp; disk hybrid hashing index)"></a>step 4.1: L-KVS(w&#x2F; compaction &amp; merging) + (in-memory &amp; disk hybrid hashing index)</h5><p>此时还是没有解决范围查找的问题。解决方法为使用B+树作为index，实现key的排序和高效的范围查找，但这和log-structured file不太兼容</p>
+<h4 id="step-5-B-tree-based-KVS"><a href="#step-5-B-tree-based-KVS" class="headerlink" title="step 5: B+ tree-based KVS"></a>step 5: B+ tree-based KVS</h4><p>B+树中，update&#x2F;insert需要多次磁盘访问，尤其是随机磁盘访问；但范围查找效果很好</p>
+<h4 id="step-6-SSTables-sorted-string-table-KVS"><a href="#step-6-SSTables-sorted-string-table-KVS" class="headerlink" title="step 6: SSTables(sorted string table) KVS"></a>step 6: SSTables(sorted string table) KVS</h4><p>SSTable基于segmented log file，同时有两个更新：</p>
 <ul>
 <li>每个segment中的key都排好序</li>
 <li>segment不可修改，因此不是append-only</li>
@@ -359,9 +348,9 @@
 <p>而查找时，先在memtable查找，再依序查找SSTable，可以在每个SSTable上保留一个稀疏的in-memory index来进行优化</p>
 <p>范围查找则需要segment之间也进行排序</p>
 <p>SSTable不应当简单地顺序存储，因此还需要优化</p>
-<h4 id="step-7-LSM-trees">step 7: LSM trees</h4>
-<p>将SSTable摆放为多层架构，除了L0之外，每层的文件都排好序，且没有重复的key；上层的数据比下层的数据更新</p>
+<h4 id="step-7-LSM-trees"><a href="#step-7-LSM-trees" class="headerlink" title="step 7: LSM trees"></a>step 7: LSM trees</h4><p>将SSTable摆放为多层架构，除了L0之外，每层的文件都排好序，且没有重复的key；上层的数据比下层的数据更新</p>
 <img src="/2025/10/19/CSE-lecture7-System-modelling-KFS/2b4b853979f4bd5da57aca36d0b95162.png" srcset="/img/loading.gif" lazyload class="" title="analysis of different system models for KVS">
+
 <p>任何系统都可能出现corner case，比如LSM tree可能出现写阻塞(write stall)，这是因为前一次写入过于耗时（多次compact）导致的</p>
 <p>对于错误处理，比如memtable丢失，可以使用log来恢复memtable</p>
 <p>相较于B+ tree，好处是写的性能更好，坏处是range性能稍差</p>
