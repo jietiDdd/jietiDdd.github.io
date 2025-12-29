@@ -19,17 +19,18 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Introduction to System Securitycross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义   security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径">
+    <meta name="description" content="Introduction to System Security cross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义  security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture21:Security">
 <meta property="og:url" content="http://example.com/2025/12/17/CSE-lecture21-Security/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Introduction to System Securitycross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义   security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径">
+<meta property="og:description" content="Introduction to System Security cross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义  security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture21-Security/8a10be17e7fae3b1d0738abf0af4e0cf.png">
 <meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture21-Security/64d8d73cb8dab123b08faa337c9571a2.png">
+<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture21-Security/17708558dba930ac10740f9901a4053d.png">
 <meta property="article:published_time" content="2025-12-17T08:28:06.000Z">
-<meta property="article:modified_time" content="2025-12-28T13:49:57.035Z">
+<meta property="article:modified_time" content="2025-12-28T14:14:49.237Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -280,10 +281,10 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Introduction-to-System-Security"><a href="#Introduction-to-System-Security" class="headerlink" title="Introduction to System Security"></a>Introduction to System Security</h2><p>cross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中</p>
+                <h2 id="Introduction-to-System-Security">Introduction to System Security</h2>
+<p>cross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中</p>
 <p>SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义</p>
 <img src="/2025/12/17/CSE-lecture21-Security/8a10be17e7fae3b1d0738abf0af4e0cf.png" srcset="/img/loading.gif" lazyload class="" title="SQL injection">
-
 <p>security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径是非常多的；同时会和其他目标冲突；security还难以量化</p>
 <p>达成安全系统有两步：目标清晰(policy)、假设清晰(threat model)</p>
 <p>policy分为CIA:</p>
@@ -293,11 +294,13 @@
 <li>访问限制（如不可用）：池化</li>
 </ul>
 <p>threat model: 即做出假设，假设有哪些威胁模型，而假设需要现实</p>
-<h3 id="guard-model"><a href="#guard-model" class="headerlink" title="guard model"></a>guard model</h3><p>当明确要保护的资源时，用墙保护资源并在端口放置守卫</p>
+<h3 id="guard-model">guard model</h3>
+<p>当明确要保护的资源时，用墙保护资源并在端口放置守卫</p>
 <p>有两个问题：守卫需要知道你是谁，守卫需要知道你是否有权限，这需要查表</p>
 <p>guard model多种多样：文件系统的守卫为OS；web server的守卫为web应用；防火墙的守卫为内部网络，认为外部网络的设备都不可信。这些都是建立在现实的threat model之上的</p>
 <p>但guard model依然可能出错，如软件bug，用户操作出错等。在设计时需要注意一定要将整个资源都包起来，不能留出守卫之外的访问漏洞</p>
-<h3 id="authentication-password"><a href="#authentication-password" class="headerlink" title="authentication: password"></a>authentication: password</h3><p>有三种方法证明你是谁：你知道的、你拥有的、你本人，各有各的优缺点</p>
+<h3 id="authentication-password">authentication: password</h3>
+<p>有三种方法证明你是谁：你知道的、你拥有的、你本人，各有各的优缺点</p>
 <p>password有以下问题：</p>
 <ul>
 <li>顺序遍历一位一位比较：可以根据响应时间判断哪一位出错</li>
@@ -308,7 +311,6 @@
 <p>可以使用加盐(salting)的方法，salt是随机值，将其和密码组合后再计算哈希。这没有真正解决这个问题，因为攻击者能窃取到整个数据库表，得到salt的明文，但由于这需要大量的算力，salting依然被大量使用</p>
 <p>验证的频率需要控制在一个合理的值，而这就需要记录状态，即cookie，包含用户名和过期时间等：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">&#123;username, expiration, H(server_key | username | expiration)&#125;<br></code></pre></td></tr></table></figure>
-
 <p>对应服务器的session</p>
 <p>早期的cookie也有bug，即直接拼接username和expiration会引发歧义，因此需要结构化</p>
 <p>phishing攻击利用错误输入url的字符引发钓鱼攻击，窃取到密码。解决方法有：</p>
@@ -319,8 +321,10 @@
 <li>specific password: 即用户给不同的网站设置不同的密码，进一步可以设计一个构造密码的算法</li>
 <li>one-time passwords: 密码只能使用n次，server最开始保存 $H^n(salt+password)$，用户首次登陆发送 $H^{n-1}(salt+password)$，这样server只用做一次哈希，并改为存储 $H^{n-1}(salt+password)$，下次登陆时client就发送 $H^{n-2}(salt+password)$，这样被截获后再次登录就会失效</li>
 <li>把authenticaion和request绑定在一起</li>
-<li>FIDO: 把指纹和私钥绑定<img src="/2025/12/17/CSE-lecture21-Security/64d8d73cb8dab123b08faa337c9571a2.png" srcset="/img/loading.gif" lazyload class="" title="FIDO"></li>
+<li>FIDO: 把指纹和私钥绑定<img src="/2025/12/17/CSE-lecture21-Security/64d8d73cb8dab123b08faa337c9571a2.png" srcset="/img/loading.gif" lazyload class="" title="FIDO">
+</li>
 </ul>
+<img src="/2025/12/17/CSE-lecture21-Security/17708558dba930ac10740f9901a4053d.png" srcset="/img/loading.gif" lazyload class="" title="example">
 
                 
               </div>
@@ -433,6 +437,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2025/12/28/CSE-lecture22-ROP-and-CFI/" title="CSE_lecture22:ROP and CFI">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CSE_lecture22:ROP and CFI</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">

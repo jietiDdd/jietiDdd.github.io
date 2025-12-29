@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Network Layer - 2case study: BGP每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付">
+    <meta name="description" content="Network Layer - 2 case study: BGP 每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付费">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture18:network-ip-2">
 <meta property="og:url" content="http://example.com/2025/12/15/CSE-lecture18-network-ip-2/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Network Layer - 2case study: BGP每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付">
+<meta property="og:description" content="Network Layer - 2 case study: BGP 每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付费">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/15/CSE-lecture18-network-ip-2/912f5284b9e3654df688e0a06c12fca5.png">
 <meta property="og:image" content="http://example.com/2025/12/15/CSE-lecture18-network-ip-2/effa929bcf9730bece472871cfcc7e7c.png">
@@ -234,7 +234,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          883 字
+          881 字
         
       </span>
     
@@ -287,32 +287,31 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Network-Layer-2"><a href="#Network-Layer-2" class="headerlink" title="Network Layer - 2"></a>Network Layer - 2</h2><h3 id="case-study-BGP"><a href="#case-study-BGP" class="headerlink" title="case study: BGP"></a>case study: BGP</h3><p>每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径</p>
+                <h2 id="Network-Layer-2">Network Layer - 2</h2>
+<h3 id="case-study-BGP">case study: BGP</h3>
+<p>每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径</p>
 <p>典型BGP的角色有：</p>
 <ul>
-<li>customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量</li>
+<li>customer/provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量</li>
 <li>peers: 流量平等，不存在隶属关系，不互相付费</li>
 </ul>
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/912f5284b9e3654df688e0a06c12fca5.png" srcset="/img/loading.gif" lazyload class="" title="customers and peers">
-
 <p>节点会广播自己能访问的节点，如向peer广播自己的customer，从而使其他节点经过自己，获得更多钱</p>
 <p>最佳的路径为customer &gt; peer &gt; provider，即优先选择自己的customer，以谋取更多利润</p>
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/effa929bcf9730bece472871cfcc7e7c.png" srcset="/img/loading.gif" lazyload class="" title="example">
-
 <p>在这个例子中Y看不到C和T节点，这似乎让Y显得没有连上网络，但BGP不阻止这种现象，因为该图是一个简化图，Y也可以通过自己的customer和provider找到这些节点，而Tier-1的节点全球只有十几个（视频网站可能导致peer之间出现付费）</p>
 <p>BGP使用path-vector，此时cost中不只有时间，更多的是考虑金钱</p>
 <p>BGP具有高可扩展，实现简单的特点，但也有不稳定，很脆弱，不安全的问题</p>
-<h3 id="case-NAT"><a href="#case-NAT" class="headerlink" title="case: NAT"></a>case: NAT</h3><p>192.168前缀的地址是内部地址，无法进入公网，如192.168.0.0&#x2F;16，这是因为IPv4的地址数太少，无法让家里的设备都拥有唯一的IPv4地址，因此需要地址转换，即NAT</p>
+<h3 id="case-NAT">case: NAT</h3>
+<p>192.168前缀的地址是内部地址，无法进入公网，如192.168.0.0/16，这是因为IPv4的地址数太少，无法让家里的设备都拥有唯一的IPv4地址，因此需要地址转换，即NAT</p>
 <p>内网的地址通过路由器访问Internet，但是这会导致内网设备的地址都是路由的地址，因此需要端口进行区分，从而实现IP的复用。具体而言，路由器需要维护一张表，实现内网地址和端口的对应关系</p>
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/f6176321eb8e073b19f096b2cd6da920.png" srcset="/img/loading.gif" lazyload class="" title="NAT">
-
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/208c28212cf23947a007335824eac858.png" srcset="/img/loading.gif" lazyload class="" title="massive NAT">
-
 <p>注意内网的设备自己也会有端口，相同内网IP的不同端口对应的NAT端口也是不同的</p>
 <p>NAT的缺点在于，端口属于TCP的概念，却被用于IP协议，破坏了分层架构</p>
-<h3 id="case-Ethernet-Mapping"><a href="#case-Ethernet-Mapping" class="headerlink" title="case: Ethernet Mapping"></a>case: Ethernet Mapping</h3><p>以太网分为半双工和全双工两大类，半双工只能发不能收，或者只能收不能发，而全双工既能发也能收</p>
+<h3 id="case-Ethernet-Mapping">case: Ethernet Mapping</h3>
+<p>以太网分为半双工和全双工两大类，半双工只能发不能收，或者只能收不能发，而全双工既能发也能收</p>
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/a77601130b77905fc22236bf91deb508.png" srcset="/img/loading.gif" lazyload class="" title="Ethernet package">
-
 <p>这里的destination和source为48位，即MAC地址</p>
 <p>以太网同样有ethernet_send和ethernet_handle，后者现在基本只用于接收，因为IP协议来做转发</p>
 <p>为了实现以太网之间的连接，需要将IP的包转为以太网的包，并实现source和destination的MAC地址的连接。因此需要IP地址和以太网MAC地址的映射，即ARP表</p>
@@ -320,16 +319,13 @@
 <p>而RARP协议则反过来通过MAC地址知道IP地址</p>
 <p>可以将默认设置为路由器的MAC地址，防止ARP表将多个跨网络的MAC地址都记录为该路由器的地址</p>
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/06ef9a2b06cdb2dbb970f54f40d34b92.png" srcset="/img/loading.gif" lazyload class="" title="put it together 1">
-
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/b14a913723e4d93c70a9f5a38ad05c46.png" srcset="/img/loading.gif" lazyload class="" title="put it together 2">
-
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/4778ec02c59f89296da5f83ed63ada8b.png" srcset="/img/loading.gif" lazyload class="" title="put it together 3">
-
 <p>隐患在于ARP poison，因为ARP表会出现道听途说问题，hacker可以据此修改其他节点中ARP表的IP与MAC的对应关系</p>
 <p>为了对抗ARP spoofing，可以写死ARP表，或者使用ARPwatch监测问题</p>
-<h3 id="data-plane-packet-forwarding"><a href="#data-plane-packet-forwarding" class="headerlink" title="data-plane: packet forwarding"></a>data-plane: packet forwarding</h3><p>network_handle检查包是否是发给自己的，如果是就向上走，否则向下进入link_send继续转发</p>
+<h3 id="data-plane-packet-forwarding">data-plane: packet forwarding</h3>
+<p>network_handle检查包是否是发给自己的，如果是就向上走，否则向下进入link_send继续转发</p>
 <img src="/2025/12/15/CSE-lecture18-network-ip-2/534511d647b37d9e267415cd6a673ed3.png" srcset="/img/loading.gif" lazyload class="" title="network_handle">
-
 <p>在forward一个IP包时，需要在forwarding table中检查是否知道destination，知道就走link，不知道就丢包；每转发一次TTL减一，为零时丢包；更新checksum（仅因为TTL更新）；最后发出去</p>
 
                 

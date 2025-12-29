@@ -19,29 +19,28 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="DNS &amp; Naming Scheme the design of DNS 实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使">
+    <meta name="description" content="ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture20:network-dns-cdn">
-<meta property="og:url" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/index.html">
+<meta property="og:title" content="CSE_lecture22:ROP and CFI">
+<meta property="og:url" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="DNS &amp; Naming Scheme the design of DNS 实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使">
+<meta property="og:description" content="ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/dd45cca283700199eacb809b2526a555.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/aff0ec72481cde897354d02a5a0cdec3.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/e9ea4893b8ccc124137c7b945201a235.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/368c7cb657384e0485ec7e7a35cb1ac4.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/6eb613edf6ddc936bcb4d6d1467f06ba.png">
-<meta property="article:published_time" content="2025-12-17T04:30:27.000Z">
-<meta property="article:modified_time" content="2025-12-17T08:21:45.715Z">
+<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png">
+<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/38b0bcd825ec5ce442e5be287bcf9154.png">
+<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/ce9dbac48e6d32b4dd2a707f7f48401e.png">
+<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/2d9c5ec0e3e554dcb081e593631f4a8b.png">
+<meta property="article:published_time" content="2025-12-28T13:57:42.000Z">
+<meta property="article:modified_time" content="2025-12-29T07:24:43.506Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/dd45cca283700199eacb809b2526a555.png">
+<meta name="twitter:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png">
   
   
   
-  <title>CSE_lecture20:network-dns-cdn - jietiDdd的个人博客</title>
+  <title>CSE_lecture22:ROP and CFI - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -207,7 +206,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture20:network-dns-cdn"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture22:ROP and CFI"></span>
           
         </div>
 
@@ -218,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-17 12:30" pubdate>
-          2025年12月17日 下午
+        <time datetime="2025-12-28 21:57" pubdate>
+          2025年12月28日 晚上
         </time>
       </span>
     
@@ -230,7 +229,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          899 字
+          743 字
         
       </span>
     
@@ -241,7 +240,7 @@
         
         
         
-          8 分钟
+          7 分钟
         
       </span>
     
@@ -278,75 +277,53 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture20:network-dns-cdn</h1>
+            <h1 id="seo-header">CSE_lecture22:ROP and CFI</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="DNS-Naming-Scheme">DNS &amp; Naming Scheme</h2>
-<h3 id="the-design-of-DNS">the design of DNS</h3>
-<p>实现hostname和IP地址的转换，从而实现用户友好</p>
-<p>一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求</p>
-<p>为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使用不同的name server解析</p>
-<p>name server分为：</p>
+                <h2 id="ROP-and-CFI">ROP and CFI</h2>
+<h3 id="security-principles">security principles</h3>
 <ul>
-<li>root zone由ICANN管理，非盈利</li>
-<li>“.com” zone由VeriSign管理，盈利</li>
-<li>从root zone到&quot;.com&quot; zone一层一层管理下面的域名</li>
+<li>least privilege: 只提供完成事件的最小权限</li>
+<li>least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权</li>
+<li>users make mistakes: 安全要考虑用户犯的诸多错误</li>
+<li>cost of security: 安全的成本不能太高</li>
 </ul>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/dd45cca283700199eacb809b2526a555.png" srcset="/img/loading.gif" lazyload class="" title="DNS hierarchy">
-<p>以&quot;<a target="_blank" rel="noopener" href="http://ipads.se.sjtu.edu.cn">ipads.se.sjtu.edu.cn</a>&quot;为例，lookup算法为：</p>
+<h3 id="stack-buffer-overflow">stack buffer overflow</h3>
+<p>攻击者往往从控制流或数据的角度来攻击</p>
+<p>stack buffer overflow通过栈溢出的手段修改return跳转的地址，从而返回到攻击者设计的恶意代码部分</p>
+<p>防御手段为DEP(data execution prevention)，即数据段不可执行，即设置为non-executable，需要修改NX bit</p>
+<p>此时攻击者使用ROP(return-oriented programming)，寻找原有的代码碎片(gadget)，这些碎片都以return结尾，在栈上注入地址指向这些碎片，从而将这些碎片代码合并在一起</p>
+<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png" srcset="/img/loading.gif" lazyload class="" title="ROP">
+<p>防御手段有：</p>
 <ul>
-<li>从root开始，告诉我们&quot;cn&quot;的name server的IP</li>
-<li>“cn” name server告诉我们&quot;<a target="_blank" rel="noopener" href="http://edu.cn">edu.cn</a>&quot;的name server的IP</li>
-<li>以此类推，直到知道&quot;<a target="_blank" rel="noopener" href="http://ipads.se.sjtu.edu.cn">ipads.se.sjtu.edu.cn</a>&quot;的IP</li>
+<li>隐藏binary file，从而无法获取gadget</li>
+<li>ASLR将代码放在随机的地址</li>
+<li>在return addr前面放置canary，覆盖addr时也会覆盖canary，通过检查canary来判断是否被攻击</li>
 </ul>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/aff0ec72481cde897354d02a5a0cdec3.png" srcset="/img/loading.gif" lazyload class="" title="DNS lookup">
-<p>即每一层的name server并不需要记住过多的域名，只需要记录下一层的几个节点即可</p>
-<p>DNS的name都是全局的，因此没有上下文的问题。域名使用&quot;.“分割，因此实际为&quot;<a target="_blank" rel="noopener" href="http://ipads.se.sjtu.edu.cn">ipads.se.sjtu.edu.cn</a>.”，最后的点表示root</p>
-<p>每个zone会对应多个name server，从而提高容错</p>
-<p>look-up算法可以进行改进：</p>
+<h3 id="CFI-control-flow-integrity">CFI: control flow integrity</h3>
+<p>设置合法的控制流，防止控制流被劫持，这需要描述control flow graph，将其和可执行的二进制文件合并后得到一个self-checking program，加入了多个检查点</p>
+<p>攻击者往往从跳转部分劫持，大部分都是direct branches，少部分的indirect branches绝大多数也是跳到那一两个地址：</p>
 <ul>
-<li>第一个DNS请求可以到任何name server，降低root的压力，这是依靠缓存实现的</li>
-<li>recursion: 降低client的压力，即由name server来帮忙递归找域名地址，好处是更快，缺点是请求是有状态的，因此只用于小范围<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/e9ea4893b8ccc124137c7b945201a235.png" srcset="/img/loading.gif" lazyload class="" title="DNS recursion">
-</li>
-<li>caching: 将访问过的地址缓存在DNS client和name server中，但会设置TTL</li>
+<li>direct branches: call或jump后跟着静态的地址</li>
+<li>indirect branches: call或jump后跟着寄存器，代码运行后才能确定跳转的地址，以及return</li>
 </ul>
-<h3 id="behind-the-DNS-design">behind the DNS design</h3>
-<p>DNS设计的优点有：</p>
+<p>CFI通过二进制重写的方法将正确的跳转思路内嵌到代码中做检查</p>
+<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/38b0bcd825ec5ce442e5be287bcf9154.png" srcset="/img/loading.gif" lazyload class="" title="CFI example">
+<p>但这需要保证所有的代码都被patch，对于库代码可能出现问题。因此使用prefetchnta，访问内存地址，如果不合法就等价于nop，比较4字节的prefetchnta后的数字即可</p>
+<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/ce9dbac48e6d32b4dd2a707f7f48401e.png" srcset="/img/loading.gif" lazyload class="" title="prefetchnta">
+<p>假设A可以到C，B可以到C和D，此时C和D的tag一样，这就会导致A可以非法访问D，如果加入判断，会导致性能下降</p>
+<p>因此引入shadow call stack，即单独维护一个存放return address的栈，这是由软件实现的，从而通过比较软件和硬件栈中的地址来判断stack over flow是否出现。为了提升性能，直接使用Intel CET维护硬件层面的shadow call stack</p>
+<p>CFI保证了stack over flow的防御，但不能防御数据修改，如函数指针，或权限位</p>
+<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/2d9c5ec0e3e554dcb081e593631f4a8b.png" srcset="/img/loading.gif" lazyload class="" title="possible execution of memory">
+<h3 id="blind-ROP">blind ROP</h3>
+<p>流程为：</p>
 <ul>
-<li>hierarchy的设计让管理分化，只需要将新的域名分配给直属的上级name server，简化了域名的管理</li>
-<li>global name防止了DNS指定上下文，而是产生一个唯一的域名</li>
-<li>lookup的性能要求不高，使得性能具备scalable</li>
-<li>一个zone有多个name server，提高了容错</li>
-</ul>
-<p>DNS设计的缺点有：</p>
-<ul>
-<li>谁去控制root zone和&quot;com&quot; zone等等？</li>
-<li>root server的负载依然很高，尤其是当访问不存在的域名时，可能出现缓存穿透</li>
-<li>client无法确定DNS服务器的响应是否正确</li>
-</ul>
-<h3 id="content-distribution">content distribution</h3>
-<p>需要减小访问网络上大型文件的延迟，client端可以使用cache，而server端也会使用cache，但由于文件很大可能装不下，因此额外使用一些服务器专门用于缓存大型文件，即CDN</p>
-<p>CDN离发出请求的client越近越好，content提供者会进行预热，在大量请求到达之前将大型文件提前缓存在CDN上，从而提升性能</p>
-<p>HTTP redirection中，一个服务器收到请求后，会让client redirect到一台更近的服务器。好处是可以细粒度分发资源，缺点是增加了一次RTT，但对于大型文件而言可以接受</p>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/368c7cb657384e0485ec7e7a35cb1ac4.png" srcset="/img/loading.gif" lazyload class="" title="HTTP redirection">
-<p>也可以通过DNS选择服务器，即在资源对应的多个IP地址中选择更近的那个。好处是降低时延，缺点是强依赖IP地址</p>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/6eb613edf6ddc936bcb4d6d1467f06ba.png" srcset="/img/loading.gif" lazyload class="" title="DNS-based server selection">
-<h3 id="naming-scheme">naming scheme</h3>
-<p>naming schemes包括：names, values, look-up algorithm</p>
-<p>binding即实现name和value的绑定，可以是一对一，也可以是一对多、多对一；而resolve实现了name的解析</p>
-<p>naming context包括两大类：context和name分开，如inode；context是name的一部分，内嵌在其中，如邮件。当name space只有一个context时为universal name spaces，全球唯一</p>
-<p>决定context的方法有：</p>
-<ul>
-<li>硬编码在resolver里面，如universal name spaces</li>
-<li>从环境变量中寻找，但需要正确的context</li>
-</ul>
-<p>name mapping的算法有：</p>
-<ul>
-<li>查表</li>
-<li>递归查找</li>
-<li>并列查找，如<code>$PATH</code>，冒号隔开的是并列关系</li>
+<li>禁止ASLR，因为在接受socket时会folk，此时地址一样，并没有重启并让地址随机偏移</li>
+<li>窃取binary：注入数据测试什么时候触发stack over flow，再继续通过是否崩溃一位一位猜测地址（这是因为canary不变）</li>
+<li>寻找gadget：测试获取的地址附近的地址，判断是crash还是hang，有用的gadget时而crash，时而hang，说明结尾是return，只是return后跳转的第二个地址是否有效罢了</li>
+<li>设置write的参数，使用BROP和PLT来设置寄存器的值和函数地址</li>
 </ul>
 
                 
@@ -416,8 +393,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture20:network-dns-cdn</div>
-      <div>http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/</div>
+      <div>CSE_lecture22:ROP and CFI</div>
+      <div>http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/</div>
     </div>
     <div class="license-meta">
       
@@ -429,7 +406,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月17日</div>
+          <div>2025年12月28日</div>
         </div>
       
       
@@ -461,18 +438,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/17/CSE-lecture21-Security/" title="CSE_lecture21:Security">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture21:Security</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/16/CSE-lecture19-network-end2end/" title="CSE_lecture19:network-end2end">
-                        <span class="hidden-mobile">CSE_lecture19:network-end2end</span>
+                      <a href="/2025/12/17/CSE-lecture21-Security/" title="CSE_lecture21:Security">
+                        <span class="hidden-mobile">CSE_lecture21:Security</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

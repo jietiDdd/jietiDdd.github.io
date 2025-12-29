@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络">
+    <meta name="description" content="Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture14:2PC+Replication">
 <meta property="og:url" content="http://example.com/2025/11/06/CSE-lecture14-2PC-Replication/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络">
+<meta property="og:description" content="Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/11/06/CSE-lecture14-2PC-Replication/fb6ff2eaaa7526c0339c6b0d5944e82a.png">
 <meta property="og:image" content="http://example.com/2025/11/06/CSE-lecture14-2PC-Replication/502b70abeb37061a1f9ca58213e1a52a.png">
@@ -281,7 +281,9 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Consistency-under-partial-failure-2PC-replicated-state-machine"><a href="#Consistency-under-partial-failure-2PC-replicated-state-machine" class="headerlink" title="Consistency under partial failure: 2PC &amp; replicated state machine"></a>Consistency under partial failure: 2PC &amp; replicated state machine</h2><h3 id="2PC-and-CAP"><a href="#2PC-and-CAP" class="headerlink" title="2PC and CAP"></a>2PC and CAP</h3><p>CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络分区的前提下，保证在消息丢失或系统故障下正常运行）三者不能兼得</p>
+                <h2 id="Consistency-under-partial-failure-2PC-replicated-state-machine">Consistency under partial failure: 2PC &amp; replicated state machine</h2>
+<h3 id="2PC-and-CAP">2PC and CAP</h3>
+<p>CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络分区的前提下，保证在消息丢失或系统故障下正常运行）三者不能兼得</p>
 <p>2PC保证了consistency，使用replication保证availability，而replication难以保证操作顺序，解决方法为：</p>
 <ul>
 <li>optimistic replication: eventual consistency</li>
@@ -300,17 +302,21 @@
 <p>由于primary要等待所有的backup的ACK，当backup挂了时，反而导致了系统不工作；可以让primary只等待一部分backup的ACK，但选择新的primary时需要额外处理，即需要从多台机器中读取最新的数据拼接起来来恢复，事实上很快</p>
 <p>quorum要求，写入时挑选 $Q_w$ 台机器写入，恢复时从 $Q_r$ 台机器中读取出来，只要保证 $Q_r + Q_w &gt; \text{Nreplicas}$ 即可</p>
 <p>最后的问题是view server挂了怎么办，因此需要引入paxos</p>
-<h3 id="paxos"><a href="#paxos" class="headerlink" title="paxos"></a>paxos</h3><h4 id="single-decree-paxos-agree-on-a-single-value-w-o-a-view-server"><a href="#single-decree-paxos-agree-on-a-single-value-w-o-a-view-server" class="headerlink" title="single-decree paxos: agree on a single value w&#x2F;o a view server"></a>single-decree paxos: agree on a single value w&#x2F;o a view server</h4><p>当只有一台writer时，遵循quorum即可，但问题在于怎么处理多台writer</p>
+<h3 id="paxos">paxos</h3>
+<h4 id="single-decree-paxos-agree-on-a-single-value-w-o-a-view-server">single-decree paxos: agree on a single value w/o a view server</h4>
+<p>当只有一台writer时，遵循quorum即可，但问题在于怎么处理多台writer</p>
 <p>paxos的角色有client, proposer, acceptor, learner，每个paxos node为后三者三合一，即每个节点充当里面的所有职责：</p>
 <p>proposer要判断自己是否是唯一的writer(leader)，即当它的proposer number最大时为唯一的writer（只需要询问超过半数的机器，从而保证冲突，需要存放highest proposal number seen）（因为另一个proposer在询问时势必会访问到重叠的acceptor，从而保证能决定冲突</p>
 <p>single-decree paxos的流程如下：</p>
 <ul>
-<li>prepare:<ul>
-<li>proposer接收到client的请求后，生成一个递增的proposal number N（为轮次&#x2F;server id对，先比较前者）（N应当大于previous proposal number seen），并发送给所有的acceptor（当然理论上发送给半数以上就可以了，但这是为了更保险）</li>
+<li>prepare:
+<ul>
+<li>proposer接收到client的请求后，生成一个递增的proposal number N（为轮次/server id对，先比较前者）（N应当大于previous proposal number seen），并发送给所有的acceptor（当然理论上发送给半数以上就可以了，但这是为了更保险）</li>
 <li>acceptor收到消息后，与自己已经做出承诺的proposal number比较，当N大于它时作出承诺，且当已经有接受的提案时返回额外的acceptedProposal和acceptedValue；否则拒绝或忽略。proposal收到半数以上的promise后，认为可以进入accept阶段（这里就会更新已作出承诺的proposal number，而acceptedProposal还没更新）</li>
 </ul>
 </li>
-<li>accept:<ul>
+<li>accept:
+<ul>
 <li>proposal收到多数派后，选择acceptedProposal最大的哪个acceptedValue，否则才能由自己决定value，并发送消息给多数派</li>
 <li>acceptor收到消息后，还是要检查N是否大于已作出承诺的proposal number，通过后再更新acceptedProposal和acceptedValue（注意这里才更新acceptedProposal）</li>
 </ul>
@@ -319,17 +325,15 @@
 <p>可以认为slot, one single-decree paxos, client request一一对应；而被拒绝的request后续会对应到新的slot和single-decree paxos上去；而learner一般只读，作为一个可选的部分，在系统紧张时才参与进来；在phase 1结束后，那个获得多数派承诺的proposer成为leader，直到它挂了</p>
 <p>一个简单的理解是proposal number用于选举唯一的write(leader)，而single-decree paxos是为了让leader知道它现在不再是唯一的writer了</p>
 <img src="/2025/11/06/CSE-lecture14-2PC-Replication/fb6ff2eaaa7526c0339c6b0d5944e82a.png" srcset="/img/loading.gif" lazyload class="" title="paxos pseudo-code">
-
 <p>举个例子，假设现在有三个acceptor A, B, C，其中A和B也是proposer：</p>
 <ul>
 <li>A发送&lt;prepare, 1&gt;，得到A和C的响应</li>
-<li>A发送&lt;accecpt, 1, “foo”&gt;给A和C并得到响应，此时A得到多数派响应，认为”foo”被选择；但A在给B发送&lt;accept, 1, “foo”&gt;前挂了</li>
+<li>A发送&lt;accecpt, 1, “foo”&gt;给A和C并得到响应，此时A得到多数派响应，认为&quot;foo&quot;被选择；但A在给B发送&lt;accept, 1, “foo”&gt;前挂了</li>
 <li>B发送&lt;prepare, 2&gt;并得到B和C的响应</li>
-<li>B发送&lt;accept, 2, “bar”&gt;给B和C并得到响应，此时B得到多数派响应，因此认为”bar”被选择</li>
+<li>B发送&lt;accept, 2, “bar”&gt;给B和C并得到响应，此时B得到多数派响应，因此认为&quot;bar&quot;被选择</li>
 </ul>
-<p>事实上上述流程并不会发生，这并不是说B不是多数派，而是”bar”不会覆写”foo”</p>
+<p>事实上上述流程并不会发生，这并不是说B不是多数派，而是&quot;bar&quot;不会覆写&quot;foo&quot;</p>
 <img src="/2025/11/06/CSE-lecture14-2PC-Replication/502b70abeb37061a1f9ca58213e1a52a.png" srcset="/img/loading.gif" lazyload class="" title="example question">
-
 <p>故在paxos，以下情况哪个让V被写入？</p>
 <ul>
 <li>leader收到了多数派的&lt;promise, …&gt;：还没有开始写value</li>
@@ -343,10 +347,10 @@
 <li>leader在发送accept后挂了：重新生成一个 $M_n$ ，其不用被记住</li>
 </ul>
 <p>目前我们在没有view server的情况下也能正常运行，但让leader挂了后，就再也修改不了value了</p>
-<h4 id="multi-paxos-agree-on-a-sequence-of-values"><a href="#multi-paxos-agree-on-a-sequence-of-values" class="headerlink" title="multi-paxos: agree on a sequence of values"></a>multi-paxos: agree on a sequence of values</h4><p>为每个log entry分配一个paxos(paxos instance)，当发起的paxos instance在别的acceptor里面已经有了value时，选择一个更大的paxos instance，直到找到一个没有value的paxos instance，但这样的方法导致了需要多次尝试，这反而在性能上不如primary-backup（多了一轮RPC）</p>
+<h4 id="multi-paxos-agree-on-a-sequence-of-values">multi-paxos: agree on a sequence of values</h4>
+<p>为每个log entry分配一个paxos(paxos instance)，当发起的paxos instance在别的acceptor里面已经有了value时，选择一个更大的paxos instance，直到找到一个没有value的paxos instance，但这样的方法导致了需要多次尝试，这反而在性能上不如primary-backup（多了一轮RPC）</p>
 <p>paxos在只有一个确定的leader时，可以进行优化，即一次性bacth完所有的paxos instance来发起一次prepare，再依次进行accept</p>
 <img src="/2025/11/06/CSE-lecture14-2PC-Replication/e6fa9eb877d7f5a87cb3d57c876b0618.png" srcset="/img/loading.gif" lazyload class="" title="prepare message batching">
-
 <p>paxos其实是不需要leader也能保证正确性的，但leader可以加速实现</p>
 <p>paxos的log可能会出现不连续的情况，维护更困难</p>
 

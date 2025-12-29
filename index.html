@@ -229,6 +229,90 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/12/28/CSE-lecture22-ROP-and-CFI/" target="_self">
+          CSE_lecture22:ROP and CFI
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/28/CSE-lecture22-ROP-and-CFI/" target="_self">
+        <div>
+          ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-28 21:57" pubdate>
+              2025-12-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
+  
+  
+
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/se/">#se</a>
+            
+              <a href="/tags/cse/">#cse</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/12/17/CSE-lecture21-Security/" target="_self">
           CSE_lecture21:Security
         </a>
@@ -237,7 +321,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/17/CSE-lecture21-Security/" target="_self">
         <div>
-          Introduction to System Securitycross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义   security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径
+          Introduction to System Security cross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义  security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径
         </div>
       </a>
 
@@ -321,7 +405,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/17/CSE-lecture20-network-dns-cdn/" target="_self">
         <div>
-          DNS &amp; Naming Schemethe design of DNS实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使用不
+          DNS &amp; Naming Scheme the design of DNS 实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使
         </div>
       </a>
 
@@ -405,7 +489,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/16/CSE-lecture19-network-end2end/" target="_self">
         <div>
-          End-to-end Layer: Best-effort is not enoughend-to-end layer UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个
+          End-to-end Layer: Best-effort is not enough end-to-end layer  UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery 保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记
         </div>
       </a>
 
@@ -489,7 +573,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/15/CSE-lecture18-network-ip-2/" target="_self">
         <div>
-          Network Layer - 2case study: BGP每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付
+          Network Layer - 2 case study: BGP 每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer/provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付费
         </div>
       </a>
 
@@ -573,7 +657,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/09/CSE-lecture17-network-ip/" target="_self">
         <div>
-          Network Layer: All about routingIP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访问
+          Network Layer: All about routing IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访
         </div>
       </a>
 
@@ -657,7 +741,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/08/CSE-lecture16-network-link/" target="_self">
         <div>
-          Introduction to Networklayers in network最常见的为四层架构分层，这是根据TCP&#x2F;IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP&#x2F;IP四层架构更加实用   Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点
+          Introduction to Network layers in network 最常见的为四层架构分层，这是根据TCP/IP系统分层的：  Application Transport Network Link  OSI标准定义的则是七层架构，但TCP/IP四层架构更加实用  Link Layer只处理线段端点间的数据搬运，Network Layer则负责寻找起始节点到目标节点的通路，End-t
         </div>
       </a>
 
@@ -741,7 +825,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/06/CSE-lecture14-2PC-Replication/" target="_self">
         <div>
-          Consistency under partial failure: 2PC &amp; replicated state machine2PC and CAPCAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在网络
+          Consistency under partial failure: 2PC &amp; replicated state machine 2PC and CAP CAP认为consistency(linearizability, all-or-nothing, before-or-after, …), availability（响应时间短，规避重启）, partition tolerance（在
         </div>
       </a>
 
@@ -825,7 +909,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/06/CSE-lecture13-Transaction-and-Multi-site-Transaction/" target="_self">
         <div>
-          Transaction &amp; Multi-site Transactiontransaction with high-performance在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 123456
+          Transaction &amp; Multi-site Transaction transaction with high-performance 在读多写少的情况下，即大部分事务只读，且单个事务中读远多于写，OCC和2PL能实现很快的性能，但原生的OCC和2PL还不行 对于OCC来说，如果中途有数据被修改了，读修改前的状态就好了。因此引入versionedData，即snapshot 1234
         </div>
       </a>
 
@@ -909,7 +993,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture12-Transaction/" target="_self">
         <div>
-          Serializability, OCC &amp; TransactionOCC: optimistic concurrency control死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放入r
+          Serializability, OCC &amp; Transaction OCC: optimistic concurrency control 死锁难以解决，因此需要避免，可以引入乐观并发控制(OCC)，其认为数据不会被race condition，因此不用拿锁，检查结果，如果真的发生race condition就放弃并重试 OCC执行事务分为以下三个阶段：  并发本地控制：不上锁，读数据放
         </div>
       </a>
 
@@ -918,90 +1002,6 @@
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
             <time datetime="2025-11-05 18:21" pubdate>
-              2025-11-05
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
-  
-  
-
-  
-
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/se/">#se</a>
-            
-              <a href="/tags/cse/">#cse</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/" target="_self">
-          CSE_lecture11:Before or after atomicity
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/" target="_self">
-        <div>
-          Before-or-after atomicity and Serializability并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system t
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-11-05 16:03" pubdate>
               2025-11-05
             </time>
           </div>

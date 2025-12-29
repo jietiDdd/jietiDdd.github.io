@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时">
+    <meta name="description" content="Realizing atomicity: Logging + Checkpoint logging for atomicity logging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture10:Atomicity-Logging">
 <meta property="og:url" content="http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时">
+<meta property="og:description" content="Realizing atomicity: Logging + Checkpoint logging for atomicity logging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/3812e2ce061f6e67e00ab0f91c9718f5.png">
 <meta property="og:image" content="http://example.com/2025/10/23/CSE-lecture10-Atomicity-Logging/2a38f2c096a7524891f1c32b9256500d.png">
@@ -281,23 +281,22 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Realizing-atomicity-Logging-Checkpoint"><a href="#Realizing-atomicity-Logging-Checkpoint" class="headerlink" title="Realizing atomicity: Logging + Checkpoint"></a>Realizing atomicity: Logging + Checkpoint</h2><h3 id="logging-for-atomicity"><a href="#logging-for-atomicity" class="headerlink" title="logging for atomicity"></a>logging for atomicity</h3><p>logging是journaling的扩展，更加通用</p>
+                <h2 id="Realizing-atomicity-Logging-Checkpoint">Realizing atomicity: Logging + Checkpoint</h2>
+<h3 id="logging-for-atomicity">logging for atomicity</h3>
+<p>logging是journaling的扩展，更加通用</p>
 <p>log entry是一个原子性的单元，维护能恢复用户数据的修改</p>
 <p>transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时transaction的操作才认为是有效的（即log完全刷盘之前都是nothing，完全刷盘后就是all）</p>
 <p>TX.begin()到TX.commit()这部分中间的内容被存放在log entry中</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">transfer(bank, a, b, amt, log):<br>    records = mmap(bank, ...)<br>    new_a = records[a] - amt<br>    new_b = records[b] + amt<br><br>    commit_log = <span class="hljs-string">&quot;log start: a:&quot;</span> + new_a + <span class="hljs-string">&quot;\b:&quot;</span> + new_b<br>    log.append(commit_log).sync()<br><br>    records[a] = new_a<br>    records[b] = new_b<br></code></pre></td></tr></table></figure>
-
 <p>在确保修改一定能被恢复之前不要真的写入数据，比如可以在内存上临时写入；再写入log保存修改的信息，这一部分有两行代码，但其实不用维护原子性，只要能检测到log是否完整写完即可；logging结束后再写入磁盘，更新完后不必fsync，而是只需要定期刷盘（如内存不够），重启后从log中恢复，刷盘前read先访问内存即可</p>
 <p>完成<code>log.append(commit_log).sync()</code>这一步后，认为是commit point</p>
 <p>redo-only logging只保证系统从旧的状态变为新的状态，注意REDO和DO不一定要一样</p>
 <img src="/2025/10/23/CSE-lecture10-Atomicity-Logging/3812e2ce061f6e67e00ab0f91c9718f5.png" srcset="/img/loading.gif" lazyload class="" title="redo-only logging">
-
 <p>value logging记录的是值，恢复时将log里面的值替换到旧的值上即可，但这样就相当于value写了两次；operation logging则是记录做了什么操作，但这样需要重新跑一遍，同时需要保证幂等性。需要权衡</p>
 <p>redo-only logging的性能很好，唯一的开销是多一次log的写入，而log是只追加的，优于随机写。缺点是更新全都缓存在内存中，内存压力大；log一直在增加，而实际上已经有大部分操作已经写回到磁盘了</p>
 <p>操作系统会在内存不够时，将部分页表swap到磁盘上，从而释放一些内存。这种系统对于redo-only logging并不友好，一方面swap后会额外占用磁盘空间，另一方面swap的性能难以建模，且强依赖操作系统</p>
 <p>为了解决内存不够的问题，需要直接在原有的位置上进行修改，此时需要维护undo log来维护修改之前的原来的数据。但依然需要redo log，从而不必等待数据落盘（赋值只是修改了内存映射区），只保证log落盘即可。使用undo-redo log实现旧的值和新的值同时写入log</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python">transfer(bank, a, b, amt, log):<br>    records = mmap(bank, ...)<br>    <span class="hljs-comment"># log记录为Action(file name, offset, old &amp; new values)</span><br>    log.append(...).sync()<br>    records[a] = records[a] - amt<br>    log.append(...).sync()<br>    records[b] = records[b] + amt<br>    log.append(<span class="hljs-string">&quot;TX &#123;id&#125; commit&quot;</span>).sync()<br></code></pre></td></tr></table></figure>
-
 <p>redo-only logging每次只append一个log entry，对应一个transaction；而undo-redo logging需要append多个log records，当多个transaction并行操作时，会导致log record不连续，出现交错，此时在log里维护一个指针指向前一个record，将同一个transaction的record串起来</p>
 <p>redo-only logging在恢复时，直接从左到右遍历一遍log entry即可；而undo-redo logging的恢复步骤为：</p>
 <ul>
@@ -307,22 +306,24 @@
 <li>redo所有的CMT log</li>
 </ul>
 <img src="/2025/10/23/CSE-lecture10-Atomicity-Logging/2a38f2c096a7524891f1c32b9256500d.png" srcset="/img/loading.gif" lazyload class="" title="the type of logging">
-
 <p>redo-only logging在执行事务和恢复操作中都更快，因此在内存足够时，偏向于使用redo-only logging</p>
 <p>undo-only logging要求修改在transaction commit前就刷盘，因此执行事务的速度比undo-redo logging还慢，因此极少使用</p>
-<h3 id="checkpoint"><a href="#checkpoint" class="headerlink" title="checkpoint"></a>checkpoint</h3><p>为了解决log file无限增长的问题，引入checkpoint，用于将系统的状态压缩得更紧凑，其应用很广泛，比如可以本地固化eventual consistency的聊天记录</p>
-<h4 id="case-study-1-checkpoint-in-logging"><a href="#case-study-1-checkpoint-in-logging" class="headerlink" title="case study 1: checkpoint in logging"></a>case study 1: checkpoint in logging</h4><p>让系统在恢复时遍历一次log，但这样太慢了；事实上已经刷盘的事务不用再恢复了。checkpoint的目的是，保证只做checkpoint之后的恢复等价于没有检查点的全部恢复，问题在于正在做checkpoint时有事务在执行，因此需要记录这些事务的log</p>
+<h3 id="checkpoint">checkpoint</h3>
+<p>为了解决log file无限增长的问题，引入checkpoint，用于将系统的状态压缩得更紧凑，其应用很广泛，比如可以本地固化eventual consistency的聊天记录</p>
+<h4 id="case-study-1-checkpoint-in-logging">case study 1: checkpoint in logging</h4>
+<p>让系统在恢复时遍历一次log，但这样太慢了；事实上已经刷盘的事务不用再恢复了。checkpoint的目的是，保证只做checkpoint之后的恢复等价于没有检查点的全部恢复，问题在于正在做checkpoint时有事务在执行，因此需要记录这些事务的log</p>
 <p>checkpoint的步骤为：</p>
 <ul>
 <li>已提交的事务刷盘并摒弃log</li>
 <li>收集未提交的事务的log</li>
 </ul>
 <img src="/2025/10/23/CSE-lecture10-Atomicity-Logging/21221e2cd480371e7620520daab6f147.png" srcset="/img/loading.gif" lazyload class="" title="recovery with checkpoint">
-
-<h4 id="case-study-2-checkpoint-in-LLM-pre-training-how-we-configure-the-checkpoint-frequency"><a href="#case-study-2-checkpoint-in-LLM-pre-training-how-we-configure-the-checkpoint-frequency" class="headerlink" title="case study 2: checkpoint in LLM (pre)training &amp; how we configure the checkpoint frequency"></a>case study 2: checkpoint in LLM (pre)training &amp; how we configure the checkpoint frequency</h4><p>定期的checkpoint保证了崩溃后不用从头开始计算，而是从某一个iteration开始计算</p>
+<h4 id="case-study-2-checkpoint-in-LLM-pre-training-how-we-configure-the-checkpoint-frequency">case study 2: checkpoint in LLM (pre)training &amp; how we configure the checkpoint frequency</h4>
+<p>定期的checkpoint保证了崩溃后不用从头开始计算，而是从某一个iteration开始计算</p>
 <p>而checkpoint本身也要保证原子性，因此使用shadow copy，保留上一次的checkpoint，直到这次的checkpoint做完</p>
 <p>checkpoint时模型训练会停下来，因此checkpoint需要更快，而这不能简单通过减少checkpoint频率来解决，因为恢复重算的时间会变长</p>
-<h4 id="case-study-3-checkpoint-in-an-eventually-consistent-system"><a href="#case-study-3-checkpoint-in-an-eventually-consistent-system" class="headerlink" title="case study 3: checkpoint in an eventually consistent system"></a>case study 3: checkpoint in an eventually consistent system</h4><p>在eventual consistency中，每个节点都会维护一个log，并在sync后重排整个log，因此为了防止log无限增长，需要引入checkpoint，而挑战在于不同设备不能自己单独决定在哪进行checkpoint</p>
+<h4 id="case-study-3-checkpoint-in-an-eventually-consistent-system">case study 3: checkpoint in an eventually consistent system</h4>
+<p>在eventual consistency中，每个节点都会维护一个log，并在sync后重排整个log，因此为了防止log无限增长，需要引入checkpoint，而挑战在于不同设备不能自己单独决定在哪进行checkpoint</p>
 <p>事实上在lamport架构中，会存在一些永远排在前面的操作，即它们在所有其他设备的lamport clock之前，此时其他设备不会传来排在它们之前的操作。因此取得所有设备的lamport clock并取最小值，在其之前的操作都是stable的</p>
 <p>但问题在于如果存在offline的机器，那么它的lamport clock会因为一直不更新自己的时间而很小，导致log中能stable的操作也会很少。因此为操作时间戳里面加入由centralized决定的CSN，其遵循严格的顺序，当收到所有小于当前CSN的消息时，当前操作也就stable了</p>
 <p>为了维护lamport clock的因果性，在分配CSN时需要也拿到当前操作之前的所有tentative操作的CSN</p>

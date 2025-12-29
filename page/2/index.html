@@ -229,6 +229,90 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/" target="_self">
+          CSE_lecture11:Before or after atomicity
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/" target="_self">
+        <div>
+          Before-or-after atomicity and Serializability 并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-11-05 16:03" pubdate>
+              2025-11-05
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
+  
+  
+
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/se/">#se</a>
+            
+              <a href="/tags/cse/">#cse</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2025/10/25/CSE-lab2%E6%94%BB%E7%95%A5/" target="_self">
           CSE_lab2攻略
         </a>
@@ -237,7 +321,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/25/CSE-lab2%E6%94%BB%E7%95%A5/" target="_self">
         <div>
-          lab2: Distributed FileSystem在lab1中，我们已经实现了基本的inode filesystem，并能够操作directory；而在lab2中，我们需要实现一个分布式的文件系统，该系统分为以下三部分，它们通过rpc进行通信：  filesystem client: 文件系统服务器，向metadata server发送请求获取元数据，再向各个data server发送请求修
+          lab2: Distributed FileSystem 在lab1中，我们已经实现了基本的inode filesystem，并能够操作directory；而在lab2中，我们需要实现一个分布式的文件系统，该系统分为以下三部分，它们通过rpc进行通信：  filesystem client: 文件系统服务器，向metadata server发送请求获取元数据，再向各个data server发送请求
         </div>
       </a>
 
@@ -321,7 +405,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/23/CSE-lecture10-Atomicity-Logging/" target="_self">
         <div>
-          Realizing atomicity: Logging + Checkpointlogging for atomicitylogging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，此时
+          Realizing atomicity: Logging + Checkpoint logging for atomicity logging是journaling的扩展，更加通用 log entry是一个原子性的单元，维护能恢复用户数据的修改 transaction用于标记哪些操作是原子性的；commit point为一行代码，经过commit point说明transaction已经是all，
         </div>
       </a>
 
@@ -405,7 +489,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/22/CSE-lecture9-Atomicity/" target="_self">
         <div>
-          Consistency under failure: The requirement of atomicity即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record = mmap(bank
+          Consistency under failure: The requirement of atomicity 即使不考虑分布式，故障的发生也可能引发不一致性 fail-stop发生时，整个系统的所有部分都出现failure 以下面的代码为例，必须保证bank(a) + bank(b)不变： 123456transfer(bank, a, b, amt):    record = mmap(ban
         </div>
       </a>
 
@@ -489,7 +573,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/20/CSE-lecture8-Consistency/" target="_self">
         <div>
-          Consistency when executing operations concurrentlyimplement ChatAPP最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上(r
+          Consistency when executing operations concurrently implement ChatAPP 最简单的方法就是使用一个中心化的服务器，但实际上使用的很少，原因为：  每次post都要网络通信，都要等待response 每次read都要等待RPC 断网时无法访问 服务器挂了就无法处理了  因此系统是需要备份的，不仅备份在server上，也要备份在各个设备上
         </div>
       </a>
 
@@ -573,7 +657,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/19/CSE-lecture7-System-modelling-KFS/" target="_self">
         <div>
-          System modelling &amp; Key-value stores(KVS)key-value store abstractionkey-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件名，
+          System modelling &amp; Key-value stores(KVS) key-value store abstraction key-value使用唯一的key来标识value，提供接口为get, scan, update, insert, delete，比文件系统更简单 一种想法是可以直接在filesystem上封装一层key-value store的API，key认为是文件
         </div>
       </a>
 
@@ -657,7 +741,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/15/CSE-lecture6-DFS/" target="_self">
         <div>
-          Distributed file system(DFS)distributed file service有以下类型：  upload&#x2F;download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和
+          Distributed file system(DFS) distributed file service有以下类型：  upload/download model: 如FTP，实现文件在客户端和服务端的复制，好处是简单，坏处是浪费、引发空间不足问题、难以保证一致性 remote access model: 使用RPC，好处是只用获取需要的部分、服务端可以维护一致性，缺点是可能出现服务器和网络问题
         </div>
       </a>
 
@@ -741,7 +825,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/10/02/CSE-lecture5-Remote-Procedure-Call/" target="_self">
         <div>
-          Remote Procedure CallRPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub   client stub做以下事情：发请求，接受响应，进行convert   server stub做以下事情：使用一
+          Remote Procedure Call RPC让文件系统变成远程，同时让远程服务器像运行在本地一样，相比于sockets api，RPC不必因为突然变成远程服务器而修改代码，即这个接口应当同时能访问本地和远程 为了不改应用的高层代码，将缺乏语义的共同部分打包成RPC stub  client stub做以下事情：发请求，接受响应，进行convert  server stub做以下事情：使用一个
         </div>
       </a>
 
@@ -825,7 +909,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/28/CSE-lecture4-Distributed-System/" target="_self">
         <div>
-          Scalability in Practice: a Highly scalable web app互联网应用需要支撑的三个能力：  处理海量的请求 存储海量的数据 透明化的可拓展性(transparent scale)  因此我们需要构建一个scalable的系统 case study: an e-commerce web application一次点击可能需要上千的服务器处理 远古时代使用单个
+          Scalability in Practice: a Highly scalable web app 互联网应用需要支撑的三个能力：  处理海量的请求 存储海量的数据 透明化的可拓展性(transparent scale)  因此我们需要构建一个scalable的系统 case study: an e-commerce web application 一次点击可能需要上千的服务器处理 远古时代使用
         </div>
       </a>
 
@@ -909,7 +993,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/09/27/CSE-lab1%E6%94%BB%E7%95%A5/" target="_self">
         <div>
-          lab1: Basic Filesystem在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等directory
+          lab1: Basic Filesystem 在lab1中，我们需要实现一个单机inode-based filesystem，共有三层架构：  block layer: 包括block manager和block allocator inode layer: 包括inode manager filesystem layer: 包括create, write, read操作，同时对等director
         </div>
       </a>
 
@@ -949,90 +1033,6 @@
     <span>></span>
     
   <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/lab/" class="category-chain-item">lab</a>
-  
-  
-
-  
-
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/se/">#se</a>
-            
-              <a href="/tags/cse/">#cse</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/09/23/CSE-lecture3-File-System-2/" target="_self">
-          CSE_lecture3:File System 2
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/09/23/CSE-lecture3-File-System-2/" target="_self">
-        <div>
-          File System API and Disk I&#x2F;Oimplement the file system APIAPI有以下几个：  CHDIR（即cd）, MKDIR CREAT, LINK, UNLINK, RENAME SYMLINK MOUNT, UNMOUNT（读取super block） OPEN, READ, WRITE, APPEND, CLOSE SYNC（将内存数据
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-09-23 16:02" pubdate>
-              2025-09-23
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
   
   
 
