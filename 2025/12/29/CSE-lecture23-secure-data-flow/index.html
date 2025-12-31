@@ -19,28 +19,30 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove">
+    <meta name="description" content="Secure Data Flow taint tracking 为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture22:ROP and CFI">
-<meta property="og:url" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/index.html">
+<meta property="og:title" content="CSE_lecture23:secure data flow">
+<meta property="og:url" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove">
+<meta property="og:description" content="Secure Data Flow taint tracking 为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png">
-<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/38b0bcd825ec5ce442e5be287bcf9154.png">
-<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/ce9dbac48e6d32b4dd2a707f7f48401e.png">
-<meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/2d9c5ec0e3e554dcb081e593631f4a8b.png">
-<meta property="article:published_time" content="2025-12-28T13:57:42.000Z">
-<meta property="article:modified_time" content="2025-12-29T07:24:43.506Z">
+<meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/581c203551a2c694c632047075b195ae.png">
+<meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/aa2cf2f07c7cfd13c29973b2e4629229.png">
+<meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/d580db254b592007cdfdb88286581e0b.png">
+<meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/99e14f22d63a81c905b54363dbfd293c.png">
+<meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/38babf70f9fa8ea26e73fb54a3177825.png">
+<meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/130582f551a0c5958281b9999258d1cb.png">
+<meta property="article:published_time" content="2025-12-29T10:02:41.000Z">
+<meta property="article:modified_time" content="2025-12-31T09:29:58.911Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png">
+<meta name="twitter:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/581c203551a2c694c632047075b195ae.png">
   
   
   
-  <title>CSE_lecture22:ROP and CFI - jietiDdd的个人博客</title>
+  <title>CSE_lecture23:secure data flow - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -206,7 +208,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture22:ROP and CFI"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture23:secure data flow"></span>
           
         </div>
 
@@ -217,8 +219,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-28 21:57" pubdate>
-          2025年12月28日 晚上
+        <time datetime="2025-12-29 18:02" pubdate>
+          2025年12月29日 晚上
         </time>
       </span>
     
@@ -229,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          743 字
+          863 字
         
       </span>
     
@@ -240,7 +242,7 @@
         
         
         
-          7 分钟
+          8 分钟
         
       </span>
     
@@ -277,54 +279,61 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture22:ROP and CFI</h1>
+            <h1 id="seo-header">CSE_lecture23:secure data flow</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="ROP-and-CFI">ROP and CFI</h2>
-<h3 id="security-principles">security principles</h3>
+                <h2 id="Secure-Data-Flow">Secure Data Flow</h2>
+<h3 id="taint-tracking">taint tracking</h3>
+<p>为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记</p>
+<p>对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可能翻四十倍</p>
+<p>taintdroid对taint的操作进行分层，高层只使用粗粒度的taint，包括对整个数据库、对整个文件、对整条消息加taint；而只对java虚拟机做细粒度的变量级的taint跟踪；而对于cpp库则提前进行分析，届时只需根据调用关系得到taint情况即可。这样就实现了性能的优化</p>
+<h3 id="defending-malicious-input">defending malicious input</h3>
+<p>一个攻击者根据以下步骤寻找bug：</p>
 <ul>
-<li>least privilege: 只提供完成事件的最小权限</li>
-<li>least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权</li>
-<li>users make mistakes: 安全要考虑用户犯的诸多错误</li>
-<li>cost of security: 安全的成本不能太高</li>
+<li>寻找契机</li>
+<li>寻找冷门部分的bug，因为测试可能性很小</li>
+<li>设计input data，这是攻击者可控的</li>
+<li>追踪input data</li>
 </ul>
-<h3 id="stack-buffer-overflow">stack buffer overflow</h3>
-<p>攻击者往往从控制流或数据的角度来攻击</p>
-<p>stack buffer overflow通过栈溢出的手段修改return跳转的地址，从而返回到攻击者设计的恶意代码部分</p>
-<p>防御手段为DEP(data execution prevention)，即数据段不可执行，即设置为non-executable，需要修改NX bit</p>
-<p>此时攻击者使用ROP(return-oriented programming)，寻找原有的代码碎片(gadget)，这些碎片都以return结尾，在栈上注入地址指向这些碎片，从而将这些碎片代码合并在一起</p>
-<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png" srcset="/img/loading.gif" lazyload class="" title="ROP">
-<p>防御手段有：</p>
-<ul>
-<li>隐藏binary file，从而无法获取gadget</li>
-<li>ASLR将代码放在随机的地址</li>
-<li>在return addr前面放置canary，覆盖addr时也会覆盖canary，通过检查canary来判断是否被攻击</li>
-</ul>
-<h3 id="CFI-control-flow-integrity">CFI: control flow integrity</h3>
-<p>设置合法的控制流，防止控制流被劫持，这需要描述control flow graph，将其和可执行的二进制文件合并后得到一个self-checking program，加入了多个检查点</p>
-<p>攻击者往往从跳转部分劫持，大部分都是direct branches，少部分的indirect branches绝大多数也是跳到那一两个地址：</p>
-<ul>
-<li>direct branches: call或jump后跟着静态的地址</li>
-<li>indirect branches: call或jump后跟着寄存器，代码运行后才能确定跳转的地址，以及return</li>
-</ul>
-<p>CFI通过二进制重写的方法将正确的跳转思路内嵌到代码中做检查</p>
-<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/38b0bcd825ec5ce442e5be287bcf9154.png" srcset="/img/loading.gif" lazyload class="" title="CFI example">
-<p>但这需要保证所有的代码都被patch，对于库代码可能出现问题。因此使用prefetchnta，访问内存地址，如果不合法就等价于nop，比较4字节的prefetchnta后的数字即可</p>
-<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/ce9dbac48e6d32b4dd2a707f7f48401e.png" srcset="/img/loading.gif" lazyload class="" title="prefetchnta">
-<p>假设A可以到C，B可以到C和D，此时C和D的tag一样，这就会导致A可以非法访问D，如果加入判断，会导致性能下降</p>
-<p>因此引入shadow call stack，即单独维护一个存放return address的栈，这是由软件实现的，从而通过比较软件和硬件栈中的地址来判断stack over flow是否出现。为了提升性能，直接使用Intel CET维护硬件层面的shadow call stack</p>
-<p>CFI保证了stack over flow的防御，但不能防御数据修改，如函数指针，或权限位</p>
-<img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/2d9c5ec0e3e554dcb081e593631f4a8b.png" srcset="/img/loading.gif" lazyload class="" title="possible execution of memory">
-<h3 id="blind-ROP">blind ROP</h3>
-<p>流程为：</p>
-<ul>
-<li>禁止ASLR，因为在接受socket时会folk，此时地址一样，并没有重启并让地址随机偏移</li>
-<li>窃取binary：注入数据测试什么时候触发stack over flow，再继续通过是否崩溃一位一位猜测地址（这是因为canary不变）</li>
-<li>寻找gadget：测试获取的地址附近的地址，判断是crash还是hang，有用的gadget时而crash，时而hang，说明结尾是return，只是return后跳转的第二个地址是否有效罢了</li>
-<li>设置write的参数，使用BROP和PLT来设置寄存器的值和函数地址</li>
-</ul>
+<p>taintcheck用于监测input data在使用taint后的整个流动过程。当用于IO量大时overhead受影响不够明显</p>
+<h3 id="secure-channel">secure channel</h3>
+<p>跨机器传输数据需要进行加密</p>
+<p>对称加密为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">encript(key, message) -&gt; ciphertext<br>encript(key, ciphertext) -&gt; message<br></code></pre></td></tr></table></figure>
+<p>即加密和解密使用的密码一致</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">MAC(key, message) -&gt; token<br></code></pre></td></tr></table></figure>
+<p>即使拥有key，也无法通过token得到message，类似于加密哈希。两者联合使用，可以在获取message的同时判断是否被篡改</p>
+<p>问题在于replay attack可以窃取到发送的信息进行重发</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/581c203551a2c694c632047075b195ae.png" srcset="/img/loading.gif" lazyload class="" title="replay attack">
+<p>通过在message中加入sequence来避免replay attack</p>
+<p>此时reflection attack利用发送者和接收者的counter不一致，将发送者的消息发回发送者</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/aa2cf2f07c7cfd13c29973b2e4629229.png" srcset="/img/loading.gif" lazyload class="" title="reflection attack">
+<p>使用两个密钥来进行加密，A给B发送的消息用key1加密，B给A发送的消息用key2加密</p>
+<p>使用Diffie-Hellman key exchange让A和B共享密钥，A持有随机数a，B持有随机数b，共享质数p和随机数g后计算 $key = g^{ab} \ mod \ p$ 即可</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/d580db254b592007cdfdb88286581e0b.png" srcset="/img/loading.gif" lazyload class="" title="share key">
+<p>但攻击者可以拦截key的分享过程，进而参与到A和B的通信过程中去</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/99e14f22d63a81c905b54363dbfd293c.png" srcset="/img/loading.gif" lazyload class="" title="man-in-the-middle">
+<p>这种攻击方法无解，因此引入RSA，即非对称加密，使用其中一个密钥加密时，必须用另一个密钥解密</p>
+<p>在加密和解密时，加密用公钥，解密用私钥；在签名和验证时，签名用私钥，验证用公钥</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">sign(secret_key, message) -&gt; sig<br>verify(public_key, message, sig) -&gt; yes/no<br></code></pre></td></tr></table></figure>
+<p>public_key公开，A给B通信时使用公钥发送消息，从而验证B的身份。获取途径为，B提供证书(CA)，其记录公钥，并包含签名，届时即可验证该签名</p>
+<h3 id="privacy">privacy</h3>
+<p>既要保证使用数据，又要保证数据不被窃取</p>
+<h4 id="OT-obvious-transfer">OT: obvious transfer</h4>
+<p>假设A持有两个电话号码，现在B希望获取其中之一，需要保证B不知道另一个电话号码，也不让A知道B选的哪个</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/38babf70f9fa8ea26e73fb54a3177825.png" srcset="/img/loading.gif" lazyload class="" title="1-out-of-2 OT">
+<h4 id="DP-differential-privacy">DP: differential privacy</h4>
+<p>B持有每个人的详细工资信息，A希望进行统计，但需要保证A无法知道具体每个人的工资信息。为了防止A通过作差反推具体每个人的工资信息，只提供约数；同时限制提问次数</p>
+<h4 id="secret-sharing">secret sharing</h4>
+<p>希望将秘密分为n份，当有k个人时即可恢复秘密</p>
+<h4 id="HE-homomorphic-encryption">HE: homomorphic encryption</h4>
+<p>同态加密后的数据依然可以参与计算并提供给计算资源，届时解密即可</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/130582f551a0c5958281b9999258d1cb.png" srcset="/img/loading.gif" lazyload class="" title="HE">
+<h4 id="TEE-trusted-execution-environment">TEE: trusted execution environment</h4>
+<p>计算资源只在cache使用明文，memory放置密文，而cache极难窃取</p>
+<h3 id="process-of-bug-report">process of bug report</h3>
 
                 
               </div>
@@ -393,8 +402,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture22:ROP and CFI</div>
-      <div>http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/</div>
+      <div>CSE_lecture23:secure data flow</div>
+      <div>http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/</div>
     </div>
     <div class="license-meta">
       
@@ -406,7 +415,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月28日</div>
+          <div>2025年12月29日</div>
         </div>
       
       
@@ -438,18 +447,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/29/CSE-lecture23-secure-data-flow/" title="CSE_lecture23:secure data flow">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture23:secure data flow</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/17/CSE-lecture21-Security/" title="CSE_lecture21:Security">
-                        <span class="hidden-mobile">CSE_lecture21:Security</span>
+                      <a href="/2025/12/28/CSE-lecture22-ROP-and-CFI/" title="CSE_lecture22:ROP and CFI">
+                        <span class="hidden-mobile">CSE_lecture22:ROP and CFI</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
