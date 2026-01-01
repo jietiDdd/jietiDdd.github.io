@@ -4,6 +4,52 @@
   
   
   <entry>
+    <title>CSE_lecture25:GPUs and FlashAttention</title>
+    <link href="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/"/>
+    <url>/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/</url>
+    
+    <content type="html"><![CDATA[]]></content>
+    
+    
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>CSE_lecture24:distributed computing</title>
+    <link href="/2025/12/31/CSE-lecture24-distributed-computing/"/>
+    <url>/2025/12/31/CSE-lecture24-distributed-computing/</url>
+    
+    <content type="html"><![CDATA[<h2 id="The-distributed-and-parallel-programming-it’s-all-about-scalability">The distributed (and parallel) programming: it’s all about scalability</h2><p>训练模型的计算分为两步：前向传播和反向传播</p><p>对于前向传播，每层计算 $Y = W \circ X$，假设：</p><p>$W: m \times k \ X: k \times B$</p><p>则近似的计算量为 $(2k - 1) \times m \times B \sim = 2 \times Size(W) * B$，对于前向传播的所有层求和即可：$2 * B * #parameters$</p><p>对于反向传播，每层计算 $dX = W \circ dY (k \times m \circ m \times B)$ 和 $dW = dY \circ XT(m \times B \circ B \times k)$，则dX计算量为：$(2m - 1) \times k \times B \sim = 2 \times Size(W) * B$，dW的计算量为：$(2B - 1) \times m \times k \sim = 2 \times Size(W) * B$，对所有层求和即可：$4 * B * #parameters$</p><p>综上，一次训练的计算量为：$6 * #parameters * Batch_size$</p><p>并行计算可以提高计算的规模</p><h3 id="single-chip-device">single chip device</h3><p>对于CPU而言，每秒能做多少次浮点计算(FLOPS)，取决于每秒能给ALU提供多少指令，即clock rate；也取决于流水线，从而充分把clock rate利用起来。理想状况下没有bubble，此时FLOPS约为clock rate</p><p>对于单核CPU，为了提升并行度，需要提高pipeline的并行度，更深的pipeline的bubble更少；超标量（即指令级并行，ILP）每次发射多条指令，尽可能让它们并行计算，但超标量不能太大，否则复杂度会指数上升，受限于芯片的物理面积</p><p>approach #1: 使用多核来规避dependency tracking的问题，使用多个CPU，彼此互相独立，减少软件层对dependency的判断，但代码为了利用多核，需要显式分配pthread</p><p>多核相互独立的代价就是CPU之间无法共享，因此需要引入cache coherence协议，使用全局的directory来存放每个数据的最新值位于哪个CPU上，代价是directory会成为性能的瓶颈，需要限制核数来保证更强的consistency model，而GPU则是在超多核的情况下完全不使用cache coherence</p><p>approach #2: 每个CPU有多个组件，但多核没有充分利用这些组件。因此另一个方法为给每个CPU增加ALU数量，限制在于ALU需要执行相同的操作。SIMD即可实现计算的加速，但问题在于将8个计算并行处理时，性能只提升到了2倍，这是因为计算脱离了缓存</p><h3 id="accessing-memory-roofline-model">accessing memory &amp; roofline model</h3><p>一次内存读取的时间足够做几百个ALU操作，拖累了算力的提升。为了优化引入了prefetch，即将下一个可能的内存读取上来，这并不总是有效</p><p>内存操作受限于内存延迟(memory latency)和内存带宽(memory bandwidth)，对于prefetch而言更重要的是后者，公式为 $load_time = latency + payload / bandwidth$</p><p>roofline model可以判别计算受限于算力还是访存。模型的y轴为算力(Gflops/second)，其中peek flops为算力的上限，当达到peek flops时说明受限于算力。x轴则是每读一个byte能做多少次计算(flops/byte)，越大说明访存次数越少，因此斜率为带宽(bytes/second)</p><img src="/2025/12/31/CSE-lecture24-distributed-computing/24645b442f11895241242cc5a56ae685.png" class="" title="roofline model"><h3 id="put-it-all-together-approach-1-approach-2-are-typically-used-together">put it all together: approach #1 + approach #2 are typically used together</h3><p>将多核和多SIMD合并在一起</p><p>CPU的很多硬件面积用于CPU控制流操作；而GPU的控制流相当简单，cache也很小，且没有cache coherence，从而获得更大面积的ALU组件，从而在牺牲复杂分支预测的前提下获得算力的提升</p><p>SIMD的指令都很简单，一次只能做简单的加法、乘法、读写等，当应用的计算复杂时（如激活函数，需要进行比较），需要使用masking，即将分支都执行，在计算其中一个分支时关闭另一个分支的写入，但会导致计算的浪费和死锁问题</p><img src="/2025/12/31/CSE-lecture24-distributed-computing/44b7403e27dfcf053000edde763bc624.png" class="" title="conditional execution under SIMD"><p>SIMT为SIMD的编程抽象，将每个ALU抽象成thread，当出现分支时自动插入mask，从而像写多核程序一样写GPU程序</p><p>为了加速矩阵乘法的操作，引入domain-specific accelerators</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>计算机学习</category>
+      
+      <category>se专业课</category>
+      
+      <category>cse</category>
+      
+      <category>笔记</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>se</tag>
+      
+      <tag>cse</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>CSE_lecture23:secure data flow</title>
     <link href="/2025/12/29/CSE-lecture23-secure-data-flow/"/>
     <url>/2025/12/29/CSE-lecture23-secure-data-flow/</url>
