@@ -29,7 +29,7 @@
 <meta property="og:image" content="http://example.com/2025/12/31/CSE-lecture24-distributed-computing/24645b442f11895241242cc5a56ae685.png">
 <meta property="og:image" content="http://example.com/2025/12/31/CSE-lecture24-distributed-computing/44b7403e27dfcf053000edde763bc624.png">
 <meta property="article:published_time" content="2025-12-31T09:31:58.000Z">
-<meta property="article:modified_time" content="2026-01-01T08:13:27.223Z">
+<meta property="article:modified_time" content="2026-01-01T08:16:12.817Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -284,9 +284,9 @@
 <p>训练模型的计算分为两步：前向传播和反向传播</p>
 <p>对于前向传播，每层计算 $Y = W \circ X$，假设：</p>
 <p>$W: m \times k \ X: k \times B$</p>
-<p>则近似的计算量为 $(2k - 1) \times m \times B \sim = 2 \times Size(W) * B$，对于前向传播的所有层求和即可：$2 * B * #parameters$</p>
-<p>对于反向传播，每层计算 $dX = W \circ dY (k \times m \circ m \times B)$ 和 $dW = dY \circ XT(m \times B \circ B \times k)$，则dX计算量为：$(2m - 1) \times k \times B \sim = 2 \times Size(W) * B$，dW的计算量为：$(2B - 1) \times m \times k \sim = 2 \times Size(W) * B$，对所有层求和即可：$4 * B * #parameters$</p>
-<p>综上，一次训练的计算量为：$6 * #parameters * Batch_size$</p>
+<p>则近似的计算量为 $(2k - 1) \times m \times B \sim = 2 \times Size(W) * B$，对于前向传播的所有层求和即可：$2 * B * parameters$</p>
+<p>对于反向传播，每层计算 $dX = W \circ dY (k \times m \circ m \times B)$ 和 $dW = dY \circ XT(m \times B \circ B \times k)$，则dX计算量为：$(2m - 1) \times k \times B \sim = 2 \times Size(W) * B$，dW的计算量为：$(2B - 1) \times m \times k \sim = 2 \times Size(W) * B$，对所有层求和即可：$4 * B * parameters$</p>
+<p>综上，一次训练的计算量为：$6 * parameters * Batch_size$</p>
 <p>并行计算可以提高计算的规模</p>
 <h3 id="single-chip-device">single chip device</h3>
 <p>对于CPU而言，每秒能做多少次浮点计算(FLOPS)，取决于每秒能给ALU提供多少指令，即clock rate；也取决于流水线，从而充分把clock rate利用起来。理想状况下没有bubble，此时FLOPS约为clock rate</p>
