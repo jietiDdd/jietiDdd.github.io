@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="End-to-end Layer: Best-effort is not enough end-to-end layer  UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery 保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记">
+    <meta name="description" content="End-to-end Layer: Best-effort is not enoughend-to-end layer UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture19:network-end2end">
 <meta property="og:url" content="http://example.com/2025/12/16/CSE-lecture19-network-end2end/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="End-to-end Layer: Best-effort is not enough end-to-end layer  UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery 保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记">
+<meta property="og:description" content="End-to-end Layer: Best-effort is not enoughend-to-end layer UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/16/CSE-lecture19-network-end2end/9a3bd2db7db6c84fa185eaf35b6747ae.png">
 <meta property="og:image" content="http://example.com/2025/12/16/CSE-lecture19-network-end2end/50c127cdd61efe195f1af6be50b268a3.png">
@@ -286,15 +286,12 @@
             
               <div class="markdown-body">
                 
-                <h2 id="End-to-end-Layer-Best-effort-is-not-enough">End-to-end Layer: Best-effort is not enough</h2>
-<h3 id="end-to-end-layer">end-to-end layer</h3>
-<ul>
+                <h2 id="End-to-end-Layer-Best-effort-is-not-enough"><a href="#End-to-end-Layer-Best-effort-is-not-enough" class="headerlink" title="End-to-end Layer: Best-effort is not enough"></a>End-to-end Layer: Best-effort is not enough</h2><h3 id="end-to-end-layer"><a href="#end-to-end-layer" class="headerlink" title="end-to-end layer"></a>end-to-end layer</h3><ul>
 <li>UDP: 最简化的协议</li>
 <li>TCP: 能保证数据顺序和不丢包，能保证不重复</li>
 <li>RTP: 建立在UDP，用于实时要求</li>
 </ul>
-<h4 id="assurance-of-at-least-once-delivery">assurance of at-least-once delivery</h4>
-<p>保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个包，发送者会保留包的复制，超时后就可以重传，一直重传直到达到limit times</p>
+<h4 id="assurance-of-at-least-once-delivery"><a href="#assurance-of-at-least-once-delivery" class="headerlink" title="assurance of at-least-once delivery"></a>assurance of at-least-once delivery</h4><p>保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个包，发送者会保留包的复制，超时后就可以重传，一直重传直到达到limit times</p>
 <p>会面临一个两难问题，即超时是因为包发过去丢失，还是对方的ACK丢失</p>
 <p>问题在于怎么确实timeout：</p>
 <ul>
@@ -302,8 +299,7 @@
 <li>adaptive timer: 超时时间适应当时的网络环境，可以设置为RTT(往返时延)的150%，或者设置为上次失败时延的两倍</li>
 <li>NAK: 与ACK相反，即接收者主动说明自己没收到的包，这样timer放在接收者，重发由NAK决定</li>
 </ul>
-<h4 id="assurance-of-at-most-once-delivery">assurance of at-most-once delivery</h4>
-<p>接收者记住自己曾受到过的包，当再次收到这个包时就不必再处理这个包。但这样可能导致表无限增长，因此难点在于怎么设置tombstone；或者由应用设置幂等性的操作</p>
+<h4 id="assurance-of-at-most-once-delivery"><a href="#assurance-of-at-most-once-delivery" class="headerlink" title="assurance of at-most-once delivery"></a>assurance of at-most-once delivery</h4><p>接收者记住自己曾受到过的包，当再次收到这个包时就不必再处理这个包。但这样可能导致表无限增长，因此难点在于怎么设置tombstone；或者由应用设置幂等性的操作</p>
 <p>问题在于怎么做duplicate suppression：</p>
 <ul>
 <li>记录水位，但默认包按照nonce的顺序，这样只用记录一个数字，但old nonce会成为tombstone</li>
@@ -311,10 +307,8 @@
 </ul>
 <p>但当接收者崩溃重启后，这些duplicate suppression会丢失，而写入磁盘又会导致性能下降，因此tombstone会占用资源。因此最好由应用层支撑幂等性</p>
 <p>实践上在5个RTT之后删除记录的包（即发送者和接收者达成了协议），避免接收者记录过多东西</p>
-<h4 id="assurance-of-data-integrity">assurance of data integrity</h4>
-<p>为了保证数据完整性，需要添加checksum</p>
-<h4 id="segments-and-reassembly-of-long-messages">segments and reassembly of long messages</h4>
-<p>对于长消息需要拆分和合并，此时会有类似于&quot;message 914, segment 3 of 7&quot;的标识，这个标识也可以用于at-least-once和at-most-once的编号</p>
+<h4 id="assurance-of-data-integrity"><a href="#assurance-of-data-integrity" class="headerlink" title="assurance of data integrity"></a>assurance of data integrity</h4><p>为了保证数据完整性，需要添加checksum</p>
+<h4 id="segments-and-reassembly-of-long-messages"><a href="#segments-and-reassembly-of-long-messages" class="headerlink" title="segments and reassembly of long messages"></a>segments and reassembly of long messages</h4><p>对于长消息需要拆分和合并，此时会有类似于”message 914, segment 3 of 7”的标识，这个标识也可以用于at-least-once和at-most-once的编号</p>
 <p>但多个长消息的分块可能出现乱序：</p>
 <ul>
 <li>接收者只ACK in-order的包，抛弃其他包</li>
@@ -322,27 +316,29 @@
 <li>结合前两个方法，维护一个有限的缓存，缓存存不下就丢包，难点在于缓存开多大</li>
 </ul>
 <p>为了缓解坏包带来的问题，可以使用NAK，而不是等到坏包超时再重发。而TCP是基于ACK，而不是NAK</p>
-<h4 id="assurance-of-jitter-control">assurance of jitter control</h4>
-<p>每个包到达的时间不完全一样，网络不稳定时导致时延突然过大。解决策略为缓冲，等待一会儿</p>
-<p>缓冲的大小为：$Number_ of_ segment_ buffers = \frac{D_{long} - D_{short}}{D_{headway}}$，即统计一段时间内的最长时延和最短时延，相减并除以平均值</p>
-<h4 id="assurance-of-authenticity-and-privacy">assurance of authenticity and privacy</h4>
-<p>保证网络的安全性，因此需要身份验证。传统的方法为密钥加密，分为对称加密和非对称加密，非对称加密性能很差，用于建立连接时，后续使用对称加密</p>
-<h4 id="end-to-end-performance">end-to-end performance</h4>
-<p>考虑性能的同时需要保证网络不崩溃</p>
+<h4 id="assurance-of-jitter-control"><a href="#assurance-of-jitter-control" class="headerlink" title="assurance of jitter control"></a>assurance of jitter control</h4><p>每个包到达的时间不完全一样，网络不稳定时导致时延突然过大。解决策略为缓冲，等待一会儿</p>
+<p>缓冲的大小为：$Number_ of_ segment_ buffers &#x3D; \frac{D_{long} - D_{short}}{D_{headway}}$，即统计一段时间内的最长时延和最短时延，相减并除以平均值</p>
+<h4 id="assurance-of-authenticity-and-privacy"><a href="#assurance-of-authenticity-and-privacy" class="headerlink" title="assurance of authenticity and privacy"></a>assurance of authenticity and privacy</h4><p>保证网络的安全性，因此需要身份验证。传统的方法为密钥加密，分为对称加密和非对称加密，非对称加密性能很差，用于建立连接时，后续使用对称加密</p>
+<h4 id="end-to-end-performance"><a href="#end-to-end-performance" class="headerlink" title="end-to-end performance"></a>end-to-end performance</h4><p>考虑性能的同时需要保证网络不崩溃</p>
 <p>使用lock-step protocol很直观，但会导致发送者和接收者出现大面积的闲置时间，浪费带宽</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/9a3bd2db7db6c84fa185eaf35b6747ae.png" srcset="/img/loading.gif" lazyload class="" title="lock-step">
+
 <p>pipelining technique会在发送一个包后继续发第二个包，但全力发包可能导致接收者无力承受，需要两边进行协商，此外也可能导致包的丢失</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/50c127cdd61efe195f1af6be50b268a3.png" srcset="/img/loading.gif" lazyload class="" title="pipelining technique">
+
 <p>为了协商速度，引入fixed window，即在发包之前协定发送包的数量。但会出现idle</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/dbc77669a9d5b0b48dd10972fde4c088.png" srcset="/img/loading.gif" lazyload class="" title="fixed window">
+
 <p>因此在收到ACK时就可以发新的包了，即sliding window</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/3c30d83acfbf1e4c5bb3bf258f0b12aa.png" srcset="/img/loading.gif" lazyload class="" title="sliding window">
+
 <p>当有包丢失时，滑动窗口会卡住，直到超时重发并ACK，这是为了防止维护一个过大且未知大小的缓存</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/c788bfeae7808b3359bc1f6823801a1e.png" srcset="/img/loading.gif" lazyload class="" title="handling packet loss">
+
 <p>window size的大小公式为：$window_ size \geq round_ trip_ time \times bottleneck_ data_ rate$</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/1a9386d0973ad03af0d25936da44db15.png" srcset="/img/loading.gif" lazyload class="" title="window size">
-<h3 id="TCP-congestion-control">TCP congestion control</h3>
-<p>network layer可以直观体验到拥塞，但发送速度是由end-to-end layer控制的</p>
+
+<h3 id="TCP-congestion-control"><a href="#TCP-congestion-control" class="headerlink" title="TCP congestion control"></a>TCP congestion control</h3><p>network layer可以直观体验到拥塞，但发送速度是由end-to-end layer控制的</p>
 <p>当load过大时，不仅会出现拥塞，甚至会出现倒塌(collapse)，成功率反而急速下降</p>
 <p>为了控制拥塞，window size的另一个公式为：$window_ size \leq min(RTT \times bottleneck_ data_ rate, receiver_ buffer)$</p>
 <p>拥塞控制的基本思想(AIMD)为：缓慢线性增加congestion window，即没有丢包就加一，一旦丢包指数减小，即除以二。当有多个发包和收包的人时需要保证公平性</p>
@@ -354,9 +350,11 @@
 <li>超时，等待随机时间，重新开始slow start</li>
 </ul>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/91b390acfa6eb7a20dfaeef99bcbf1d5.png" srcset="/img/loading.gif" lazyload class="" title="retrofitting TCP">
+
 <p>为了提高利用率，在window size减小时可以减的少一点，因此在数据中心会单独适配TCP</p>
 <p>AIMD通过反复调整可以自动保证多个发送者的公平性，即不需要各个节点协商专门调整。这也是为什么window size下降时需要减半</p>
 <img src="/2025/12/16/CSE-lecture19-network-end2end/cf660ab350aa549916c11b1303a3dab7.png" srcset="/img/loading.gif" lazyload class="" title="AIMP leads to efficiency and fairness">
+
 <p>TCP的缺点在于：</p>
 <ul>
 <li>路由器buffer太大会导致长的延时</li>

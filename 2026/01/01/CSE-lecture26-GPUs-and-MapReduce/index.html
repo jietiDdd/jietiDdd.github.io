@@ -19,19 +19,21 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="The distributed (and parallel) programming on a single device &amp; MapReduce from single device to a distributed computing">
+    <meta name="description" content="The distributed (and parallel) programming on a single device &amp; MapReducefrom single device to a distributed computing单芯片的性能增长已经非常有限，因此引入分布式计算，使用很多张卡。但分布式计算在编程时需要考虑更多情况，因此使用分布式计算框架，让算法工程师不用自行考虑分布式">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture26:GPUs and MapReduce">
 <meta property="og:url" content="http://example.com/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="The distributed (and parallel) programming on a single device &amp; MapReduce from single device to a distributed computing">
+<meta property="og:description" content="The distributed (and parallel) programming on a single device &amp; MapReducefrom single device to a distributed computing单芯片的性能增长已经非常有限，因此引入分布式计算，使用很多张卡。但分布式计算在编程时需要考虑更多情况，因此使用分布式计算框架，让算法工程师不用自行考虑分布式">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/2e76abf49df20b56ce463485e30fc157.png">
 <meta property="article:published_time" content="2026-01-01T10:22:06.000Z">
-<meta property="article:modified_time" content="2026-01-01T13:37:40.169Z">
+<meta property="article:modified_time" content="2026-01-01T15:36:08.706Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/2e76abf49df20b56ce463485e30fc157.png">
   
   
   
@@ -224,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          5 字
+          1k 字
         
       </span>
     
@@ -235,7 +237,7 @@
         
         
         
-          1 分钟
+          9 分钟
         
       </span>
     
@@ -277,8 +279,66 @@
             
               <div class="markdown-body">
                 
-                <h2 id="The-distributed-and-parallel-programming-on-a-single-device-MapReduce">The distributed (and parallel) programming on a single device &amp; MapReduce</h2>
-<h3 id="from-single-device-to-a-distributed-computing">from single device to a distributed computing</h3>
+                <h2 id="The-distributed-and-parallel-programming-on-a-single-device-MapReduce"><a href="#The-distributed-and-parallel-programming-on-a-single-device-MapReduce" class="headerlink" title="The distributed (and parallel) programming on a single device &amp; MapReduce"></a>The distributed (and parallel) programming on a single device &amp; MapReduce</h2><h3 id="from-single-device-to-a-distributed-computing"><a href="#from-single-device-to-a-distributed-computing" class="headerlink" title="from single device to a distributed computing"></a>from single device to a distributed computing</h3><p>单芯片的性能增长已经非常有限，因此引入分布式计算，使用很多张卡。但分布式计算在编程时需要考虑更多情况，因此使用分布式计算框架，让算法工程师不用自行考虑分布式计算的细节问题</p>
+<p>对于数据中心，为了统计网站访问量，需要记录巨大的log，现在的任务是找到其中最热的网页推荐给用户。对于单机系统，使用单线程的命令行指令即可找到；而对于海量的log entry只能使用分布式，使用RPC分区并将计算分发给多台设备。难点在于：怎么高效地传输海量数据，怎么在带宽受限时高效地回收RPC，怎么应对设备出错，以及根据设备状态合理实现分区平衡</p>
+<p>因此要解决的问题有：</p>
+<ul>
+<li>在节点间高效传数据</li>
+<li>节点协调同步</li>
+<li>容错</li>
+<li>使用locality减少数据传输</li>
+<li>充分利用资源，即平衡快慢设备</li>
+</ul>
+<h3 id="MapReduce-simplified-data-processing-on-large-clusters"><a href="#MapReduce-simplified-data-processing-on-large-clusters" class="headerlink" title="MapReduce: simplified data processing on large clusters"></a>MapReduce: simplified data processing on large clusters</h3><p>MapReduce是一种distributed batch processing system，使用函数式编程，其并行度很高：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs LISP">Map(<span class="hljs-name">function</span>, set of values)<br>Reduce(<span class="hljs-name">function</span>, set of values)<br></code></pre></td></tr></table></figure>
+
+<p>Map将function作用于set的每个value，Reduce使用function将所有value结合在一起：</p>
+<figure class="highlight lisp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs LISP">(<span class="hljs-name">map</span> #&#x27;length&#x27; (() (<span class="hljs-name">a</span>) (<span class="hljs-name">a</span> b) (<span class="hljs-name">a</span> b c))) -&gt; (<span class="hljs-number">0</span> <span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span>)<br>(<span class="hljs-name">reduce</span> #&#x27;+&#x27; (<span class="hljs-number">1</span> <span class="hljs-number">2</span> <span class="hljs-number">3</span> <span class="hljs-number">4</span> <span class="hljs-number">5</span>)) -&gt; <span class="hljs-number">15</span><br></code></pre></td></tr></table></figure>
+
+<p>只要用户将操作分为Map和Reduce（其中Reduce可以使用Map后的数据），底层就可以优化前面提到的问题：</p>
+<ul>
+<li>在节点间高效传数据：根据数据被用于Map还是Reduce来进行优化，如将Map放在GFS节点上，Reduce放在Map机房</li>
+<li>节点协调同步：Reducer在Mapper后调度</li>
+<li>容错：函数是无状态的，重做即可</li>
+<li>使用locality减少数据传输：根据数据的位置，将Map和Reduce放在同一机器</li>
+<li>充分利用资源，即平衡快慢设备：将慢机器上的Map任务分配给快机器即可，但Reduce对并行不友好</li>
+</ul>
+<p>google的MapReduce进一步优化，Map的结果为kv对，此时Reduce根据key来进行分区，从而实现Reduce的并行</p>
+<p>有了MapReduce后，用户只需要考虑算法即可</p>
+<p>如对于word count，MapReduce可以这样设计：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python">Map (<span class="hljs-built_in">input</span>) <span class="hljs-comment"># a shard of file</span><br><span class="hljs-keyword">for</span> each word w <span class="hljs-keyword">in</span> <span class="hljs-built_in">input</span><br>    EmitIntermediate (w, <span class="hljs-string">&quot;1&quot;</span>);<br><br>Reduce (String key, Iterator values)<br>    <span class="hljs-built_in">int</span> result = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">for</span> each v <span class="hljs-keyword">in</span> values<br>        result += ParseInt (v);<br>    emit (AsString (result));<br></code></pre></td></tr></table></figure>
+
+<p>MapReduce的执行流为：</p>
+<ul>
+<li>Map Worker:<ul>
+<li>Map: 数据分片为shard后调用Map函数，生成键值对</li>
+<li>Partition: 调用分区函数，根据key将数据分配给不同的Reducer，实现负载均衡</li>
+</ul>
+</li>
+<li>Reduce Worker:<ul>
+<li>Sort: 对键排序，从而将同一个键的值聚合在一起</li>
+<li>Reduce: 对相同键对应的值进行聚合操作，得到最终结果</li>
+</ul>
+</li>
+</ul>
+<img src="/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/2e76abf49df20b56ce463485e30fc157.png" srcset="/img/loading.gif" lazyload class="" title="MapReduce">
+
+<ul>
+<li>step1: 对文件分片为shard，从而分配给不同的Map Reducer，在GFS场景下为64MB，适配chunk size，降低RPC通信次数，并保证并行度</li>
+<li>step2: 在集群上分配出一个master和多个workers，即remote fork</li>
+<li>step3: 将shard发送给Map Worker，并调用Map函数，生成的键值对暂存在内存中</li>
+<li>step4: 生成IF(intermediate files)，分为多个partition，这是根据分区函数划分的</li>
+<li>step5: Reducer Worker根据分区从Map Worker中获取数据。为了防止数据过多使Reducer Worker内存溢出，需要进行排序，只需要将同一个key的值都拿过来，不需要一次性拿走所有的key</li>
+<li>step6: Reducer Worker进行聚合并直接输出结果</li>
+</ul>
+<p>MapReduce需要进行容错，不需要用户进行log标记（类似于transaction)，并提供GFS，其可以抽象成不会挂的文件系统：</p>
+<ul>
+<li>Worker failure: 类似于raft使用log将会导致性能很差，因此直接进行重做(re-execution)即可，因为Map和Reduce是无状态的，且不会被用户感知</li>
+<li>Master failure: 重做不是一个好的策略，因为时间开销过大。使用高的checkpoint记录中间状态即可</li>
+<li>bad records: 可能因为用户提供的Map或Reduce本身出错，当反复挂时，直接跳过</li>
+</ul>
+<p>locality用于减少网络访问，需要将计算放在离存储更近的地方。而google的计算节点也是GFS chunkserver，而Reducer在Mapper的数据获取可以通过整形规划来进行优化</p>
+<p>对于负载均衡，由于任务可以重做，因此采取first win即可</p>
 
                 
               </div>
@@ -391,6 +451,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2026/01/01/CSE-lecture27-Distributed-Training/" title="CSE_lecture27:Distributed Training">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CSE_lecture27:Distributed Training</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">

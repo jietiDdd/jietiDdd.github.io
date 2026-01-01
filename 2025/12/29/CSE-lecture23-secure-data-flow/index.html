@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Secure Data Flow taint tracking 为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可">
+    <meta name="description" content="Secure Data Flowtaint tracking为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可能翻">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture23:secure data flow">
 <meta property="og:url" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Secure Data Flow taint tracking 为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可">
+<meta property="og:description" content="Secure Data Flowtaint tracking为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可能翻">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/581c203551a2c694c632047075b195ae.png">
 <meta property="og:image" content="http://example.com/2025/12/29/CSE-lecture23-secure-data-flow/aa2cf2f07c7cfd13c29973b2e4629229.png">
@@ -231,7 +231,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          863 字
+          864 字
         
       </span>
     
@@ -284,13 +284,10 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Secure-Data-Flow">Secure Data Flow</h2>
-<h3 id="taint-tracking">taint tracking</h3>
-<p>为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记</p>
+                <h2 id="Secure-Data-Flow"><a href="#Secure-Data-Flow" class="headerlink" title="Secure Data Flow"></a>Secure Data Flow</h2><h3 id="taint-tracking"><a href="#taint-tracking" class="headerlink" title="taint tracking"></a>taint tracking</h3><p>为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记</p>
 <p>对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可能翻四十倍</p>
 <p>taintdroid对taint的操作进行分层，高层只使用粗粒度的taint，包括对整个数据库、对整个文件、对整条消息加taint；而只对java虚拟机做细粒度的变量级的taint跟踪；而对于cpp库则提前进行分析，届时只需根据调用关系得到taint情况即可。这样就实现了性能的优化</p>
-<h3 id="defending-malicious-input">defending malicious input</h3>
-<p>一个攻击者根据以下步骤寻找bug：</p>
+<h3 id="defending-malicious-input"><a href="#defending-malicious-input" class="headerlink" title="defending malicious input"></a>defending malicious input</h3><p>一个攻击者根据以下步骤寻找bug：</p>
 <ul>
 <li>寻找契机</li>
 <li>寻找冷门部分的bug，因为测试可能性很小</li>
@@ -298,43 +295,44 @@
 <li>追踪input data</li>
 </ul>
 <p>taintcheck用于监测input data在使用taint后的整个流动过程。当用于IO量大时overhead受影响不够明显</p>
-<h3 id="secure-channel">secure channel</h3>
-<p>跨机器传输数据需要进行加密</p>
+<h3 id="secure-channel"><a href="#secure-channel" class="headerlink" title="secure channel"></a>secure channel</h3><p>跨机器传输数据需要进行加密</p>
 <p>对称加密为：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">encript(key, message) -&gt; ciphertext<br>encript(key, ciphertext) -&gt; message<br></code></pre></td></tr></table></figure>
+
 <p>即加密和解密使用的密码一致</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python">MAC(key, message) -&gt; token<br></code></pre></td></tr></table></figure>
+
 <p>即使拥有key，也无法通过token得到message，类似于加密哈希。两者联合使用，可以在获取message的同时判断是否被篡改</p>
 <p>问题在于replay attack可以窃取到发送的信息进行重发</p>
 <img src="/2025/12/29/CSE-lecture23-secure-data-flow/581c203551a2c694c632047075b195ae.png" srcset="/img/loading.gif" lazyload class="" title="replay attack">
+
 <p>通过在message中加入sequence来避免replay attack</p>
 <p>此时reflection attack利用发送者和接收者的counter不一致，将发送者的消息发回发送者</p>
 <img src="/2025/12/29/CSE-lecture23-secure-data-flow/aa2cf2f07c7cfd13c29973b2e4629229.png" srcset="/img/loading.gif" lazyload class="" title="reflection attack">
+
 <p>使用两个密钥来进行加密，A给B发送的消息用key1加密，B给A发送的消息用key2加密</p>
-<p>使用Diffie-Hellman key exchange让A和B共享密钥，A持有随机数a，B持有随机数b，共享质数p和随机数g后计算 $key = g^{ab} \ mod \ p$ 即可</p>
+<p>使用Diffie-Hellman key exchange让A和B共享密钥，A持有随机数a，B持有随机数b，共享质数p和随机数g后计算 $key &#x3D; g^{ab} \ mod \ p$ 即可</p>
 <img src="/2025/12/29/CSE-lecture23-secure-data-flow/d580db254b592007cdfdb88286581e0b.png" srcset="/img/loading.gif" lazyload class="" title="share key">
+
 <p>但攻击者可以拦截key的分享过程，进而参与到A和B的通信过程中去</p>
 <img src="/2025/12/29/CSE-lecture23-secure-data-flow/99e14f22d63a81c905b54363dbfd293c.png" srcset="/img/loading.gif" lazyload class="" title="man-in-the-middle">
+
 <p>这种攻击方法无解，因此引入RSA，即非对称加密，使用其中一个密钥加密时，必须用另一个密钥解密</p>
 <p>在加密和解密时，加密用公钥，解密用私钥；在签名和验证时，签名用私钥，验证用公钥</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python">sign(secret_key, message) -&gt; sig<br>verify(public_key, message, sig) -&gt; yes/no<br></code></pre></td></tr></table></figure>
-<p>public_key公开，A给B通信时使用公钥发送消息，从而验证B的身份。获取途径为，B提供证书(CA)，其记录公钥，并包含签名，届时即可验证该签名</p>
-<h3 id="privacy">privacy</h3>
-<p>既要保证使用数据，又要保证数据不被窃取</p>
-<h4 id="OT-obvious-transfer">OT: obvious transfer</h4>
-<p>假设A持有两个电话号码，现在B希望获取其中之一，需要保证B不知道另一个电话号码，也不让A知道B选的哪个</p>
-<img src="/2025/12/29/CSE-lecture23-secure-data-flow/38babf70f9fa8ea26e73fb54a3177825.png" srcset="/img/loading.gif" lazyload class="" title="1-out-of-2 OT">
-<h4 id="DP-differential-privacy">DP: differential privacy</h4>
-<p>B持有每个人的详细工资信息，A希望进行统计，但需要保证A无法知道具体每个人的工资信息。为了防止A通过作差反推具体每个人的工资信息，只提供约数；同时限制提问次数</p>
-<h4 id="secret-sharing">secret sharing</h4>
-<p>希望将秘密分为n份，当有k个人时即可恢复秘密</p>
-<h4 id="HE-homomorphic-encryption">HE: homomorphic encryption</h4>
-<p>同态加密后的数据依然可以参与计算并提供给计算资源，届时解密即可</p>
-<img src="/2025/12/29/CSE-lecture23-secure-data-flow/130582f551a0c5958281b9999258d1cb.png" srcset="/img/loading.gif" lazyload class="" title="HE">
-<h4 id="TEE-trusted-execution-environment">TEE: trusted execution environment</h4>
-<p>计算资源只在cache使用明文，memory放置密文，而cache极难窃取</p>
-<h3 id="process-of-bug-report">process of bug report</h3>
 
+<p>public_key公开，A给B通信时使用公钥发送消息，从而验证B的身份。获取途径为，B提供证书(CA)，其记录公钥，并包含签名，届时即可验证该签名</p>
+<h3 id="privacy"><a href="#privacy" class="headerlink" title="privacy"></a>privacy</h3><p>既要保证使用数据，又要保证数据不被窃取</p>
+<h4 id="OT-obvious-transfer"><a href="#OT-obvious-transfer" class="headerlink" title="OT: obvious transfer"></a>OT: obvious transfer</h4><p>假设A持有两个电话号码，现在B希望获取其中之一，需要保证B不知道另一个电话号码，也不让A知道B选的哪个</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/38babf70f9fa8ea26e73fb54a3177825.png" srcset="/img/loading.gif" lazyload class="" title="1-out-of-2 OT">
+
+<h4 id="DP-differential-privacy"><a href="#DP-differential-privacy" class="headerlink" title="DP: differential privacy"></a>DP: differential privacy</h4><p>B持有每个人的详细工资信息，A希望进行统计，但需要保证A无法知道具体每个人的工资信息。为了防止A通过作差反推具体每个人的工资信息，只提供约数；同时限制提问次数</p>
+<h4 id="secret-sharing"><a href="#secret-sharing" class="headerlink" title="secret sharing"></a>secret sharing</h4><p>希望将秘密分为n份，当有k个人时即可恢复秘密</p>
+<h4 id="HE-homomorphic-encryption"><a href="#HE-homomorphic-encryption" class="headerlink" title="HE: homomorphic encryption"></a>HE: homomorphic encryption</h4><p>同态加密后的数据依然可以参与计算并提供给计算资源，届时解密即可</p>
+<img src="/2025/12/29/CSE-lecture23-secure-data-flow/130582f551a0c5958281b9999258d1cb.png" srcset="/img/loading.gif" lazyload class="" title="HE">
+
+<h4 id="TEE-trusted-execution-environment"><a href="#TEE-trusted-execution-environment" class="headerlink" title="TEE: trusted execution environment"></a>TEE: trusted execution environment</h4><p>计算资源只在cache使用明文，memory放置密文，而cache极难窃取</p>
+<h3 id="process-of-bug-report"><a href="#process-of-bug-report" class="headerlink" title="process of bug report"></a>process of bug report</h3>
                 
               </div>
             

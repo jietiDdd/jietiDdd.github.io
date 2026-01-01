@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove">
+    <meta name="description" content="ROP and CFIsecurity principles least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer overf">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture22:ROP and CFI">
 <meta property="og:url" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove">
+<meta property="og:description" content="ROP and CFIsecurity principles least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer overf">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png">
 <meta property="og:image" content="http://example.com/2025/12/28/CSE-lecture22-ROP-and-CFI/38b0bcd825ec5ce442e5be287bcf9154.png">
@@ -282,28 +282,25 @@
             
               <div class="markdown-body">
                 
-                <h2 id="ROP-and-CFI">ROP and CFI</h2>
-<h3 id="security-principles">security principles</h3>
-<ul>
+                <h2 id="ROP-and-CFI"><a href="#ROP-and-CFI" class="headerlink" title="ROP and CFI"></a>ROP and CFI</h2><h3 id="security-principles"><a href="#security-principles" class="headerlink" title="security principles"></a>security principles</h3><ul>
 <li>least privilege: 只提供完成事件的最小权限</li>
 <li>least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权</li>
 <li>users make mistakes: 安全要考虑用户犯的诸多错误</li>
 <li>cost of security: 安全的成本不能太高</li>
 </ul>
-<h3 id="stack-buffer-overflow">stack buffer overflow</h3>
-<p>攻击者往往从控制流或数据的角度来攻击</p>
+<h3 id="stack-buffer-overflow"><a href="#stack-buffer-overflow" class="headerlink" title="stack buffer overflow"></a>stack buffer overflow</h3><p>攻击者往往从控制流或数据的角度来攻击</p>
 <p>stack buffer overflow通过栈溢出的手段修改return跳转的地址，从而返回到攻击者设计的恶意代码部分</p>
 <p>防御手段为DEP(data execution prevention)，即数据段不可执行，即设置为non-executable，需要修改NX bit</p>
 <p>此时攻击者使用ROP(return-oriented programming)，寻找原有的代码碎片(gadget)，这些碎片都以return结尾，在栈上注入地址指向这些碎片，从而将这些碎片代码合并在一起</p>
 <img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/f4679bf5a22470dfbbb5445dae223a34.png" srcset="/img/loading.gif" lazyload class="" title="ROP">
+
 <p>防御手段有：</p>
 <ul>
 <li>隐藏binary file，从而无法获取gadget</li>
 <li>ASLR将代码放在随机的地址</li>
 <li>在return addr前面放置canary，覆盖addr时也会覆盖canary，通过检查canary来判断是否被攻击</li>
 </ul>
-<h3 id="CFI-control-flow-integrity">CFI: control flow integrity</h3>
-<p>设置合法的控制流，防止控制流被劫持，这需要描述control flow graph，将其和可执行的二进制文件合并后得到一个self-checking program，加入了多个检查点</p>
+<h3 id="CFI-control-flow-integrity"><a href="#CFI-control-flow-integrity" class="headerlink" title="CFI: control flow integrity"></a>CFI: control flow integrity</h3><p>设置合法的控制流，防止控制流被劫持，这需要描述control flow graph，将其和可执行的二进制文件合并后得到一个self-checking program，加入了多个检查点</p>
 <p>攻击者往往从跳转部分劫持，大部分都是direct branches，少部分的indirect branches绝大多数也是跳到那一两个地址：</p>
 <ul>
 <li>direct branches: call或jump后跟着静态的地址</li>
@@ -311,14 +308,16 @@
 </ul>
 <p>CFI通过二进制重写的方法将正确的跳转思路内嵌到代码中做检查</p>
 <img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/38b0bcd825ec5ce442e5be287bcf9154.png" srcset="/img/loading.gif" lazyload class="" title="CFI example">
+
 <p>但这需要保证所有的代码都被patch，对于库代码可能出现问题。因此使用prefetchnta，访问内存地址，如果不合法就等价于nop，比较4字节的prefetchnta后的数字即可</p>
 <img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/ce9dbac48e6d32b4dd2a707f7f48401e.png" srcset="/img/loading.gif" lazyload class="" title="prefetchnta">
+
 <p>假设A可以到C，B可以到C和D，此时C和D的tag一样，这就会导致A可以非法访问D，如果加入判断，会导致性能下降</p>
 <p>因此引入shadow call stack，即单独维护一个存放return address的栈，这是由软件实现的，从而通过比较软件和硬件栈中的地址来判断stack over flow是否出现。为了提升性能，直接使用Intel CET维护硬件层面的shadow call stack</p>
 <p>CFI保证了stack over flow的防御，但不能防御数据修改，如函数指针，或权限位</p>
 <img src="/2025/12/28/CSE-lecture22-ROP-and-CFI/2d9c5ec0e3e554dcb081e593631f4a8b.png" srcset="/img/loading.gif" lazyload class="" title="possible execution of memory">
-<h3 id="blind-ROP">blind ROP</h3>
-<p>流程为：</p>
+
+<h3 id="blind-ROP"><a href="#blind-ROP" class="headerlink" title="blind ROP"></a>blind ROP</h3><p>流程为：</p>
 <ul>
 <li>禁止ASLR，因为在接受socket时会folk，此时地址一样，并没有重启并让地址随机偏移</li>
 <li>窃取binary：注入数据测试什么时候触发stack over flow，再继续通过是否崩溃一位一位猜测地址（这是因为canary不变）</li>

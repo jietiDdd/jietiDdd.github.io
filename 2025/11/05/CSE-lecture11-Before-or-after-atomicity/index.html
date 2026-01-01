@@ -19,12 +19,12 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Before-or-after atomicity and Serializability 并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system">
+    <meta name="description" content="Before-or-after atomicity and Serializability并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system t">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture11:Before or after atomicity">
 <meta property="og:url" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="Before-or-after atomicity and Serializability 并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system">
+<meta property="og:description" content="Before-or-after atomicity and Serializability并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型 假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system t">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/9ae51ac6e118f6b85e11b9b1abcf766c.png">
 <meta property="og:image" content="http://example.com/2025/11/05/CSE-lecture11-Before-or-after-atomicity/dc58cfd6cbc36b4bbde1109078932e9c.png">
@@ -285,8 +285,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="Before-or-after-atomicity-and-Serializability">Before-or-after atomicity and Serializability</h2>
-<p>并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型</p>
+                <h2 id="Before-or-after-atomicity-and-Serializability"><a href="#Before-or-after-atomicity-and-Serializability" class="headerlink" title="Before-or-after atomicity and Serializability"></a>Before-or-after atomicity and Serializability</h2><p>并发能提升吞吐量，但是会危害正确性，因此需要引入before-or-after模型</p>
 <p>假设有一个单线程的银行系统，此时请求响应的时间不会仅由RPC和请求处理时间的时间决定，而是由吞吐量决定的。当有多个请求发过来时，请求会陷入排队，出队后才会处理，因此当request arrival rate大于system throughput时，延迟会爆炸</p>
 <p>使用concurrency来scaling throughput：</p>
 <ul>
@@ -295,12 +294,15 @@
 </ul>
 <p>但并发操作容易引发正确性问题：</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/9ae51ac6e118f6b85e11b9b1abcf766c.png" srcset="/img/loading.gif" lazyload class="" title="race condition">
+
 <p>race condition难以控制，同时不确定性导致难以发现和debug</p>
 <p>保证在并发情况下，能够让效果等价于一系列操作的串行执行，因此需要维护一些操作整体为原子的，挡住可能会引发race condition的其他操作</p>
 <p>使用全局锁(global lock)可以达到这个效果，但会导致性能很差，如导致不会引发race contidion的操作阻塞，以及拿锁本身也会有开销。因此需要减小锁的范围，比如不同的数据记录（如不同账户）使用不同的锁(fine-grained lock)，但缺点是不能严格保证before-or-after，如存在访问多个数据的操作</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/dc58cfd6cbc36b4bbde1109078932e9c.png" srcset="/img/loading.gif" lazyload class="" title="accessing multiple records">
+
 <p>对于要处理多个数据的操作，应当在开头拿到所有锁，在结尾才释放掉所有锁</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/0c6e78a463ada00690344a1b30d4697b.png" srcset="/img/loading.gif" lazyload class="" title="acquire all locks first, and release them at last">
+
 <p>这样的缺点是拿锁的时间会非常长，因此引入two-phase locking(2PL)，即只保证操作在释放某一个锁后不再拿任何新的锁，此时可以实现不在一开头拿完所有锁，也不用在最后才释放所有锁</p>
 <p>global lock, fine-grained lock, 2PL lock都能保证before-or-after atomicity</p>
 <p>判别是否保证before-or-after的一种方法是能否找到一个等价的串行执行，这不仅要保证写的正确性，也要保证读的正确性，即判别view serializability时，需要找到一个view equivalent的serial schedule，满足每个操作的读正确，最终写正确</p>
@@ -312,11 +314,14 @@
 </ul>
 <p>conflict serializability只需要找到所有conflict的顺序等价于某一个串行的conflict关系。可以认为事务是节点，conflict是有向边（方向为第一个操作发生在哪个事务中），只要其为无环图，就能找到一个拓扑排序，从而实现conflict serializability</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/497c9e20e7ba2156b8884c8dd142b907.png" srcset="/img/loading.gif" lazyload class="" title="conflict serializability">
+
 <p>但事实上就算有环，也可以找到一个等价的串行执行（写最终正确，每个操作的读正确），因此认为 $\text{view serializability} \supset \text{conflict serializability}$ ，conflict serializability虽然定义更严格，但实现更容易</p>
 <p>2PL能够实现conflict serializability，可以用反证法证明</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/c530ec45c0012f1bbd2d044c35cf8c25.png" srcset="/img/loading.gif" lazyload class="" title="proof of 2PL">
+
 <p>然而2PL其实并不见得一定能保证conflict serializability，因为可能出现错拿锁漏拿锁，比如下图新插入的老师没有涨薪，因为锁是存在在成员内部的，即幻读问题(phantom problem)</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/d345ab3b5e149d0ee280271110311b8d.png" srcset="/img/loading.gif" lazyload class="" title="phantom problem">
+
 <p>解决幻读问题可以用以下方法：</p>
 <ul>
 <li>谓词锁(predicate lock)，即锁住满足某个条件的所有数据，但开销大</li>
@@ -325,6 +330,7 @@
 </ul>
 <p>2PL的另一个问题就是死锁。2PL本身是一个悲观锁(pessimistic)，即认为race condition一定发生，故访问数据前一定上锁，但这样可能引发死锁，即互相等待对方释放锁</p>
 <img src="/2025/11/05/CSE-lecture11-Before-or-after-atomicity/3aec3c88631164596f4a50c9e4a4c30f.png" srcset="/img/loading.gif" lazyload class="" title="deadlock">
+
 <p>死锁的解决方法如下，但事实上都各有各的问题：</p>
 <ul>
 <li>让大家都按照同一个顺序访问各个数据(pre-defined order)，但难以提前知道要访问哪些数据</li>

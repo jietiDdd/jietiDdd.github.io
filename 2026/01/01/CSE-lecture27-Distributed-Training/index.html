@@ -19,29 +19,25 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="DNS &amp; Naming Schemethe design of DNS实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使用不">
+    <meta name="description" content="Distributed Computing frameworks: MapReduce, computation graph &amp; Distributed trainingMapReduce也有其局限性：  单个MapReduce难以实现排序等应用，因此使用多个MapReduce并串联在一起 chaining multiple MapReduce tasks并不是好的解决方法，因为需要拆分，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSE_lecture20:network-dns-cdn">
-<meta property="og:url" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/index.html">
+<meta property="og:title" content="CSE_lecture27:Distributed Training">
+<meta property="og:url" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="DNS &amp; Naming Schemethe design of DNS实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使用不">
+<meta property="og:description" content="Distributed Computing frameworks: MapReduce, computation graph &amp; Distributed trainingMapReduce也有其局限性：  单个MapReduce难以实现排序等应用，因此使用多个MapReduce并串联在一起 chaining multiple MapReduce tasks并不是好的解决方法，因为需要拆分，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/dd45cca283700199eacb809b2526a555.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/aff0ec72481cde897354d02a5a0cdec3.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/e9ea4893b8ccc124137c7b945201a235.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/368c7cb657384e0485ec7e7a35cb1ac4.png">
-<meta property="og:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/6eb613edf6ddc936bcb4d6d1467f06ba.png">
-<meta property="article:published_time" content="2025-12-17T04:30:27.000Z">
-<meta property="article:modified_time" content="2025-12-17T08:21:45.715Z">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/1af6d7b66a8677357c192dc4f7c0dcb4.png">
+<meta property="article:published_time" content="2026-01-01T15:05:49.000Z">
+<meta property="article:modified_time" content="2026-01-01T15:57:06.795Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/dd45cca283700199eacb809b2526a555.png">
+<meta name="twitter:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/1af6d7b66a8677357c192dc4f7c0dcb4.png">
   
   
   
-  <title>CSE_lecture20:network-dns-cdn - jietiDdd的个人博客</title>
+  <title>CSE_lecture27:Distributed Training - jietiDdd的个人博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -207,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="CSE_lecture20:network-dns-cdn"></span>
+            <span id="subtitle" data-typed-text="CSE_lecture27:Distributed Training"></span>
           
         </div>
 
@@ -218,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-12-17 12:30" pubdate>
-          2025年12月17日 下午
+        <time datetime="2026-01-01 23:05" pubdate>
+          2026年1月1日 晚上
         </time>
       </span>
     
@@ -230,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          885 字
+          224 字
         
       </span>
     
@@ -241,7 +237,7 @@
         
         
         
-          8 分钟
+          2 分钟
         
       </span>
     
@@ -278,75 +274,23 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">CSE_lecture20:network-dns-cdn</h1>
+            <h1 id="seo-header">CSE_lecture27:Distributed Training</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="DNS-Naming-Scheme"><a href="#DNS-Naming-Scheme" class="headerlink" title="DNS &amp; Naming Scheme"></a>DNS &amp; Naming Scheme</h2><h3 id="the-design-of-DNS"><a href="#the-design-of-DNS" class="headerlink" title="the design of DNS"></a>the design of DNS</h3><p>实现hostname和IP地址的转换，从而实现用户友好</p>
-<p>一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求</p>
-<p>为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使用不同的name server解析</p>
-<p>name server分为：</p>
+                <h2 id="Distributed-Computing-frameworks-MapReduce-computation-graph-Distributed-training"><a href="#Distributed-Computing-frameworks-MapReduce-computation-graph-Distributed-training" class="headerlink" title="Distributed Computing frameworks: MapReduce, computation graph &amp; Distributed training"></a>Distributed Computing frameworks: MapReduce, computation graph &amp; Distributed training</h2><p>MapReduce也有其局限性：</p>
 <ul>
-<li>root zone由ICANN管理，非盈利</li>
-<li>“.com” zone由VeriSign管理，盈利</li>
-<li>从root zone到”.com” zone一层一层管理下面的域名</li>
+<li>单个MapReduce难以实现排序等应用，因此使用多个MapReduce并串联在一起</li>
+<li>chaining multiple MapReduce tasks并不是好的解决方法，因为需要拆分，同时容错难度上升，且在任务之前存在反复写入GFS的开销</li>
 </ul>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/dd45cca283700199eacb809b2526a555.png" srcset="/img/loading.gif" lazyload class="" title="DNS hierarchy">
+<h3 id="from-MapReduce-to-DAG-computation-graph"><a href="#from-MapReduce-to-DAG-computation-graph" class="headerlink" title="from MapReduce to DAG(computation graph)"></a>from MapReduce to DAG(computation graph)</h3><p>计算图相当于将任务和数据抽象成节点，构成有向无环图，此时Reducer知道哪些节点需要它的output，因此只需要放在内存即可，不用访问GFS，减小开销</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/1af6d7b66a8677357c192dc4f7c0dcb4.png" srcset="/img/loading.gif" lazyload class="" title="DAG">
 
-<p>以”ipads.se.sjtu.edu.cn”为例，lookup算法为：</p>
-<ul>
-<li>从root开始，告诉我们”cn”的name server的IP</li>
-<li>“cn” name server告诉我们”edu.cn”的name server的IP</li>
-<li>以此类推，直到知道”ipads.se.sjtu.edu.cn”的IP</li>
-</ul>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/aff0ec72481cde897354d02a5a0cdec3.png" srcset="/img/loading.gif" lazyload class="" title="DNS lookup">
-
-<p>即每一层的name server并不需要记住过多的域名，只需要记录下一层的几个节点即可</p>
-<p>DNS的name都是全局的，因此没有上下文的问题。域名使用”.”分割，因此实际为”ipads.se.sjtu.edu.cn.”，最后的点表示root</p>
-<p>每个zone会对应多个name server，从而提高容错</p>
-<p>look-up算法可以进行改进：</p>
-<ul>
-<li>第一个DNS请求可以到任何name server，降低root的压力，这是依靠缓存实现的</li>
-<li>recursion: 降低client的压力，即由name server来帮忙递归找域名地址，好处是更快，缺点是请求是有状态的，因此只用于小范围<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/e9ea4893b8ccc124137c7b945201a235.png" srcset="/img/loading.gif" lazyload class="" title="DNS recursion"></li>
-<li>caching: 将访问过的地址缓存在DNS client和name server中，但会设置TTL</li>
-</ul>
-<h3 id="behind-the-DNS-design"><a href="#behind-the-DNS-design" class="headerlink" title="behind the DNS design"></a>behind the DNS design</h3><p>DNS设计的优点有：</p>
-<ul>
-<li>hierarchy的设计让管理分化，只需要将新的域名分配给直属的上级name server，简化了域名的管理</li>
-<li>global name防止了DNS指定上下文，而是产生一个唯一的域名</li>
-<li>lookup的性能要求不高，使得性能具备scalable</li>
-<li>一个zone有多个name server，提高了容错</li>
-</ul>
-<p>DNS设计的缺点有：</p>
-<ul>
-<li>谁去控制root zone和”com” zone等等？</li>
-<li>root server的负载依然很高，尤其是当访问不存在的域名时，可能出现缓存穿透</li>
-<li>client无法确定DNS服务器的响应是否正确</li>
-</ul>
-<h3 id="content-distribution"><a href="#content-distribution" class="headerlink" title="content distribution"></a>content distribution</h3><p>需要减小访问网络上大型文件的延迟，client端可以使用cache，而server端也会使用cache，但由于文件很大可能装不下，因此额外使用一些服务器专门用于缓存大型文件，即CDN</p>
-<p>CDN离发出请求的client越近越好，content提供者会进行预热，在大量请求到达之前将大型文件提前缓存在CDN上，从而提升性能</p>
-<p>HTTP redirection中，一个服务器收到请求后，会让client redirect到一台更近的服务器。好处是可以细粒度分发资源，缺点是增加了一次RTT，但对于大型文件而言可以接受</p>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/368c7cb657384e0485ec7e7a35cb1ac4.png" srcset="/img/loading.gif" lazyload class="" title="HTTP redirection">
-
-<p>也可以通过DNS选择服务器，即在资源对应的多个IP地址中选择更近的那个。好处是降低时延，缺点是强依赖IP地址</p>
-<img src="/2025/12/17/CSE-lecture20-network-dns-cdn/6eb613edf6ddc936bcb4d6d1467f06ba.png" srcset="/img/loading.gif" lazyload class="" title="DNS-based server selection">
-
-<h3 id="naming-scheme"><a href="#naming-scheme" class="headerlink" title="naming scheme"></a>naming scheme</h3><p>naming schemes包括：names, values, look-up algorithm</p>
-<p>binding即实现name和value的绑定，可以是一对一，也可以是一对多、多对一；而resolve实现了name的解析</p>
-<p>naming context包括两大类：context和name分开，如inode；context是name的一部分，内嵌在其中，如邮件。当name space只有一个context时为universal name spaces，全球唯一</p>
-<p>决定context的方法有：</p>
-<ul>
-<li>硬编码在resolver里面，如universal name spaces</li>
-<li>从环境变量中寻找，但需要正确的context</li>
-</ul>
-<p>name mapping的算法有：</p>
-<ul>
-<li>查表</li>
-<li>递归查找</li>
-<li>并列查找，如<code>$PATH</code>，冒号隔开的是并列关系</li>
-</ul>
-
+<p>不存在依赖关系的节点可以并行计算</p>
+<p>DAG的容错更加复杂，需要级联的恢复。对于小型计算任务，优先使用re-execution；对于大型计算任务，优先使用checkpoint</p>
+<p>DAG看似比MapReduce更通用，但不同应用的并行度不一样，怎么生成高并行度的DAG也不一样</p>
+<h4 id="how-to-express-AI-program-to-distributed-framework-dataflow-graph"><a href="#how-to-express-AI-program-to-distributed-framework-dataflow-graph" class="headerlink" title="how to express AI program to distributed framework? dataflow graph"></a>how to express AI program to distributed framework? dataflow graph</h4>
                 
               </div>
             
@@ -414,8 +358,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>CSE_lecture20:network-dns-cdn</div>
-      <div>http://example.com/2025/12/17/CSE-lecture20-network-dns-cdn/</div>
+      <div>CSE_lecture27:Distributed Training</div>
+      <div>http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/</div>
     </div>
     <div class="license-meta">
       
@@ -427,7 +371,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年12月17日</div>
+          <div>2026年1月1日</div>
         </div>
       
       
@@ -459,18 +403,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/12/17/CSE-lecture21-Security/" title="CSE_lecture21:Security">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">CSE_lecture21:Security</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/12/16/CSE-lecture19-network-end2end/" title="CSE_lecture19:network-end2end">
-                        <span class="hidden-mobile">CSE_lecture19:network-end2end</span>
+                      <a href="/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/" title="CSE_lecture26:GPUs and MapReduce">
+                        <span class="hidden-mobile">CSE_lecture26:GPUs and MapReduce</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

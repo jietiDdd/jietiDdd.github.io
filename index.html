@@ -229,6 +229,90 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/01/01/CSE-lecture27-Distributed-Training/" target="_self">
+          CSE_lecture27:Distributed Training
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/CSE-lecture27-Distributed-Training/" target="_self">
+        <div>
+          Distributed Computing frameworks: MapReduce, computation graph &amp; Distributed trainingMapReduce也有其局限性：  单个MapReduce难以实现排序等应用，因此使用多个MapReduce并串联在一起 chaining multiple MapReduce tasks并不是好的解决方法，因为需要拆分，
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-01 23:05" pubdate>
+              2026-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
+  
+  
+
+  
+
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/se/">#se</a>
+            
+              <a href="/tags/cse/">#cse</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/" target="_self">
           CSE_lecture26:GPUs and MapReduce
         </a>
@@ -237,7 +321,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/" target="_self">
         <div>
-          The distributed (and parallel) programming on a single device &amp; MapReduce from single device to a distributed computing
+          The distributed (and parallel) programming on a single device &amp; MapReducefrom single device to a distributed computing单芯片的性能增长已经非常有限，因此引入分布式计算，使用很多张卡。但分布式计算在编程时需要考虑更多情况，因此使用分布式计算框架，让算法工程师不用自行考虑分布式
         </div>
       </a>
 
@@ -321,7 +405,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/" target="_self">
         <div>
-          More on GPUs, tiling and FlashAttention case study: GPU GPU的基础单元为SM，每个SM上有多个warp，在同一个warp上都会执行同一个指令，有32个SIMD线程 现代GPU，如H100，引入了tensor core，即脉冲阵列；同时core变得更具体，定制浮点数计算；还降低了用于图形学的SFU数量。但整体架构没有很大区别 SIMT使得多核
+          More on GPUs, tiling and FlashAttentioncase study: GPUGPU的基础单元为SM，每个SM上有多个warp，在同一个warp上都会执行同一个指令，有32个SIMD线程 现代GPU，如H100，引入了tensor core，即脉冲阵列；同时core变得更具体，定制浮点数计算；还降低了用于图形学的SFU数量。但整体架构没有很大区别 SIMT使得多核程序
         </div>
       </a>
 
@@ -405,7 +489,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/31/CSE-lecture24-distributed-computing/" target="_self">
         <div>
-          The distributed (and parallel) programming: it’s all about scalability 训练模型的计算分为两步：前向传播和反向传播 对于前向传播，每层计算 $Y = W \circ X$，假设： $W: m \times k \ X: k \times B$ 则近似的计算量为 $(2k - 1) \times m \times B \sim =
+          The distributed (and parallel) programming: it’s all about scalability训练模型的计算分为两步：前向传播和反向传播 对于前向传播，每层计算 $Y &#x3D; W \circ X$，假设： $W: m \times k \ X: k \times B$ 则近似的计算量为 $(2k - 1) \times m \times B \s
         </div>
       </a>
 
@@ -489,7 +573,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/29/CSE-lecture23-secure-data-flow/" target="_self">
         <div>
-          Secure Data Flow taint tracking 为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可
+          Secure Data Flowtaint tracking为了防止数据暴露，希望系统具备观测数据流动的能力(taint training)，即对数据进行标记 对于外部进入的数据，认为其不安全，设置taint status为true，从而标记出所有与外部数据相关的数据，如出现jump xxx，这个xxx的taint status为true，认为代码出现问题。taint的overhead极大，可能翻
         </div>
       </a>
 
@@ -573,7 +657,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/28/CSE-lecture22-ROP-and-CFI/" target="_self">
         <div>
-          ROP and CFI security principles  least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer ove
+          ROP and CFIsecurity principles least privilege: 只提供完成事件的最小权限 least trust: 给组件分配任务时只提供最小的信任，如zero trust，内部也视为外网，使用U盘鉴权 users make mistakes: 安全要考虑用户犯的诸多错误 cost of security: 安全的成本不能太高  stack buffer overf
         </div>
       </a>
 
@@ -657,7 +741,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/17/CSE-lecture21-Security/" target="_self">
         <div>
-          Introduction to System Security cross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义  security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径
+          Introduction to System Securitycross-site scripting: 在评论中注入代码，而网站错误解读将其运行，或注入到其他用户的html中 SQL injection: 在SQL语句中注入SQL语句本身的语法，从而修改语句的含义   security难于实现，因为这是一个negative goal，如禁止某人访问某文件，这需要遍历所有访问这个文件的路径，但路径
         </div>
       </a>
 
@@ -741,7 +825,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/17/CSE-lecture20-network-dns-cdn/" target="_self">
         <div>
-          DNS &amp; Naming Scheme the design of DNS 实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使
+          DNS &amp; Naming Schemethe design of DNS实现hostname和IP地址的转换，从而实现用户友好 一个域名可以对应多个IP地址，从而实现负载均衡，允许用户访问一个更近的IP地址；一个IP地址也可以对应多个域名；这种映射关系可以发生变化，但需要向DNS服务商发送请求 为了能够扩大规模，需要引入hierarchy的思想，即进行分层，分成不同的域，每个zone使用不
         </div>
       </a>
 
@@ -825,7 +909,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/16/CSE-lecture19-network-end2end/" target="_self">
         <div>
-          End-to-end Layer: Best-effort is not enough end-to-end layer  UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery 保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记
+          End-to-end Layer: Best-effort is not enoughend-to-end layer UDP: 最简化的协议 TCP: 能保证数据顺序和不丢包，能保证不重复 RTP: 建立在UDP，用于实时要求  assurance of at-least-once delivery保证发出的包至少成功一次，在best-effort网络中会为每个包加一个nonce，用于标记是哪个
         </div>
       </a>
 
@@ -909,7 +993,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2025/12/15/CSE-lecture18-network-ip-2/" target="_self">
         <div>
-          Network Layer - 2 case study: BGP 每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer/provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付费
+          Network Layer - 2case study: BGP每个region都希望实现自己的policy，比如某些region不想把数据发给其他某些region，或者不允许经过某些路径 典型BGP的角色有：  customer&#x2F;provider: customer为provider提供的流量付费，因为低级的AS需要向高级的AS购买流量 peers: 流量平等，不存在隶属关系，不互相付
         </div>
       </a>
 
@@ -919,90 +1003,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2025-12-15 18:07" pubdate>
               2025-12-15
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/" class="category-chain-item">计算机学习</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/" class="category-chain-item">se专业课</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/" class="category-chain-item">cse</a>
-  
-  
-    <span>></span>
-    
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%AD%A6%E4%B9%A0/se%E4%B8%93%E4%B8%9A%E8%AF%BE/cse/%E7%AC%94%E8%AE%B0/" class="category-chain-item">笔记</a>
-  
-  
-
-  
-
-  
-
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/se/">#se</a>
-            
-              <a href="/tags/cse/">#cse</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/09/CSE-lecture17-network-ip/" target="_self">
-          CSE_lecture17:network-ip
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/09/CSE-lecture17-network-ip/" target="_self">
-        <div>
-          Network Layer: All about routing IP协议的传输是尽力而为(best-effort)的，因此是可以丢包的 与之对应的是guaranteed-delivery network，需要一个缓存队列，但会导致延时，进而导致超时重发。需要由上层来实现 这一层有network_send和network_handle，后者可能处理，也可能转发 路由有很多网口，实现了跨子网之间的访
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-09 11:58" pubdate>
-              2025-12-09
             </time>
           </div>
         
