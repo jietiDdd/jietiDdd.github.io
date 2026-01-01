@@ -19,19 +19,25 @@
   <meta name="author" content="jietiDdd">
   <meta name="keywords" content="">
   
-    <meta name="description" content="More on GPUs, tiling and FlashAttention">
+    <meta name="description" content="More on GPUs, tiling and FlashAttention case study: GPU GPU的基础单元为SM，每个SM上有多个warp，在同一个warp上都会执行同一个指令，有32个SIMD线程 现代GPU，如H100，引入了tensor core，即脉冲阵列；同时core变得更具体，定制浮点数计算；还降低了用于图形学的SFU数量。但整体架构没有很大区别 SIMT使得多核">
 <meta property="og:type" content="article">
 <meta property="og:title" content="CSE_lecture25:GPUs and FlashAttention">
 <meta property="og:url" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/index.html">
 <meta property="og:site_name" content="jietiDdd的个人博客">
-<meta property="og:description" content="More on GPUs, tiling and FlashAttention">
+<meta property="og:description" content="More on GPUs, tiling and FlashAttention case study: GPU GPU的基础单元为SM，每个SM上有多个warp，在同一个warp上都会执行同一个指令，有32个SIMD线程 现代GPU，如H100，引入了tensor core，即脉冲阵列；同时core变得更具体，定制浮点数计算；还降低了用于图形学的SFU数量。但整体架构没有很大区别 SIMT使得多核">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/a38b3f47eec12e84cf72968ab1e9e4bb.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/5fe634429ba80aa504ac7a28da69748b.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/cb2b3e1fe3c4f240439e7c9a66a1eecd.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/c7e349232804a7231bd0ff7e92f08641.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/3377a5aef1b70acc1690cd38088508a9.png">
 <meta property="article:published_time" content="2026-01-01T08:05:46.000Z">
-<meta property="article:modified_time" content="2026-01-01T08:14:39.188Z">
+<meta property="article:modified_time" content="2026-01-01T13:37:07.711Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/a38b3f47eec12e84cf72968ab1e9e4bb.png">
   
   
   
@@ -224,7 +230,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2 字
+          1.2k 字
         
       </span>
     
@@ -235,7 +241,7 @@
         
         
         
-          1 分钟
+          11 分钟
         
       </span>
     
@@ -278,6 +284,47 @@
               <div class="markdown-body">
                 
                 <h2 id="More-on-GPUs-tiling-and-FlashAttention">More on GPUs, tiling and FlashAttention</h2>
+<h3 id="case-study-GPU">case study: GPU</h3>
+<p>GPU的基础单元为SM，每个SM上有多个warp，在同一个warp上都会执行同一个指令，有32个SIMD线程</p>
+<p>现代GPU，如H100，引入了tensor core，即脉冲阵列；同时core变得更具体，定制浮点数计算；还降低了用于图形学的SFU数量。但整体架构没有很大区别</p>
+<p>SIMT使得多核程序也能在GPU上运行，thread会group成thread block，使得它们能够运行在同一个SM上，便于同步；一个grid（一个应用）包含了多个thread block</p>
+<p>GPU的thread数量被定死，但用户可以使用任意数量的thread，只需要将其划分成多个thread block，GPU会根据SM数均分thread block；而每个thread block也会被拆分成多个wrap</p>
+<p>GPU的存储为memory hierarchy，每个wrap有自己的register file和自己的cache，访问register的cycle数少，而访问cache和DRAM会逐层增多</p>
+<p>在同一个warp的所有thread共享相同的program counter，因此这些线程同一时间只能做同一件事。当遇到control flow时，需要使用masking，但可能导致CUDA程序出现死锁问题</p>
+<p>现代GPU不会再出现死锁问题，因为每个ALU有自己的PC，但这些thread还是共享相同的decoder，在不同thread可以执行不同分支的情况下，尽可能让它们还是跑同一指令</p>
+<p>thread block的优点在于可以让里面的thread共享SM上的shared memory，同时可以方便进行thread之间的同步。而访问global memory将会很耗时，即cycle数很多的同时bandwidth也很小，同时load unit很少</p>
+<h3 id="example-revisited-vector-add">example revisited: vector add</h3>
+<p>向量相加很适合GPU进行并行计算。为了知道当前线程操作的数据位置i，需要确定自己是哪个thread block idx的第几个线程：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function">__global__ <span class="hljs-type">void</span> <span class="hljs-title">vecAddKernal</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">float</span>* A, <span class="hljs-type">const</span> <span class="hljs-type">float</span>* B, <span class="hljs-type">float</span>* C, <span class="hljs-type">int</span> n)</span></span>&#123;<br>    i = blockDim.x + blockIdx.x + threadIdx.x<br>    <span class="hljs-keyword">if</span> (i &lt; n)&#123;<br>        C[i] = A[i] + B[i];<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>但这种计算方式性能很差，即受限于访存</p>
+<p>两个向量的存储有两种类型，行存和列存：</p>
+<img src="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/a38b3f47eec12e84cf72968ab1e9e4bb.png" srcset="/img/loading.gif" lazyload class="" title="memory layout">
+<p>由于一次读取会将多个byte读取上来，因此列存的访存次数更少，缺点是需要进行一次列存的转换</p>
+<h3 id="optimizing-attention-computation-analysis-from-a-memory-access-perspective">optimizing attention computation: analysis from a memory access perspective</h3>
+<img src="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/5fe634429ba80aa504ac7a28da69748b.png" srcset="/img/loading.gif" lazyload class="" title="attention basics 1">
+<img src="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/cb2b3e1fe3c4f240439e7c9a66a1eecd.png" srcset="/img/loading.gif" lazyload class="" title="attention basics 2">
+<img src="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/c7e349232804a7231bd0ff7e92f08641.png" srcset="/img/loading.gif" lazyload class="" title="attention basics 3">
+<p>除了softmax的核心均为矩阵乘法，因此重点优化矩阵乘法，而矩阵乘法的FLOPS数量级为 $O(n^3)$</p>
+<p>受限于带宽，在访存时为了加速，尽量访问SRAM（如registered files），而减少HBM（如global memory）的访问</p>
+<p>对于矩阵A(N*K)和B(K*M)相乘得到C(N*M)，要尽可能控制内存访问。假设一次内存读取会读上来BB个bytes，且为行存</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.N:<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.M:<br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.K:<br>            HBM_read(A[i][k]) <br>            HBM_read(B[k][j])<br>            C[i][j] += A[i][k] * B[k][j]<br>        HBM_write(C[i][j])<br></code></pre></td></tr></table></figure>
+<p>这个简单的实现没有利用一次读取BB个bytes的特性，因此的数量级为 $O(NMK*BB)$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.N:<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.M:<br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.K:<br>            <span class="hljs-keyword">if</span> k % BB == <span class="hljs-number">0</span>:<br>                HBM_read(A[i][k]) <span class="hljs-comment"># will read A[i][k:k+BB] </span><br>            HBM_read(B[k][j]<br>            C[i][j] += A[i][k] * B[k][j]<br>    <span class="hljs-keyword">if</span> j % BB == <span class="hljs-number">0</span>:<br>        HBM_write(C[i][j]) <span class="hljs-comment"># will write C[i][j:j+BB]</span><br></code></pre></td></tr></table></figure>
+<p>这个代码利用了访存优化，但受限于B矩阵按列读取，故数量级依然为 $O(NMK*BB)$</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.N:<br>    <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.K:<br>        HBM_read(A[i][k])<br>        <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.M:<br>            <span class="hljs-keyword">if</span> j % BB == <span class="hljs-number">0</span>:<br>                HBM_read(B[k][j])<br>                HBM_read(C[i][j])<br>            C[i][j] += A[i][k] * B[k][j]<br>        <span class="hljs-keyword">if</span> j % BB == <span class="hljs-number">0</span>: <br>            HBM_write(C[i][j])<br></code></pre></td></tr></table></figure>
+<p>通过交换j和k的循环，使得B矩阵也是按行读取的，从而可以利用到访存优化，数量级降低到 $O(NMK)$</p>
+<p>使用tiling进一步降低访存次数，即将矩阵乘法进行分块</p>
+<img src="/2026/01/01/CSE-lecture25-GPUs-and-FlashAttention/3377a5aef1b70acc1690cd38088508a9.png" srcset="/img/loading.gif" lazyload class="" title="tiling">
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.N/BN.step(BN):<br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.M/BM.step(BM):<br>        <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.K/BK.step(BK):<br>            load(A[i:i+BN][k:k+BK])<br>            load(B[k+BK][j:j+BM])<br>            C[i:i+BN][j:j+BM] += A[i:i+BN][k:k+BK] * B[k+BK][j:j+BM]<br>        write(C[i:i+BN][j:j+BM])<br></code></pre></td></tr></table></figure>
+<p>此时访存次数为：$O(\frac{N}{BN} \times \frac{M}{BM} + 2 \times \frac{N}{BN} \times \frac{M}{BM} \times \frac{K}{BK})$，进一步下降。当然这些数据应当放在SRAM上，因为SRAM有20MB，足够放下</p>
+<p>tiling可以更改i, j, k的顺序，其改变的是分母的因子</p>
+<p>使用auto tuning来选择最为合适的BM, BN, BK</p>
+<p>在attention中，由于N远大于d，在tiling情况下，认为矩阵乘法和softmax的访存复杂度约为 $O(n^2)$，因此性能受限于上下文长度</p>
+<p>flash attention进一步优化复杂度，即对attention的多步操作进行合并</p>
+<p>忽略softmax，则只用考虑 $QK^TV$，这可以进一步优化复杂度：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.N/BQ.step(BQ):  <span class="hljs-comment">## Iterate over the Q</span><br>    load(Q[i:i + BQ , <span class="hljs-number">0</span>:d])<br>    write(O[i:i + BQ , <span class="hljs-number">0</span>:d])<br>    O[i:i + BQ , <span class="hljs-number">0</span>:d] = <span class="hljs-number">0</span><br>    <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> <span class="hljs-number">0.</span>.N/BK.step(BK):<br>         load(KT[<span class="hljs-number">0</span>:d,j:j+ BK ])<br>         load(V[j:j+ BK, <span class="hljs-number">0</span>:d])<br>         O[i:i+BQ ,<span class="hljs-number">0</span>:d] += Q[i:i+BQ,<span class="hljs-number">0</span>:d] * KT[<span class="hljs-number">0</span>:d,j:j+ BK ] * V[j:j+ BK, <span class="hljs-number">0</span>:d] <br>      write(O[i:i + BQ , <span class="hljs-number">0</span>:d])<br></code></pre></td></tr></table></figure>
+<p>假设GPU缓存量大小为：$M \sim = B_Q * d$，那么复杂度为：$O(\frac{N^2d^2}{M})$，而d往往远小于B_Q</p>
+<p>现在将softmax考虑进来，使用online softmax来优化归一化需要整行值的问题</p>
 
                 
               </div>
@@ -390,6 +437,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2026/01/01/CSE-lecture26-GPUs-and-MapReduce/" title="CSE_lecture26:GPUs and MapReduce">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CSE_lecture26:GPUs and MapReduce</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
