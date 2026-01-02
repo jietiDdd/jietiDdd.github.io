@@ -27,8 +27,14 @@
 <meta property="og:description" content="Distributed Computing frameworks: MapReduce, computation graph &amp; Distributed trainingMapReduce也有其局限性：  单个MapReduce难以实现排序等应用，因此使用多个MapReduce并串联在一起 chaining multiple MapReduce tasks并不是好的解决方法，因为需要拆分，">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/1af6d7b66a8677357c192dc4f7c0dcb4.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/5c9b58939de7361be0ed27aea0f067ca.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/0b7d2b82e636de898f3f8be515776141.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/5ebc82c6c66c615cf5ad83baa2d1c6c0.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/a63a8f16a471d8a91893f360591d66e8.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/b0a14d23954ccf7ca6a4d7d11659aad5.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/cd96d49fe8ee8d10e0b4483b42fbecf4.png">
 <meta property="article:published_time" content="2026-01-01T15:05:49.000Z">
-<meta property="article:modified_time" content="2026-01-01T15:57:06.795Z">
+<meta property="article:modified_time" content="2026-01-02T07:15:04.618Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -226,7 +232,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          224 字
+          918 字
         
       </span>
     
@@ -237,7 +243,7 @@
         
         
         
-          2 分钟
+          8 分钟
         
       </span>
     
@@ -290,7 +296,40 @@
 <p>不存在依赖关系的节点可以并行计算</p>
 <p>DAG的容错更加复杂，需要级联的恢复。对于小型计算任务，优先使用re-execution；对于大型计算任务，优先使用checkpoint</p>
 <p>DAG看似比MapReduce更通用，但不同应用的并行度不一样，怎么生成高并行度的DAG也不一样</p>
-<h4 id="how-to-express-AI-program-to-distributed-framework-dataflow-graph"><a href="#how-to-express-AI-program-to-distributed-framework-dataflow-graph" class="headerlink" title="how to express AI program to distributed framework? dataflow graph"></a>how to express AI program to distributed framework? dataflow graph</h4>
+<h4 id="how-to-express-AI-program-to-distributed-framework-dataflow-graph"><a href="#how-to-express-AI-program-to-distributed-framework-dataflow-graph" class="headerlink" title="how to express AI program to distributed framework? dataflow graph"></a>how to express AI program to distributed framework? dataflow graph</h4><p>复杂的计算可以表征成计算图，好处在于：</p>
+<ul>
+<li>方便计算导数，自动求导并链式反向传播</li>
+<li>兼容性好，根据计算图实现对应硬件的算子即可</li>
+<li>将优化与算法工作解耦</li>
+</ul>
+<h3 id="case-study-distributed-training"><a href="#case-study-distributed-training" class="headerlink" title="case study: distributed training"></a>case study: distributed training</h3><p>计算图是顺序执行的，难以在不同节点上并行执行。但对于模型训练的模式相对确定，利用这些模式来做并行处理</p>
+<h4 id="sync-data-parallel"><a href="#sync-data-parallel" class="headerlink" title="(sync) data parallel"></a>(sync) data parallel</h4><p>$w^1 &#x3D; w^0 - \frac{\alpha}{B}\sum_{i &#x3D; 1}^{B}\frac{\partial J(w^0)}{\partial w}$，因此计算梯度时可以并行计算各个数据，累加在一起即可</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/5c9b58939de7361be0ed27aea0f067ca.png" srcset="/img/loading.gif" lazyload class="" title="data parallel">
+
+<p>不需要每次load W，直接使用locality即可；也不需要job manager，因为每台机器做的事情一样(SPMD)，即程序一样，只是数据不同</p>
+<p>设计的目标为high GPU utilization，衡量的指标为MFU(model FLOPS utilization)，即GPU的利用率，影响因素有：</p>
+<ul>
+<li>能否在forward和backward时用满GPU，取决于算子</li>
+<li>最小化空转时间（数据加载时间），可以在数据加载的同时并行进行forward+backward的计算<img src="/2026/01/01/CSE-lecture27-Distributed-Training/0b7d2b82e636de898f3f8be515776141.png" srcset="/img/loading.gif" lazyload class="" title="hide GPU idle time"></li>
+<li>数据同步时间的优化，即sum的时间。根据amdahl’s law，串行部分的比例越高，即使并行机器增加也很难提升性能</li>
+</ul>
+<p>关键步骤为allreduce：在进行累加之后，还要广播结果，让每台机器更新参数</p>
+<p>尝试1: parameter server(PS)，中心化的服务器聚合数据，由它reduce后广播出去。该尝试的瓶颈为网络传输，假设N为参数量，P为processor个数，则需要的带宽为 $O(P*N)$，而这很难达到</p>
+<p>尝试1.5: co-located &amp; sharded PS，即利用processors之间的流量，此时每台机器只做一个partition的数据，传输量降低到 $O(N * (P - 1) &#x2F; P)$，完成之后再广播出去</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/5ebc82c6c66c615cf5ad83baa2d1c6c0.png" srcset="/img/loading.gif" lazyload class="" title="co-located &amp; sharded PS">
+
+<p>但问题在于fan-in，即多台机器同时向一台机器发送消息，导致网卡缓存溢出，出现频繁的切换，发起拥塞控制，使网络性能变差</p>
+<p>尝试2: de-centralized approach for allreduce，即一个接一个发送数据，fan-in性能很好，但通讯轮数达到 $O(P * P)$，因此将后续的通信提前，构成一个环</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/a63a8f16a471d8a91893f360591d66e8.png" srcset="/img/loading.gif" lazyload class="" title="de-centralized approach for allreduce">
+
+<p>此时数据传输还是 $O(P * N)$，因此使用partition，每个节点只做自己的partition，但还有一些问题：GPU需要始终维持与其他所有的节点通信，需要频繁在host查询连接信息；节点间需要同步。因此期望每台机器只和相邻节点通信</p>
+<p>尝试3: ring allreduce，将每个节点的partition组装，只进行相邻节点通信；最后再做一轮广播，让每个节点拥有所有partition</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/b0a14d23954ccf7ca6a4d7d11659aad5.png" srcset="/img/loading.gif" lazyload class="" title="ring allreduce">
+
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/cd96d49fe8ee8d10e0b4483b42fbecf4.png" srcset="/img/loading.gif" lazyload class="" title="ring allreduce 2">
+
+<p>不同partition的allreduce顺序不一致，因此reduce需要具有交换律</p>
+
                 
               </div>
             
