@@ -33,8 +33,13 @@
 <meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/a63a8f16a471d8a91893f360591d66e8.png">
 <meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/b0a14d23954ccf7ca6a4d7d11659aad5.png">
 <meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/cd96d49fe8ee8d10e0b4483b42fbecf4.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/900172806f7c2f06485dda6994d16868.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/91b65099bc533e2c9161e0199bd31268.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/3332688a47e2caa2041d986112bba205.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/281118fc5be11c95bc8eadd31456ed28.png">
+<meta property="og:image" content="http://example.com/2026/01/01/CSE-lecture27-Distributed-Training/77ba9149fba46902de40233013dc675e.png">
 <meta property="article:published_time" content="2026-01-01T15:05:49.000Z">
-<meta property="article:modified_time" content="2026-01-02T07:15:04.618Z">
+<meta property="article:modified_time" content="2026-01-02T14:00:08.558Z">
 <meta property="article:author" content="jietiDdd">
 <meta property="article:tag" content="se">
 <meta property="article:tag" content="cse">
@@ -232,7 +237,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          918 字
+          1.4k 字
         
       </span>
     
@@ -243,7 +248,7 @@
         
         
         
-          8 分钟
+          12 分钟
         
       </span>
     
@@ -323,12 +328,33 @@
 <img src="/2026/01/01/CSE-lecture27-Distributed-Training/a63a8f16a471d8a91893f360591d66e8.png" srcset="/img/loading.gif" lazyload class="" title="de-centralized approach for allreduce">
 
 <p>此时数据传输还是 $O(P * N)$，因此使用partition，每个节点只做自己的partition，但还有一些问题：GPU需要始终维持与其他所有的节点通信，需要频繁在host查询连接信息；节点间需要同步。因此期望每台机器只和相邻节点通信</p>
-<p>尝试3: ring allreduce，将每个节点的partition组装，只进行相邻节点通信；最后再做一轮广播，让每个节点拥有所有partition</p>
+<p>尝试3: ring allreduce，将每个节点的partition组装，只进行相邻节点通信；最后再做一轮广播，让每个节点拥有所有partition，此时传输量为 $2 * (P - 1) * N &#x2F; P$，fan-in为O(1)</p>
 <img src="/2026/01/01/CSE-lecture27-Distributed-Training/b0a14d23954ccf7ca6a4d7d11659aad5.png" srcset="/img/loading.gif" lazyload class="" title="ring allreduce">
 
 <img src="/2026/01/01/CSE-lecture27-Distributed-Training/cd96d49fe8ee8d10e0b4483b42fbecf4.png" srcset="/img/loading.gif" lazyload class="" title="ring allreduce 2">
 
 <p>不同partition的allreduce顺序不一致，因此reduce需要具有交换律</p>
+<p>ring allreduce的通信轮数高，故瓶颈在于latency而不是bandwidth</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/900172806f7c2f06485dda6994d16868.png" srcset="/img/loading.gif" lazyload class="" title="compare">
+
+<p>使用tree可以进一步降低通信轮数，而fan-in变为2，使用两棵tree来避免机器的空转</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/91b65099bc533e2c9161e0199bd31268.png" srcset="/img/loading.gif" lazyload class="" title="double binary tree allreduce">
+
+<h4 id="model-parallelism"><a href="#model-parallelism" class="headerlink" title="model parallelism"></a>model parallelism</h4><p>参数量的增长远快于GPU显存的扩大，因此需要将模型切分到不同的GPU上</p>
+<p>一种切分是根据layer切分。stage包含多个layer，分发给多个GPU运行。为了防止GPU空转，需要将stage拆分成多个小的batch(micro-batching)，从而构成parallelism，减小bubble</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/3332688a47e2caa2041d986112bba205.png" srcset="/img/loading.gif" lazyload class="" title="micro-batching">
+
+<p>问题在于怎么设置p和m的值，bubble的数量是p-1，因此浪费的时间为：$(p-1)*(t_f+t_b)$，占比为 $\frac{p-1}{m}$，故需要增加m或减小p</p>
+<p>增加m会导致计算效率变低，这是因为随着batch size增加，locality利用越来越好，使执行时间增长越来越慢，故batch size越小效益越低。但增大batch size也会影响训练的准确度，且让内存压力增加</p>
+<p>减小p也不现实，因为单个GPU放不下海量的参数</p>
+<p>tensor parallelism对单个layer作进一步切分，但需要网络通信将矩阵合并在一起，传输量为 $(P-1)\times \frac{di \times B}{P} \sim &#x3D; di \times B$</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/281118fc5be11c95bc8eadd31456ed28.png" srcset="/img/loading.gif" lazyload class="" title="TP">
+
+<p>model parallelism在micro batch之间存在通信开销</p>
+<p>tensor parallelism的开销为：$Forward \sim &#x3D; 2 \times di \times B \ Backward \sim &#x3D; 4 \times di \times B$，而layer之间的pipeline parallelism的开销为：$Forward \sim &#x3D; di \times B \ Backward \sim &#x3D; di \times B$，因此前者的网络速度需要远快于后者。因此现代GPU内部的带宽会是跨机器之间的数倍，在同一台机器之内使用TP，跨机器使用pipeline parallelism</p>
+<img src="/2026/01/01/CSE-lecture27-Distributed-Training/77ba9149fba46902de40233013dc675e.png" srcset="/img/loading.gif" lazyload class="" title="parallelize distributed training">
+
+<p>为了应对不同机器的速度不同的问题，进行异步训练，当一部分机器计算出来时就进行allreduce，剩下的等到下一次iteration进行，会牺牲正确性</p>
 
                 
               </div>
