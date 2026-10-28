@@ -18,10 +18,16 @@
   const originalKey = 'rank-studio-v1-published-' + originalName;
   const archivedKey = 'rank-studio-v1-published-' + archivedName;
 
+  // Move saved edits to the preserved page key without keeping a second full copy.
   try {
     const oldValue = localStorage.getItem(originalKey);
     if (oldValue !== null && localStorage.getItem(archivedKey) === null) {
-      localStorage.setItem(archivedKey, oldValue);
+      localStorage.removeItem(originalKey);
+      try {
+        localStorage.setItem(archivedKey, oldValue);
+      } catch (error) {
+        localStorage.setItem(originalKey, oldValue);
+      }
     }
   } catch {}
 
