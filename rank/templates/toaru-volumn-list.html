@@ -17,12 +17,17 @@
   const originalKey = 'rank-studio-v1-published-' + originalName;
   const archivedName = originalName + '-original';
 
-  // Keep edits saved under the old page URL when opening the preserved page in the frame.
+  // Move saved edits to the preserved page key without keeping a second full copy.
   try {
     const oldValue = localStorage.getItem(originalKey);
     const archivedKey = 'rank-studio-v1-published-' + archivedName;
     if (oldValue !== null && localStorage.getItem(archivedKey) === null) {
-      localStorage.setItem(archivedKey, oldValue);
+      localStorage.removeItem(originalKey);
+      try {
+        localStorage.setItem(archivedKey, oldValue);
+      } catch (error) {
+        localStorage.setItem(originalKey, oldValue);
+      }
     }
   } catch {}
 
