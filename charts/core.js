@@ -20,7 +20,7 @@ function mix(a,b,t){t=Math.max(0,Math.min(1,t));let rgb=x=>[1,3,5].map(i=>parseI
 function baseColor(s,d,j,i){let p=palettes[s.palette]||palettes.sage;if(s.colorBase==='category'||s.colorRule==='category'||['pie','donut'].includes(s.type))return p[i%p.length];return s.seriesColors?.[d.cols[j]]||p[j%p.length]}
 function shade(base,strength){return mix('#ffffff',base,Math.max(5,Math.min(100,strength))/100)}
 function bandIndex(s,d,v,j){let metric=bandMetric(s,d,v,j),index=(s.bands||[]).findIndex(b=>metric<b.max);return index<0?(s.bands||[]).length:index}
-function bandStrength(s,index){if(index<s.bands.length)return s.bands[index].strength??(20+80*index/Math.max(1,s.bands.length));return s.bandOverflowStrength??100}
+function bandStrength(s,index){if(index<s.bands.length)return s.bands[index].strength??Math.round(20+80*index/Math.max(1,s.bands.length));return s.bandOverflowStrength??100}
 function color(s,d,v,j,i){if(v===null)return '#d7ddcf';let base=baseColor(s,d,j,i),st=d.stats[j];if(['series','category'].includes(s.colorRule))return base;let replace=s.colorEffect==='replace',lo=s.lowStrength??30,hi=s.highStrength??100;if(s.colorRule==='bands'){let index=bandIndex(s,d,v,j);return replace?bandColor(s,d,v,j):shade(base,bandStrength(s,index))}let t=s.colorRule==='mean'?(v>=st.mean?1:0):s.colorRule==='threshold'?(v>=s.threshold?1:0):s.colorRule==='share'?(st.positive>0&&Math.max(0,v)/st.positive*100>=s.threshold?1:0):st.max===st.min?.5:(v-st.min)/(st.max-st.min);return replace?mix(s.low,s.high,t):shade(base,lo+(hi-lo)*t)}
 function csvCell(x){let t=String(x??''); // avoid formulas when exported data is opened in spreadsheet applications
 if(/^[=+@\t\r]/.test(t)||(/^\-/.test(t)&&num(t)===null))t="'"+t;return '"'+t.replace(/"/g,'""')+'"'}
