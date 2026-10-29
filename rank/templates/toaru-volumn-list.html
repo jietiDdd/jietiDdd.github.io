@@ -38,8 +38,18 @@
   window.installRankDropFeedback(frame);
   document.body.append(frame);
 
+  let storageFailureActive = false;
+  let storageFailureObserver = null;
+  const setStorageFailure = active => { storageFailureActive = active; };
+  window.addEventListener('beforeunload', event => {
+    if (!storageFailureActive) return;
+    event.preventDefault();
+    event.returnValue = '';
+  });
+
   frame.addEventListener('load', () => {
     let win, doc;
+    storageFailureObserver?.disconnect();
     try {
       win = frame.contentWindow;
       doc = frame.contentDocument;
@@ -48,13 +58,6 @@
     }
     if (!win || !doc) return;
 
-    let storageFailureActive = false;
-    const setStorageFailure = active => { storageFailureActive = active; };
-    window.addEventListener('beforeunload', event => {
-      if (!storageFailureActive) return;
-      event.preventDefault();
-      event.returnValue = '';
-    });
     const checkStorageFailure = () => {
       const status = doc.getElementById('saveState');
       const failed = !!status && (status.classList.contains('storage-error') || status.textContent.includes('储存空间不足'));
@@ -62,8 +65,8 @@
     };
     const status = doc.getElementById('saveState');
     if (status) {
-      const observer = new win.MutationObserver(checkStorageFailure);
-      observer.observe(status, { attributes: true, childList: true, characterData: true, subtree: true });
+      storageFailureObserver = new win.MutationObserver(checkStorageFailure);
+      storageFailureObserver.observe(status, { attributes: true, childList: true, characterData: true, subtree: true });
     }
     checkStorageFailure();
 
