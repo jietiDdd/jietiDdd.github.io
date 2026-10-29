@@ -11,6 +11,7 @@
   </style>
 </head>
 <body>
+<script src="../drag-feedback.js"></script>
 <script>
 (() => {
   const originalName = 'anshao-characters';
@@ -34,6 +35,7 @@
   const frame = document.createElement('iframe');
   frame.title = '暗少角色喜好榜';
   frame.src = './' + archivedName + '.html';
+  window.installRankDropFeedback(frame);
   document.body.append(frame);
 
   frame.addEventListener('load', () => {
